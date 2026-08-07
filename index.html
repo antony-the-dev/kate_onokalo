@@ -24,25 +24,38 @@
   @keyframes breathe { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   @keyframes nudge { 0%,100% { transform: translateX(0); opacity: .5; } 50% { transform: translateX(9px); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  @media (max-width: 900px) {
+    [data-ribbon] { flex-wrap: wrap !important; justify-content: center !important; text-align: center !important; gap: 4px 12px !important; padding: 8px 16px !important; line-height: 1.5; }
+    [data-hdr] { height: auto !important; flex-wrap: wrap !important; padding-top: 12px !important; padding-bottom: 10px !important; gap: 10px 16px !important; }
+    [data-nav] { order: 3 !important; width: 100% !important; justify-content: center !important; flex-wrap: wrap !important; gap: 9px 15px !important; font-size: 10.5px !important; letter-spacing: .12em !important; }
+    [data-secthead] { flex-wrap: wrap !important; }
+    [data-modal] { align-items: flex-start !important; padding: 74px 16px 36px !important; }
+    [data-modal-in] { margin: auto !important; }
+    [data-modal-img] { max-height: 44vh !important; }
+  }
+  @media (max-width: 560px) {
+    [data-hint] { display: none !important; }
+  }
 </style>
 </helmet>
 
 <div ref="{{ rootRef }}" style="background: #E9E4DC; overflow-x: hidden;">
 
   <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
-    <div style="background: #111C2E; color: #E9E4DC; padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
+    <div data-ribbon="1" style="background: #111C2E; color: #E9E4DC; padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; flex-wrap: wrap; text-align: center; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
       <span data-en="Open to collaborations — merch, prints, joint projects">Відкрита до колаборацій — мерч, принти, спільні проєкти</span>
       <a href="#collab" style="color: #C7A17A; border-bottom: 1px solid rgba(199,161,122,.4);" data-en="Details">Детальніше</a>
     </div>
   </sc-if>
 
   <header style="position: sticky; top: 0; z-index: 40; background: rgba(233,228,220,.86); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(27,26,22,.12);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px); height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+    <div data-hdr="1" style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px); height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
       <a href="#top" style="display: flex; flex-direction: column; line-height: 1.05; flex: none;">
         <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;">Онокало</span>
         <span style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: #857F74; padding-left: 2px;">Kateryna · Fine Art</span>
       </a>
-      <nav style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #4A463E;">
+      <nav data-nav="1" style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #4A463E;">
         <a href="#wall" data-en="Works">Роботи</a>
         <a href="#about" data-en="About">Про мене</a>
         <a href="#interior" data-en="At home">В інтер’єрі</a>
@@ -95,13 +108,13 @@
   </section>
 
   <section id="wall" style="padding-bottom: clamp(56px, 8vw, 110px);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid rgba(27,26,22,.14);">
+    <div data-secthead="1" style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid rgba(27,26,22,.14);">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="The wall">Стіна</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0; letter-spacing: -.01em;" data-en="Four halls, one wall">Чотири зали, одна стіна</h2>
       </div>
       <div style="display: flex; align-items: center; gap: 14px; padding-bottom: 4px;">
-        <span style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
+        <span data-hint="1" style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
         <div style="display: flex; gap: 8px;">
           <button onClick="{{ wallPrev }}" aria-label="Назад" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟵</button>
           <button onClick="{{ wallNext }}" aria-label="Далі" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1; animation: nudge 3s ease-in-out infinite;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟶</button>
@@ -248,7 +261,7 @@
   </section>
 
   <section id="interior" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(28px, 4vw, 52px);">
+    <div data-secthead="1" style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(28px, 4vw, 52px);">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="At home">В інтер’єрі</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="How it lives on a real wall">Як це живе на справжній стіні</h2>
@@ -354,10 +367,10 @@
   </section>
 
   <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(13,21,35,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
-      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; color: #E4DED4;">
+    <div data-modal="1" onClick="{{ closeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(13,21,35,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+      <div data-modal-in="1" onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; color: #E4DED4;">
         <div style="display: flex; justify-content: center;">
-          <img src="{{ aImg }}" alt="{{ aTitle }}" style="display: block; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
+          <img data-modal-img="1" src="{{ aImg }}" alt="{{ aTitle }}" style="display: block; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
         </div>
         <div style="max-width: 460px;">
           <div style="font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: #C7A17A; margin-bottom: 18px;">{{ aHall }}</div>
