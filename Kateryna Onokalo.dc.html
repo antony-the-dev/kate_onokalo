@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Commissioner:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: #E9E4DC; color: #1B1A16; font-family: "Commissioner", system-ui, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: #9A4A28; }
+  img { max-width: 100%; }
+  [data-wall]::-webkit-scrollbar { display: none; }
+  [data-wall] { scrollbar-width: none; -ms-overflow-style: none; }
+  @keyframes floatIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes breathe { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes nudge { 0%,100% { transform: translateX(0); opacity: .5; } 50% { transform: translateX(9px); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="background: #E9E4DC; overflow-x: hidden;">
+
+  <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
+    <div style="background: #111C2E; color: #E9E4DC; padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
+      <span data-en="Open to collaborations — merch, prints, joint projects">Відкрита до колаборацій — мерч, принти, спільні проєкти</span>
+      <a href="#collab" style="color: #C7A17A; border-bottom: 1px solid rgba(199,161,122,.4);" data-en="Details">Детальніше</a>
+    </div>
+  </sc-if>
+
+  <header style="position: sticky; top: 0; z-index: 40; background: rgba(233,228,220,.86); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(27,26,22,.12);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px); height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+      <a href="#top" style="display: flex; flex-direction: column; line-height: 1.05; flex: none;">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;">Онокало</span>
+        <span style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: #857F74; padding-left: 2px;">Kateryna · Fine Art</span>
+      </a>
+      <nav style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #4A463E;">
+        <a href="#wall" data-en="Works">Роботи</a>
+        <a href="#about" data-en="About">Про мене</a>
+        <a href="#interior" data-en="At home">В інтер’єрі</a>
+        <a href="#order" data-en="Commission">На замовлення</a>
+        <a href="#collab" data-en="Merch">Мерч</a>
+        <a href="#contact" data-en="Contact">Контакти</a>
+      </nav>
+      <div style="display: flex; align-items: center; gap: 18px; flex: none;">
+        <button onClick="{{ toggleLang }}" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #4A463E; cursor: pointer;" style-hover="border-color: #1B1A16; color: #1B1A16;">{{ langLabel }}</button>
+        <button onClick="{{ openCart }}" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #1B1A16; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <span data-en="Cart">Кошик</span>
+          <span style="min-width: 20px; height: 20px; border-radius: 999px; background: #111C2E; color: #E9E4DC; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section id="top" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
+    <div style="animation: floatIn .9s ease-out both;">
+      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #857F74; margin-bottom: 26px;" data-en="Abstraction · Oil · Acrylic">Абстракція · Олія · Акрил</div>
+      <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(46px, 7.4vw, 108px); line-height: .95; letter-spacing: -.02em; margin: 0 0 28px;">
+        <span data-en="Kateryna">Катерина</span><br><em style="font-style: italic;" data-en="Onokalo">Онокало</em>
+      </h1>
+      <p style="font-size: clamp(16px, 1.35vw, 19px); line-height: 1.65; max-width: 40ch; color: #3B3830; margin: 0 0 36px; text-wrap: pretty;" data-en="I have been painting for fifteen years. Around 1200 canvases have left the studio — and each one still leaves with a piece of that day inside it.">Я малюю п’ятнадцять років. Зі студії вийшло близько 1200 полотен — і кожне досі забирає з собою частинку того дня, коли писалося.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+        <a href="#wall" style="background: #111C2E; color: #E9E4DC; padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: #9A4A28; color: #F3EFE8;" data-en="Walk the gallery">Пройти галереєю</a>
+        <a href="#order" style="border: 1px solid rgba(27,26,22,.28); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="border-color: #1B1A16;" data-en="Commission a painting">Картина на замовлення</a>
+      </div>
+      <div style="display: flex; gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 6vw, 68px); padding-top: 26px; border-top: 1px solid rgba(27,26,22,.14);">
+        <div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1;">15</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="years painting">років у фарбі</div>
+        </div>
+        <div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1;">1200</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="canvases">полотен</div>
+        </div>
+        <div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1;">4</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="halls / series">зали серій</div>
+        </div>
+      </div>
+    </div>
+    <div style="position: relative; display: flex; justify-content: center; animation: floatIn 1.1s .1s ease-out both;">
+      <div style="animation: breathe 9s ease-in-out infinite;">
+        <img src="img/hero-1600.webp" alt="Течія, олія на полотні" style="display: block; width: min(560px, 82vw); box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
+      </div>
+      <div style="position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); width: min(620px, 90vw); height: 60px; background: radial-gradient(ellipse at center, rgba(20,19,15,.16), transparent 70%);"></div>
+    </div>
+  </section>
+
+  <section id="wall" style="padding-bottom: clamp(56px, 8vw, 110px);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid rgba(27,26,22,.14);">
+      <div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #857F74;" data-en="The wall">Стіна</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0; letter-spacing: -.01em;" data-en="Four halls, one wall">Чотири зали, одна стіна</h2>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding-bottom: 4px;">
+        <span style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
+        <div style="display: flex; gap: 8px;">
+          <button onClick="{{ wallPrev }}" aria-label="Назад" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟵</button>
+          <button onClick="{{ wallNext }}" aria-label="Далі" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1; animation: nudge 3s ease-in-out infinite;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟶</button>
+        </div>
+      </div>
+    </div>
+
+    <div data-wall="1" ref="{{ wallRef }}" style="display: flex; align-items: center; gap: clamp(46px, 6vw, 110px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; padding: clamp(40px, 6vw, 76px) max(24px, 34vw) clamp(30px, 4vw, 56px); background: linear-gradient(180deg, #E9E4DC 0%, #E3DDD3 60%, #DCD5C9 100%);">
+
+      <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
+        <div style="height: 1px; background: rgba(27,26,22,.3); width: 46px; margin-bottom: 20px;"></div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: #857F74;">I</div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;" data-en="Abstraction">Абстракція</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Here the paint is the subject. I let it flow and only decide when to stop.">Тут фарба сама і є сюжетом. Я даю їй текти й лише вирішую, коли зупинитись.</p>
+      </div>
+
+      <figure data-art="1" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-01-w1100.webp" alt="Течія" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Current">Течія</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Oil on canvas · 80×80">Олія на полотні · 80×80</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">34 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <figure data-art="2" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-04-w1100.webp" alt="Тиха вода" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Still Water">Тиха вода</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Oil on canvas · 100×60">Олія на полотні · 100×60</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">29 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
+        <div style="height: 1px; background: rgba(27,26,22,.3); width: 46px; margin-bottom: 20px;"></div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: #857F74;">II</div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;" data-en="Flowers &amp; Fields">Квіти й поля</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Thick impasto, laid with a palette knife. These canvases are worth touching with your eyes up close.">Густе імпасто, покладене мастихіном. Ці полотна варто розглядати зблизька.</p>
+      </div>
+
+      <figure data-art="3" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-02-w1100.webp" alt="Букет у сірому" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Bouquet in Grey">Букет у сірому</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Oil, impasto · 60×60">Олія, імпасто · 60×60</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">26 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <figure data-art="4" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-08-w1100.webp" alt="Зелений шепіт" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Green Whisper">Зелений шепіт</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Oil, impasto · 60×60">Олія, імпасто · 60×60</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">24 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <figure data-art="5" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-09-w1100.webp" alt="Надвечір’я" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Late Light">Надвечір’я</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Acrylic on canvas · 60×60">Акрил на полотні · 60×60</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">22 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
+        <div style="height: 1px; background: rgba(27,26,22,.3); width: 46px; margin-bottom: 20px;"></div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: #857F74;">III</div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;" data-en="Ukraine">Україна</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Works I painted for myself first. Part of the price of each one goes to the army.">Роботи, які я спершу писала для себе. Частина ціни кожної йде на військо.</p>
+      </div>
+
+      <figure data-art="6" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-05-w1100.webp" alt="Мати" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;" data-en="Mother">Мати</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Oil on canvas · 70×70">Олія на полотні · 70×70</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">40 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
+        <div style="height: 1px; background: rgba(27,26,22,.3); width: 46px; margin-bottom: 20px;"></div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: #857F74;">IV</div>
+        <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;" data-en="Pop &amp; Characters">Поп-образи</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Lighter work — for kids’ rooms, cafés, and gifts that make people laugh.">Легкіше — для дитячих, кафе й подарунків, з яких смішно.</p>
+      </div>
+
+      <figure data-art="7" onClick="{{ openWork }}" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
+        <img src="img/paint-07-w1100.webp" alt="Route 66" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
+        <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;">Route 66</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;" data-en="Acrylic on paper · 70×50">Акрил на папері · 70×50</div>
+          </div>
+          <div style="font-size: 14px; white-space: nowrap;">18 000 ₴</div>
+        </figcaption>
+      </figure>
+
+      <div style="flex: none; width: min(320px, 70vw); scroll-snap-align: center; align-self: center;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.25; margin-bottom: 18px;" data-en="This is a fraction of 1200 canvases.">Це частка з 1200 полотен.</div>
+        <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0 0 22px;" data-en="Looking for a particular colour, size or mood — write to me and I will send what is in the studio right now.">Шукаєте певний колір, розмір чи настрій — напишіть, і я надішлю те, що зараз є у студії.</p>
+        <a href="#contact" style="border-bottom: 1px solid rgba(27,26,22,.35); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;" data-en="Write to me">Написати мені</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" style="background: #111C2E; color: #E4DED4;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <img src="img/kate-01.webp" alt="Катерина у студії" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
+        <img src="img/kate-02.webp" alt="Катерина Онокало" style="display: block; width: 100%;">
+        <div style="border: 1px solid rgba(228,222,212,.2); padding: 18px; display: flex; flex-direction: column; justify-content: flex-end;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .3em; color: #C7A17A;">2011</div>
+          <div style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #9C958A; margin-top: 8px;" data-en="first canvas">перше полотно</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #C7A17A; margin-bottom: 24px;" data-en="About me">Про мене</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 56px); line-height: 1.08; margin: 0 0 28px;" data-en="I paint so that a room starts to breathe">Я малюю так, щоб кімната почала дихати</h2>
+        <p style="font-size: 16px; line-height: 1.75; color: #C4BDB2; max-width: 46ch; margin: 0 0 18px; text-wrap: pretty;" data-en="I am Kateryna Onokalo. I studied at the Nizhyn College of Culture and Arts named after Maria Zankovetska, and I have been painting for fifteen years — mostly abstraction, oil and acrylic, often with a palette knife.">Мене звати Катерина Онокало. Навчалась у Ніжинському коледжі культури і мистецтв імені Марії Заньковецької, малюю п’ятнадцять років — переважно абстракцію, олією та акрилом, часто мастихіном.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: #C4BDB2; max-width: 46ch; margin: 0 0 34px; text-wrap: pretty;" data-en="Around 1200 works have already gone to homes, cafés and offices. I do not paint interiors to match a sofa — but I do care that the painting feels at home where it ends up.">Близько 1200 робіт уже роз’їхалися по домах, кафе й офісах. Я не пишу картину «під диван» — але мені важливо, щоб їй було добре там, де вона житиме.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 26px; padding-top: 26px; border-top: 1px solid rgba(228,222,212,.2); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #9C958A;">
+          <span data-en="Oil · Acrylic · Palette knife">Олія · Акрил · Мастихін</span>
+          <span data-en="Ships across Ukraine and abroad">Доставка Україною і за кордон</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interior" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(28px, 4vw, 52px);">
+      <div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #857F74;" data-en="At home">В інтер’єрі</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="How it lives on a real wall">Як це живе на справжній стіні</h2>
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: #6A655B; max-width: 34ch; margin: 0;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
+      <figure style="margin: 0;">
+        <img src="img/paint-06-w1100.webp" alt="Картина у вітальні" style="display: block; width: 100%;">
+        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
+      </figure>
+      <figure style="margin: 0;">
+        <img src="img/paint-03-w1100.webp" alt="Диптих у їдальні" style="display: block; width: 100%;">
+        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="order" style="background: #E3DDD3; border-top: 1px solid rgba(27,26,22,.12); border-bottom: 1px solid rgba(27,26,22,.12);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 76px);">
+      <div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #857F74; margin-bottom: 22px;" data-en="Commission">На замовлення</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 26px;" data-en="A painting made for your room">Картина, яку я напишу під вашу кімнату</h2>
+        <p style="font-size: 16px; line-height: 1.75; color: #3B3830; max-width: 44ch; margin: 0 0 30px; text-wrap: pretty;" data-en="I take commissions. We start with a conversation about the mood, then I draw an individual sketch — and only after you approve it do I touch the canvas.">Я беру замовлення. Починаємо з розмови про настрій, далі я розробляю індивідуальний ескіз — і тільки після вашого «так» беруся за полотно.</p>
+        <button onClick="{{ orderTg }}" style="background: #111C2E; color: #E9E4DC; border: none; padding: 16px 32px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #9A4A28;" data-en="Discuss a sketch in Telegram">Обговорити ескіз у Telegram</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #9A4A28;">01</div>
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="A conversation">Розмова</div>
+            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="Your room, the light, the colours you live with, and what the painting should do for you.">Ваша кімната, світло, кольори, з якими живете, і що картина має для вас робити.</p>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #9A4A28;">02</div>
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="Individual sketch">Індивідуальний ескіз</div>
+            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="I develop a sketch for the piece and show it in scale on a photo of your wall. Changes are normal at this stage.">Розробляю ескіз майбутньої роботи й показую в масштабі на фото вашої стіни. Правки на цьому етапі — норма.</p>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16); border-bottom: 1px solid rgba(27,26,22,.16);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #9A4A28;">03</div>
+          <div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="The canvas">Полотно</div>
+            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="Two to four weeks depending on size. I send progress photos, and the painting ships varnished and packed.">Два–чотири тижні залежно від розміру. Надсилаю фото процесу, відправляю полотно залакованим і запакованим.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="collab" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+    <div style="max-width: 76ch;">
+      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #857F74; margin-bottom: 22px;" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
+      <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.8vw, 52px); line-height: 1.1; margin: 0 0 26px;" data-en="The paintings can live beyond the canvas">Картини можуть жити далі за полотно</h2>
+      <p style="font-size: 16px; line-height: 1.75; color: #3B3830; margin: 0 0 40px; text-wrap: pretty;" data-en="I am open to putting my work on merch — prints, textiles, packaging, clothing — and to joint projects: exhibiting in cafés, showrooms and hotels, or an individual pattern drawn for your brand. If you have an idea, bring it; the format we can invent together.">Я відкрита до того, щоб мої роботи були на мерчі — принти, текстиль, упаковка, одяг — і до спільних проєктів: виставити картини у кафе, шоурумі чи готелі, намалювати індивідуальний патерн для вашого бренду. Якщо у вас є ідея, приносьте — формат придумаємо разом.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: rgba(27,26,22,.14);">
+        <div style="background: #E9E4DC; padding: 26px 22px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Prints &amp; merch">Принти й мерч</div>
+          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Licensing a work for a print run.">Ліцензія на роботу для тиражу.</p>
+        </div>
+        <div style="background: #E9E4DC; padding: 26px 22px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Spaces">Простори</div>
+          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Paintings on the walls of your café, hotel or showroom.">Картини на стінах вашого кафе, готелю чи шоуруму.</p>
+        </div>
+        <div style="background: #E9E4DC; padding: 26px 22px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Brand pattern">Патерн для бренду</div>
+          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="An individual painted pattern, drawn by hand.">Індивідуальний мальований патерн, від руки.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="background: #111C2E; color: #E4DED4;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(32px, 5vw, 70px); align-items: end;">
+        <div>
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #C7A17A; margin-bottom: 22px;" data-en="Contact">Контакти</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4.2vw, 58px); line-height: 1.05; margin: 0 0 22px;" data-en="Write to me — I answer myself">Напишіть мені — відповідаю сама</h2>
+          <p style="font-size: 15.5px; line-height: 1.7; color: #C4BDB2; max-width: 40ch; margin: 0;" data-en="Telegram is fastest. Tell me the work you like or the size you need, and I will send everything available.">Найшвидше — у Telegram. Скажіть, яка робота сподобалась або який розмір потрібен, і я надішлю все, що є.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <a href="{{ tgLink }}" target="_blank" rel="noopener" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid rgba(228,222,212,.2); font-size: 15px;" style-hover="color: #C7A17A;">
+            <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #9C958A;">Telegram</span>
+            <span>{{ tgHandle }}</span>
+          </a>
+          <a href="https://instagram.com/" target="_blank" rel="noopener" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid rgba(228,222,212,.2); font-size: 15px;" style-hover="color: #C7A17A;">
+            <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #9C958A;">Instagram</span>
+            <span>@onokalo.art</span>
+          </a>
+          <a href="mailto:hello@onokalo.art" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid rgba(228,222,212,.2); border-bottom: 1px solid rgba(228,222,212,.2); font-size: 15px;" style-hover="color: #C7A17A;">
+            <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #9C958A;">Email</span>
+            <span>hello@onokalo.art</span>
+          </a>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: clamp(40px, 6vw, 80px); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #7C766C;">
+        <span>© 2026 Kateryna Onokalo</span>
+        <span data-en="Nizhyn · Ukraine">Ніжин · Україна</span>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(13,21,35,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
+      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; color: #E4DED4;">
+        <div style="display: flex; justify-content: center;">
+          <img src="{{ aImg }}" alt="{{ aTitle }}" style="display: block; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
+        </div>
+        <div style="max-width: 460px;">
+          <div style="font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: #C7A17A; margin-bottom: 18px;">{{ aHall }}</div>
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(32px, 4vw, 54px); line-height: 1.05; margin: 0 0 22px;">{{ aTitle }}</h3>
+          <p style="font-size: 15.5px; line-height: 1.7; color: #C4BDB2; margin: 0 0 28px; text-wrap: pretty;">{{ aDesc }}</p>
+          <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid rgba(228,222,212,.2); font-size: 13.5px;">
+              <span style="color: #9C958A; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lSize }}</span><span>{{ aSize }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid rgba(228,222,212,.2); font-size: 13.5px;">
+              <span style="color: #9C958A; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lTech }}</span><span>{{ aTech }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid rgba(228,222,212,.2); border-bottom: 1px solid rgba(228,222,212,.2); font-size: 13.5px;">
+              <span style="color: #9C958A; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lYear }}</span><span>{{ aYear }}</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 24px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3vw, 38px);">{{ aPrice }}</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #7C766C;">{{ lOne }}</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+            <button onClick="{{ addToCart }}" style="background: #E9E4DC; color: #111C2E; border: none; padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lAdd }}</button>
+            <button onClick="{{ askTg }}" style="background: none; color: #E4DED4; border: 1px solid rgba(228,222,212,.32); padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="border-color: #E4DED4;">{{ lAsk }}</button>
+          </div>
+          <div style="display: flex; gap: 22px; margin-top: 34px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #9C958A;">
+            <button onClick="{{ prevWork }}" style="background: none; border: none; color: inherit; font: inherit; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; padding: 8px 0;" style-hover="color: #E4DED4;">⟵ {{ lPrev }}</button>
+            <button onClick="{{ nextWork }}" style="background: none; border: none; color: inherit; font: inherit; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; padding: 8px 0;" style-hover="color: #E4DED4;">{{ lNext }} ⟶</button>
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ closeWork }}" aria-label="Закрити" style="position: fixed; top: 22px; right: 24px; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.1); border: 1px solid rgba(228,222,212,.25); color: #E4DED4; font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.2);">✕</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeCart }}" style="position: fixed; inset: 0; z-index: 95; background: rgba(13,21,35,.6); display: flex; justify-content: flex-end;">
+      <aside onClick="{{ stop }}" style="width: min(440px, 100%); background: #E9E4DC; height: 100%; display: flex; flex-direction: column; box-shadow: -30px 0 60px rgba(0,0,0,.35); animation: floatIn .3s ease-out both;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px clamp(20px, 3vw, 32px); border-bottom: 1px solid rgba(27,26,22,.14);">
+          <div style="font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">{{ lCart }}</div>
+          <button onClick="{{ closeCart }}" aria-label="Закрити" style="background: none; border: none; font-size: 17px; cursor: pointer; color: #1B1A16; width: 44px; height: 44px;">✕</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: clamp(16px, 2.4vw, 26px) clamp(20px, 3vw, 32px);">
+          <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+            <p style="font-size: 14.5px; line-height: 1.7; color: #6A655B;">{{ lEmpty }}</p>
+          </sc-if>
+          <sc-for list="{{ cart }}" as="it" hint-placeholder-count="2">
+            <div style="display: grid; grid-template-columns: 68px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(27,26,22,.12);">
+              <img src="{{ it.thumb }}" alt="{{ it.title }}" style="display: block; width: 68px; height: 68px; object-fit: cover;">
+              <div>
+                <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px;">{{ it.title }}</div>
+                <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #857F74; margin-top: 5px;">{{ it.size }}</div>
+                <div style="font-size: 13.5px; margin-top: 6px;">{{ it.priceText }}</div>
+              </div>
+              <button data-i="{{ it.idx }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid rgba(27,26,22,.2); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: #6A655B; font-size: 13px;" style-hover="border-color: #9A4A28; color: #9A4A28;">✕</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: clamp(18px, 2.6vw, 28px) clamp(20px, 3vw, 32px); border-top: 1px solid rgba(27,26,22,.14);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px;">
+            <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;">{{ lTotal }}</span>
+            <span style="font-family: 'Cormorant Garamond', serif; font-size: 30px;">{{ totalText }}</span>
+          </div>
+          <button onClick="{{ checkout }}" style="width: 100%; background: #111C2E; color: #E9E4DC; border: none; padding: 17px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 50px;" style-hover="background: #9A4A28;">{{ lCheckout }}</button>
+          <p style="font-size: 12px; line-height: 1.6; color: #857F74; margin: 14px 0 0;">{{ lCheckoutNote }}</p>
+        </div>
+      </aside>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 120; background: #111C2E; color: #E9E4DC; padding: 14px 26px; font-size: 12.5px; letter-spacing: .04em; box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); animation: floatIn .3s ease-out both; max-width: 90vw; text-align: center;">{{ toast }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;telegramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;@onokalo_art&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;galleryDepth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.5,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Стіна&quot;},&quot;showCollabRibbon&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Хедер&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  wallRef = React.createRef();
+  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '' };
+
+  works = [
+    { id: 1, img: 'img/paint-01-w1100.webp', thumb: 'img/paint-01-w600.webp', price: 34000, year: '2024',
+      ua: { t: 'Течія', hall: 'Зала I · Абстракція', size: '80 × 80 см', tech: 'Олія на полотні',
+        d: 'Полотно про рух: синє тече вниз, вохра йде дугою вгору. Писала його за один довгий день, майже не відходячи. Лакована, готова до підвішування.' },
+      en: { t: 'Current', hall: 'Hall I · Abstraction', size: '80 × 80 cm', tech: 'Oil on canvas',
+        d: 'A canvas about movement: the blue runs down, the ochre arcs up. Painted in one long day, almost without stepping away. Varnished, ready to hang.' } },
+    { id: 2, img: 'img/paint-04-w1100.webp', thumb: 'img/paint-04-w600.webp', price: 29000, year: '2023',
+      ua: { t: 'Тиха вода', hall: 'Зала I · Абстракція', size: '100 × 60 см', tech: 'Олія на полотні',
+        d: 'Вертикаль, зібрана з тонких напівпрозорих шарів: небо зверху, пісок знизу, мідні краплі як дощ. Добре працює у вузькій ніші чи біля вікна.' },
+      en: { t: 'Still Water', hall: 'Hall I · Abstraction', size: '100 × 60 cm', tech: 'Oil on canvas',
+        d: 'A vertical built from thin translucent layers: sky above, sand below, copper drops like rain. Works well in a narrow niche or beside a window.' } },
+    { id: 3, img: 'img/paint-02-w1100.webp', thumb: 'img/paint-02-w600.webp', price: 26000, year: '2024',
+      ua: { t: 'Букет у сірому', hall: 'Зала II · Квіти й поля', size: '60 × 60 см', tech: 'Олія, мастихін',
+        d: 'Густе імпасто: кожен пелюсток — окремий рух мастихіна. На сірому тлі квіти світяться самі, без додаткової лампи.' },
+      en: { t: 'Bouquet in Grey', hall: 'Hall II · Flowers & Fields', size: '60 × 60 cm', tech: 'Oil, palette knife',
+        d: 'Thick impasto: every petal is a separate stroke of the knife. Against the grey ground the flowers glow on their own, no extra lamp needed.' } },
+    { id: 4, img: 'img/paint-08-w1100.webp', thumb: 'img/paint-08-w600.webp', price: 24000, year: '2025',
+      ua: { t: 'Зелений шепіт', hall: 'Зала II · Квіти й поля', size: '60 × 60 см', tech: 'Олія, мастихін',
+        d: 'Луг зблизька, коли трава вища за тебе. Дрібні цятки фарби нанесені пальцем — саме вони дають відчуття вітру.' },
+      en: { t: 'Green Whisper', hall: 'Hall II · Flowers & Fields', size: '60 × 60 cm', tech: 'Oil, palette knife',
+        d: 'A meadow up close, when the grass stands taller than you. The tiny specks are laid with a finger — they are what makes the wind.' } },
+    { id: 5, img: 'img/paint-09-w1100.webp', thumb: 'img/paint-09-w600.webp', price: 22000, year: '2025',
+      ua: { t: 'Надвечір’я', hall: 'Зала II · Квіти й поля', size: '60 × 60 см', tech: 'Акрил на полотні',
+        d: 'Помаранчеві хмари над полем — той короткий момент, коли світло гріє, а повітря вже холодне. Найтепліша робота серії.' },
+      en: { t: 'Late Light', hall: 'Hall II · Flowers & Fields', size: '60 × 60 cm', tech: 'Acrylic on canvas',
+        d: 'Orange clouds over a field — the short moment when the light is still warm and the air is already cold. The warmest work in the series.' } },
+    { id: 6, img: 'img/paint-05-w1100.webp', thumb: 'img/paint-05-w600.webp', price: 40000, year: '2023',
+      ua: { t: 'Мати', hall: 'Зала III · Україна', size: '70 × 70 см', tech: 'Олія на полотні',
+        d: 'Київ уночі, прапор на вітрі, вогні на дніпровських схилах. Писала для себе і довго не могла віддати. Частина ціни йде на військо.' },
+      en: { t: 'Mother', hall: 'Hall III · Ukraine', size: '70 × 70 cm', tech: 'Oil on canvas',
+        d: 'Kyiv at night, the flag in the wind, lights on the Dnipro slopes. Painted for myself and hard to let go of. Part of the price goes to the army.' } },
+    { id: 7, img: 'img/paint-07-w1100.webp', thumb: 'img/paint-07-w600.webp', price: 18000, year: '2025',
+      ua: { t: 'Route 66', hall: 'Зала IV · Поп-образи', size: '70 × 50 см', tech: 'Акрил на папері',
+        d: 'Замовна робота в дитячу, яку я лишила собі в портфоліо. Такі образи малюю під будь-якого героя — це і є замовний ескіз у дії.' },
+      en: { t: 'Route 66', hall: 'Hall IV · Pop & Characters', size: '70 × 50 cm', tech: 'Acrylic on paper',
+        d: 'A commission for a kids’ room that I kept in the portfolio. I paint these for any character — this is what a commissioned sketch looks like in practice.' } }
+  ];
+
+  dict = {
+    ua: { size: 'Розмір', tech: 'Техніка', year: 'Рік', one: 'Єдиний екземпляр', add: 'Додати в кошик', ask: 'Запитати в Telegram',
+      prev: 'Попередня', next: 'Наступна', cart: 'Кошик', empty: 'У кошику поки порожньо. Відкрийте будь-яку роботу зі стіни й додайте її сюди.',
+      total: 'Разом', checkout: 'Оформити в Telegram', note: 'Текст замовлення скопіюється у буфер — просто вставте його в чат. Оплата і доставка узгоджуються там.',
+      copied: 'Замовлення скопійовано — вставте його в чат Telegram', added: 'Додано в кошик' },
+    en: { size: 'Size', tech: 'Technique', year: 'Year', one: 'One of a kind', add: 'Add to cart', ask: 'Ask in Telegram',
+      prev: 'Previous', next: 'Next', cart: 'Cart', empty: 'Your cart is empty. Open any work on the wall and add it here.',
+      total: 'Total', checkout: 'Order via Telegram', note: 'The order text is copied to your clipboard — just paste it into the chat. Payment and delivery are agreed there.',
+      copied: 'Order copied — paste it into the Telegram chat', added: 'Added to cart' }
+  };
+
+  get handle() { return this.props.telegramHandle || '@onokalo_art'; }
+  get tgUrl() { return 'https://t.me/' + this.handle.replace('@', ''); }
+  get L() { return this.dict[this.state.lang]; }
+
+  money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
+
+  componentDidMount() {
+    this.applyLang();
+    const w = this.wallRef.current;
+    if (w) {
+      w.style.cursor = 'grab';
+      let down = false, sx = 0, sl = 0, moved = false;
+      this.onDown = (e) => {
+        if (e.pointerType === 'touch') return;
+        down = true; moved = false; sx = e.clientX; sl = w.scrollLeft;
+        w.style.cursor = 'grabbing';
+      };
+      this.onMove = (e) => {
+        if (!down) return;
+        const dx = e.clientX - sx;
+        if (Math.abs(dx) > 4) moved = true;
+        w.scrollLeft = sl - dx;
+      };
+      this.onUp = () => {
+        down = false; w.style.cursor = 'grab';
+        if (moved) { this.dragged = true; setTimeout(() => { this.dragged = false; }, 60); }
+      };
+      w.addEventListener('pointerdown', this.onDown);
+      window.addEventListener('pointermove', this.onMove);
+      window.addEventListener('pointerup', this.onUp);
+      this.onScroll = () => {
+        if (this.raf) return;
+        this.raf = requestAnimationFrame(() => { this.raf = null; this.depth(); });
+      };
+      w.addEventListener('scroll', this.onScroll, { passive: true });
+      window.addEventListener('resize', this.onScroll);
+      this.depth();
+    }
+    this.onKey = (e) => {
+      if (e.key === 'Escape') this.setState({ activeId: null, drawer: false });
+      if (this.state.activeId && e.key === 'ArrowRight') this.step(1);
+      if (this.state.activeId && e.key === 'ArrowLeft') this.step(-1);
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+
+  componentWillUnmount() {
+    const w = this.wallRef.current;
+    if (w) { w.removeEventListener('pointerdown', this.onDown); w.removeEventListener('scroll', this.onScroll); }
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('pointerup', this.onUp);
+    window.removeEventListener('resize', this.onScroll);
+    window.removeEventListener('keydown', this.onKey);
+  }
+
+  componentDidUpdate() { this.applyLang(); }
+
+  applyLang() {
+    const r = this.rootRef.current;
+    if (!r) return;
+    const en = this.state.lang === 'en';
+    r.querySelectorAll('[data-en]').forEach(el => {
+      if (!el.hasAttribute('data-ua')) el.setAttribute('data-ua', el.textContent);
+      const t = en ? el.getAttribute('data-en') : el.getAttribute('data-ua');
+      if (el.textContent !== t) el.textContent = t;
+    });
+  }
+
+  depth() {
+    const w = this.wallRef.current;
+    if (!w) return;
+    const amount = this.props.galleryDepth ?? 0.5;
+    const cx = window.innerWidth / 2;
+    w.querySelectorAll('[data-art]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      const d = Math.min(Math.abs(r.left + r.width / 2 - cx) / cx, 1);
+      const k = 1 - d;
+      el.style.transform = 'scale(' + (1 - 0.12 * amount * (1 - k)).toFixed(4) + ')';
+      el.style.opacity = (0.62 + 0.38 * k).toFixed(3);
+    });
+  }
+
+  nudgeWall(dir) {
+    const w = this.wallRef.current;
+    if (!w) return;
+    w.scrollBy({ left: dir * Math.min(w.clientWidth * 0.62, 760), behavior: 'smooth' });
+  }
+
+  find(id) { return this.works.find(w => w.id === Number(id)); }
+
+  step(dir) {
+    const i = this.works.findIndex(w => w.id === this.state.activeId);
+    const n = (i + dir + this.works.length) % this.works.length;
+    this.setState({ activeId: this.works[n].id });
+  }
+
+  orderText() {
+    const l = this.state.lang;
+    const lines = this.state.cart.map(c => {
+      const w = this.find(c);
+      return '— ' + w[l].t + ', ' + w[l].size + ', ' + this.money(w.price);
+    });
+    const head = l === 'en' ? 'Hello! I would like to order:' : 'Вітаю! Хочу замовити:';
+    const tot = (l === 'en' ? 'Total: ' : 'Разом: ') + this.money(this.total());
+    return head + '\n' + lines.join('\n') + '\n' + tot;
+  }
+
+  total() { return this.state.cart.reduce((s, id) => s + this.find(id).price, 0); }
+
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this.tt);
+    this.tt = setTimeout(() => this.setState({ toast: '' }), 3200);
+  }
+
+  renderVals() {
+    const l = this.state.lang;
+    const L = this.L;
+    const a = this.state.activeId ? this.find(this.state.activeId) : null;
+    const av = a ? a[l] : null;
+    return {
+      rootRef: this.rootRef,
+      wallRef: this.wallRef,
+      ribbon: this.props.showCollabRibbon ?? true,
+      langLabel: l === 'ua' ? 'EN' : 'UA',
+      toggleLang: () => this.setState({ lang: l === 'ua' ? 'en' : 'ua' }),
+      tgHandle: this.handle,
+      tgLink: this.tgUrl,
+      cartCount: this.state.cart.length,
+      openCart: () => this.setState({ drawer: true }),
+      closeCart: () => this.setState({ drawer: false }),
+      drawer: this.state.drawer,
+      stop: (e) => e.stopPropagation(),
+      openWork: (e) => { if (this.dragged) return; this.setState({ activeId: Number(e.currentTarget.dataset.art) }); },
+      wallPrev: () => this.nudgeWall(-1),
+      wallNext: () => this.nudgeWall(1),
+      closeWork: () => this.setState({ activeId: null }),
+      prevWork: () => this.step(-1),
+      nextWork: () => this.step(1),
+      active: !!a,
+      aImg: a ? a.img : '',
+      aTitle: av ? av.t : '',
+      aHall: av ? av.hall : '',
+      aDesc: av ? av.d : '',
+      aSize: av ? av.size : '',
+      aTech: av ? av.tech : '',
+      aYear: a ? a.year : '',
+      aPrice: a ? this.money(a.price) : '',
+      addToCart: () => {
+        const id = this.state.activeId;
+        this.setState(s => ({ cart: s.cart.indexOf(id) === -1 ? s.cart.concat(id) : s.cart, activeId: null, drawer: true }));
+        this.flash(L.added);
+      },
+      askTg: () => {
+        const msg = (l === 'en' ? 'Hello! Tell me more about ' : 'Вітаю! Розкажіть детальніше про ') + '«' + av.t + '»';
+        try { navigator.clipboard.writeText(msg); } catch (err) {}
+        window.open(this.tgUrl, '_blank', 'noopener');
+      },
+      orderTg: () => {
+        const msg = l === 'en' ? 'Hello! I would like to commission a painting.' : 'Вітаю! Хочу замовити картину.';
+        try { navigator.clipboard.writeText(msg); } catch (err) {}
+        window.open(this.tgUrl, '_blank', 'noopener');
+      },
+      cart: this.state.cart.map((id, i) => {
+        const w = this.find(id);
+        return { idx: i, thumb: w.thumb, title: w[l].t, size: w[l].size, priceText: this.money(w.price) };
+      }),
+      empty: this.state.cart.length === 0,
+      removeItem: (e) => {
+        const i = Number(e.currentTarget.dataset.i);
+        this.setState(s => ({ cart: s.cart.filter((_, j) => j !== i) }));
+      },
+      totalText: this.money(this.total()),
+      checkout: () => {
+        if (!this.state.cart.length) return;
+        try { navigator.clipboard.writeText(this.orderText()); } catch (err) {}
+        window.open(this.tgUrl, '_blank', 'noopener');
+        this.flash(L.copied);
+      },
+      toast: this.state.toast,
+      lSize: L.size, lTech: L.tech, lYear: L.year, lOne: L.one, lAdd: L.add, lAsk: L.ask,
+      lPrev: L.prev, lNext: L.next, lCart: L.cart, lEmpty: L.empty, lTotal: L.total,
+      lCheckout: L.checkout, lCheckoutNote: L.note
+    };
+  }
+}
+
+</script>
+</body>
+</html>
