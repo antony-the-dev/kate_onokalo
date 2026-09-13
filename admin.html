@@ -206,6 +206,7 @@ function resizeTo(file, max) {
 }
 
 async function saveItem() {
+  if (!(await requireAuth())) return;
   const id = editingId || newId();
   const file = $("#edImg").files[0];
   const price = Number($("#edPrice").value);
@@ -283,6 +284,7 @@ function bindOps(el) {
     const d = rows.find(x => x.id === id);
     if (!d) return;
     if (act === "edit") { openEditor(id); return; }
+    if (!(await requireAuth())) return;
     if (act === "del") {
       if (!confirm("Видалити «" + (d.title || "") + "» безповоротно?")) return;
       await sb.storage.from(BUCKET).remove([id + "/full.webp"]);
@@ -401,6 +403,7 @@ function renderHalls() {
 
 function bindHallOps(el) {
   el.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", async () => {
+    if (!(await requireAuth())) return;
     const act = b.dataset.act, id = b.dataset.id;
     const h = halls.find(x => x.id === id);
     if (!h) return;
@@ -446,6 +449,7 @@ function openHallEditor(id) {
 function closeHallEditor() { $("#hallEditor").style.display = "none"; editingHallId = null; }
 
 async function saveHall() {
+  if (!(await requireAuth())) return;
   const name = $("#heName").value.trim();
   if (!name) { toast("Вкажіть назву зали"); return; }
   const id = editingHallId || newId();
@@ -465,6 +469,7 @@ $("#heClose").addEventListener("click", closeHallEditor);
 $("#heCancel").addEventListener("click", closeHallEditor);
 $("#heSave").addEventListener("click", saveHall);
 $("#heDelete").addEventListener("click", async () => {
+  if (!(await requireAuth())) return;
   if (!editingHallId || !confirm("Видалити залу? Роботи стануть «Без зали».")) return;
   const h = halls.find(x => x.id === editingHallId);
   if (h) await sb.from("items").update({ hall: "" }).eq("hall", h.name);
@@ -538,13 +543,19 @@ async function sessionAlive() {
   return !!(data && data.user);
 }
 
+async function requireAuth() {
+  const alive = await sessionAlive();
+  if (!alive) { setUser(null); toast("Сесію завершено — увійдіть заново."); return false; }
+  return true;
+}
+
 function init() {
   if (!CONFIG_OK) {
     document.body.innerHTML = '<div class="wrap"><div class="card"><h1>Supabase не налаштовано</h1><p class="muted" style="margin-top:10px;">Заповніть <b>supabase-config.js</b> (url та anonKey з налаштувань проєкту).</p></div></div>';
     return;
   }
   sb = window.supabase.createClient(CFG.url, CFG.anonKey);
-  sb.auth.getSession().then(({ data }) => setUser(data.session ? data.session.user : null));
+  sb.auth.getUser().then(({ data }) => setUser(data.user || null)).catch(() => setUser(null));
   sb.auth.onAuthStateChange((_e, session) => setUser(session ? session.user : null));
 }
 init();
