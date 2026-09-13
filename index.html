@@ -825,12 +825,12 @@ class Component extends DCLogic {
         en: { t: stripEn(h.name_en) || h.name_en || h.name, n: h.note_en || '' }
       };
     });
-    const paints = this.paints().filter(p => !p.hidden).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const paints = this.paints().filter(p => !p.hidden && p.ua && p.ua.hall).sort((a, b) => (a.order || 0) - (b.order || 0));
     if (!paints.length) return [];
     const out = [];
     const seen = new Set();
     paints.forEach((w) => {
-      const hall = (w.ua && w.ua.hall) || 'Зала I · Абстракція';
+      const hall = w.ua.hall;
       if (!seen.has(hall)) {
         seen.add(hall);
         const meta = hallMap[hall] || HALLS[hall] || { num: '', ua: { t: hall, n: '' }, en: { t: hall, n: '' } };
@@ -948,7 +948,7 @@ class Component extends DCLogic {
         return { id: String(w.id), sku: 'w' + w.id, thumb: w.thumb || w.img, title: wl.t || '', size: wl.size || '', priceText: this.money(w.price) };
       }),
       wall: this.buildWall(),
-      wallEmpty: this.paints().filter(p => !p.hidden).length === 0,
+      wallEmpty: !this.paints().some(p => !p.hidden && p.ua && p.ua.hall),
       paper: this.posts().filter(p => !p.hidden).sort((a, b) => (a.order || 0) - (b.order || 0)).map(g => {
         const gl = this.loc(g, l);
         return { sku: 'p' + g.id, img: g.img || '', hasImg: !!g.img, noImg: !g.img, title: gl.t || '', size: gl.size || '', priceText: this.money(g.price) };
