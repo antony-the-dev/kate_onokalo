@@ -220,7 +220,7 @@ async function saveItem() {
       const blob = await resizeTo(file, 1600);
       const path = id + "/full.webp";
       const up = await sb.storage.from(BUCKET).upload(path, blob, { upsert: true, contentType: "image/webp", cacheControl: "31536000" });
-      if (up.error) throw up.error;
+      if (up.error) throw new Error("Завантаження фото: " + up.error.message);
       img = sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
     }
     const hallUa = $("#edHall").value.trim();
@@ -239,7 +239,7 @@ async function saveItem() {
     const { error } = await sb.from("items").upsert(row, { onConflict: "id" });
     if (error) {
       const alive = await sessionAlive();
-      throw new Error(error.message + (alive ? "" : " — схоже, ви не увійшли"));
+      throw new Error("Збереження в базу: " + error.message + (alive ? "" : " — ви не увійшли"));
     }
     toast("Збережено");
     closeEditor();
