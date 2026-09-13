@@ -220,7 +220,10 @@ async function saveItem() {
       const blob = await resizeTo(file, 1600);
       const path = id + "/full.webp";
       const up = await sb.storage.from(BUCKET).upload(path, blob, { upsert: true, contentType: "image/webp", cacheControl: "31536000" });
-      if (up.error) throw new Error("Завантаження фото: " + up.error.message);
+      if (up.error) {
+        const u = await sb.auth.getUser().catch(() => ({ data: { user: null } }));
+        throw new Error("Завантаження фото: " + (up.error.message || up.error) + (u.data && u.data.user ? " [сесія: " + u.data.user.email + "]" : " [немає сесії]"));
+      }
       img = sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
     }
     const hallUa = $("#edHall").value.trim();
