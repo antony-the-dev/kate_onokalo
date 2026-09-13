@@ -296,10 +296,11 @@ function bindOps(el) {
     if (!(await requireAuth())) return;
     if (act === "del") {
       if (!confirm("Видалити «" + (d.title || "") + "» безповоротно?")) return;
-      await sb.storage.from(BUCKET).remove([id + "/full.webp"]);
+      const rm = await sb.storage.from(BUCKET).remove([id + "/full.webp"]);
+      if (rm.error) console.warn("storage remove:", rm.error.message || rm.error);
       const { error } = await sb.from("items").delete().eq("id", id);
       if (error) { toast(error.message); return; }
-      toast("Видалено");
+      toast("Видалено" + (rm.error ? " (фото не стерлося: " + (rm.error.message || "помилка") + ")" : ""));
       await load();
       return;
     }
@@ -524,10 +525,11 @@ $("#edSave").addEventListener("click", saveItem);
 $("#edDelete").addEventListener("click", async () => {
   if (!editingId || !confirm("Видалити безповоротно?")) return;
   try {
-    await sb.storage.from(BUCKET).remove([editingId + "/full.webp"]);
+    const rm = await sb.storage.from(BUCKET).remove([editingId + "/full.webp"]);
+    if (rm.error) console.warn("storage remove:", rm.error.message || rm.error);
     const { error } = await sb.from("items").delete().eq("id", editingId);
     if (error) throw error;
-    toast("Видалено");
+    toast("Видалено" + (rm.error ? " (фото не стерлося: " + (rm.error.message || "помилка") + ")" : ""));
     closeEditor();
     await load();
   } catch (e) { toast("Помилка: " + e.message); }
