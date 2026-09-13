@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Адмін · Катерина Онокало</title>
+<script src="./supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Commissioner", system-ui, sans-serif; font-weight: 300; background: #E9E4DC; color: #1B1A16; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+  .card { background: #F4F0E8; border: 1px solid rgba(27,26,22,.12); border-radius: 14px; padding: 22px; }
+  h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 26px; letter-spacing: .02em; }
+  .muted { color: #857F74; font-size: 13.5px; }
+  input, select, textarea { width: 100%; background: #E9E4DC; border: 1px solid rgba(27,26,22,.25); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 15px; color: #1B1A16; margin-top: 6px; }
+  label { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #5A554C; margin-bottom: 14px; }
+  button { font: inherit; font-weight: 500; cursor: pointer; }
+  .btn { border: none; border-radius: 10px; padding: 13px 22px; font-size: 13px; letter-spacing: .08em; }
+  .btn-dark { background: #0A1C3B; color: #E9E4DC; }
+  .btn-line { background: none; border: 1px solid rgba(27,26,22,.3); color: #1B1A16; }
+  .btn-danger { background: #B4501C; color: #FFF; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .tabs { display: flex; gap: 8px; margin: 22px 0 16px; flex-wrap: wrap; }
+  .tab { border: 1px solid rgba(27,26,22,.3); background: none; border-radius: 999px; padding: 10px 18px; font-size: 13px; letter-spacing: .05em; }
+  .tab.active { background: #0A1C3B; color: #E9E4DC; border-color: #0A1C3B; }
+  .item { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; background: #F4F0E8; border: 1px solid rgba(27,26,22,.12); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .item img, .thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; background: #DCD5C9; }
+  .item .thumb { display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 20px; color: #B4501C; }
+  .item .t { font-size: 15.5px; }
+  .item .s { font-size: 12.5px; color: #857F74; margin-top: 3px; }
+  .item .price { font-size: 14.5px; font-weight: 500; }
+  .item .ops { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ops button { border: 1px solid rgba(27,26,22,.25); background: none; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
+  .ops button:hover { border-color: #0A1C3B; }
+  .hidden-tag { color: #B4501C; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-left: 8px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0A1C3B; color: #E9E4DC; padding: 12px 22px; border-radius: 999px; font-size: 13.5px; display: none; z-index: 50; }
+  #editor, #hallEditor { position: fixed; inset: 0; background: rgba(10,28,59,.6); display: none; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; z-index: 40; }
+  #editor .card, #hallEditor .card { max-width: 620px; width: 100%; max-height: 92vh; overflow-y: auto; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } .item { grid-template-columns: 52px 1fr; } .item img, .item .thumb { width: 52px; height: 52px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="login" class="card" style="max-width:420px; margin:8vh auto 0;">
+    <h1>Вхід в адмінку</h1>
+    <p class="muted" style="margin:8px 0 20px;">Увійдіть зі своєю поштою, щоб керувати роботами.</p>
+    <label>Email<input id="email" type="email" autocomplete="username"></label>
+    <label>Пароль<input id="pass" type="password" autocomplete="current-password"></label>
+    <div class="row" style="margin-top:6px;">
+      <button class="btn btn-dark" id="loginBtn">Увійти</button>
+      <span class="muted" id="loginErr"></span>
+    </div>
+  </div>
+
+  <div id="app" style="display:none;">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <h1>Адмін · Катерина Онокало</h1>
+      <div class="row">
+        <span class="muted" id="whoami"></span>
+        <button class="btn btn-line" id="logoutBtn">Вийти</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-cat="paintings">Картини</button>
+      <button class="tab" data-cat="postcards">Листівки і закладинки</button>
+      <button class="tab" data-cat="boxes">Подарункові бокси</button>
+      <button class="tab" data-cat="halls">Зали</button>
+    </div>
+
+    <div class="row" style="justify-content:space-between; margin-bottom:16px;">
+      <span class="muted" id="count"></span>
+      <button class="btn btn-dark" id="addBtn">Додати</button>
+    </div>
+
+    <div id="list"></div>
+  </div>
+</div>
+
+<div id="editor">
+  <div class="card">
+    <div class="row" style="justify-content:space-between; margin-bottom:14px;">
+      <h1 id="edTitle">Нова робота</h1>
+      <button class="btn btn-line" id="edClose">Закрити</button>
+    </div>
+    <label>Фото<input type="file" id="edImg" accept="image/*" capture="environment"></label>
+    <div style="display:flex; gap:14px; align-items:center; margin-bottom:14px;">
+      <img id="edPrev" class="thumb" style="width:88px; height:88px; display:none;" alt="">
+      <span class="muted" id="edImgNote">Оберіть фото з телефону чи комп'ютера — стиснеться автоматично.</span>
+    </div>
+    <div class="grid2">
+      <label>Назва *<input id="edTua" type="text"></label>
+      <label>Назва англ. (необов.)<input id="edTen" type="text"></label>
+      <label>Ціна, грн *<input id="edPrice" type="number" min="0"></label>
+      <label>Розмір<input id="edSize" type="text" placeholder="80 × 80 см"></label>
+    </div>
+    <label id="hallLbl">Зала<select id="edHall">
+      <option value="">Без зали</option>
+      <option value="Зала I · Абстракція">Зала I · Абстракція</option>
+      <option value="Зала II · Квіти й поля">Зала II · Квіти й поля</option>
+      <option value="Зала III · Україна">Зала III · Україна</option>
+      <option value="Зала IV · Поп-образи">Зала IV · Поп-образи</option>
+    </select></label>
+    <div class="grid2">
+      <label>Техніка<input id="edTech" type="text" placeholder="Олія на полотні"></label>
+      <label>Рік<input id="edYear" type="text" placeholder="2026"></label>
+    </div>
+    <label>Опис (необов.)<textarea id="edDesc" rows="3" placeholder="Кілька слів про роботу — показується у вікні картини"></textarea></label>
+    <div class="row" style="margin-bottom:14px;">
+      <label style="margin:0; display:flex; align-items:center; gap:8px; font-size:14px; text-transform:none; letter-spacing:0;">
+        <input type="checkbox" id="edHidden" style="width:auto; margin:0;">Сховати з сайту
+      </label>
+    </div>
+    <div class="row" style="justify-content:space-between;">
+      <button class="btn btn-danger" id="edDelete" style="display:none;">Видалити</button>
+      <div class="row">
+        <button class="btn btn-line" id="edCancel">Скасувати</button>
+        <button class="btn btn-dark" id="edSave">Зберегти</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="hallEditor">
+  <div class="card">
+    <div class="row" style="justify-content:space-between; margin-bottom:14px;">
+      <h1 id="heTitle">Нова зала</h1>
+      <button class="btn btn-line" id="heClose">Закрити</button>
+    </div>
+    <div class="grid2">
+      <label>Мітка (I, II, V…)<input id="heNum" type="text" placeholder="V"></label>
+      <label>Назва укр. *<input id="heName" type="text" placeholder="Залишки літа"></label>
+    </div>
+    <label>Назва англ.<input id="heNameEn" type="text" placeholder="Late Summer"></label>
+    <label>Опис укр.<textarea id="heNote" rows="2" placeholder="Кілька слів — показується на «Стіні»"></textarea></label>
+    <label>Опис англ.<textarea id="heNoteEn" rows="2"></textarea></label>
+    <div class="row" style="justify-content:space-between;">
+      <button class="btn btn-danger" id="heDelete" style="display:none;">Видалити</button>
+      <div class="row">
+        <button class="btn btn-line" id="heCancel">Скасувати</button>
+        <button class="btn btn-dark" id="heSave">Зберегти</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const CFG = window.SUPABASE_CONFIG || {};
+const CONFIG_OK = CFG.url && CFG.anonKey;
+const BUCKET = "items";
+
+const HALLS = {
+  "Зала I · Абстракція": "Hall I · Abstraction",
+  "Зала II · Квіти й поля": "Hall II · Flowers & Fields",
+  "Зала III · Україна": "Hall III · Ukraine",
+  "Зала IV · Поп-образи": "Hall IV · Pop & Characters"
+};
+
+let sb = null;
+let cat = "paintings";
+let editingId = null;
+let editingHallId = null;
+let rows = [];
+let halls = [];
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast._t); toast._t = setTimeout(() => t.style.display = "none", 2800); }
+
+function newId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0, v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function resizeTo(file, max) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        c.toBlob((blob) => blob ? resolve(blob) : reject(new Error("no blob")), "image/webp", 0.82);
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveItem() {
+  const id = editingId || newId();
+  const file = $("#edImg").files[0];
+  const price = Number($("#edPrice").value);
+  const titleUa = $("#edTua").value.trim();
+  if (!titleUa) { toast("Вкажіть назву"); return; }
+  const btn = $("#edSave");
+  btn.disabled = true;
+  let img = editingId ? (document.getElementById("edPrev").dataset.current || "") : "";
+  try {
+    if (file) {
+      const blob = await resizeTo(file, 1600);
+      const path = id + "/full.webp";
+      const up = await sb.storage.from(BUCKET).upload(path, blob, { upsert: true, contentType: "image/webp", cacheControl: "31536000" });
+      if (up.error) throw up.error;
+      img = sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+    const hallUa = $("#edHall").value.trim();
+    const techUa = $("#edTech").value.trim();
+    const sizeUa = $("#edSize").value.trim();
+    const descUa = $("#edDesc").value.trim();
+    const titleEn = $("#edTen").value.trim() || titleUa;
+    const row = {
+      id, cat, sort_order: Number(window._edOrder || 0), price: isNaN(price) ? 0 : price,
+      year: $("#edYear").value.trim(), img, hidden: $("#edHidden").checked,
+      title: titleUa, title_en: titleEn,
+      hall: hallUa, hall_en: HALLS[hallUa] || hallUa,
+      size: sizeUa, size_en: sizeUa, tech: techUa, tech_en: techUa,
+      description: descUa, description_en: descUa
+    };
+    const { error } = await sb.from("items").upsert(row, { onConflict: "id" });
+    if (error) {
+      const alive = await sessionAlive();
+      throw new Error(error.message + (alive ? "" : " — схоже, ви не увійшли"));
+    }
+    toast("Збережено");
+    closeEditor();
+    await load();
+  } catch (e) {
+    console.error(e);
+    toast("Помилка: " + (e && e.message ? e.message : e));
+  }
+  btn.disabled = false;
+}
+
+function renderList(data) {
+  const list = data
+    .filter(d => (d.cat || "paintings") === cat)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  $("#count").textContent = list.length + " шт.";
+  const el = $("#list");
+  if (!list.length) { el.innerHTML = '<p class="muted">Тут поки порожньо. Натисніть «Додати».</p>'; return; }
+  el.innerHTML = list.map((d) => {
+    return `<div class="item">
+      ${d.img ? `<img src="${d.img}" alt="">` : '<div class="thumb">◦</div>'}
+      <div>
+        <div class="t">${d.title || ''}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}</div>
+        <div class="s">${d.size || ''}</div>
+        <div class="price">${d.price ? Number(d.price).toLocaleString("uk-UA") : ''} грн</div>
+      </div>
+      <div class="ops">
+        <button data-act="up" data-id="${d.id}">↑</button>
+        <button data-act="down" data-id="${d.id}">↓</button>
+        <button data-act="hide" data-id="${d.id}">${d.hidden ? "Показати" : "Сховати"}</button>
+        <button data-act="edit" data-id="${d.id}">Редагувати</button>
+        <button data-act="del" data-id="${d.id}" style="color:#B4501C;">Видалити</button>
+      </div>
+    </div>`;
+  }).join("");
+  bindOps(el);
+}
+
+function bindOps(el) {
+  el.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", async () => {
+    const act = b.dataset.act, id = b.dataset.id;
+    const d = rows.find(x => x.id === id);
+    if (!d) return;
+    if (act === "edit") { openEditor(id); return; }
+    if (act === "del") {
+      if (!confirm("Видалити «" + (d.title || "") + "» безповоротно?")) return;
+      await sb.storage.from(BUCKET).remove([id + "/full.webp"]);
+      const { error } = await sb.from("items").delete().eq("id", id);
+      if (error) { toast(error.message); return; }
+      toast("Видалено");
+      await load();
+      return;
+    }
+    if (act === "hide") {
+      const { error } = await sb.from("items").update({ hidden: !d.hidden }).eq("id", id);
+      if (error) { toast(error.message); return; }
+      toast(d.hidden ? "Показано" : "Сховано");
+      await load();
+    } else {
+      const list = rows.filter(x => (x.cat || "paintings") === cat).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      const i = list.findIndex(x => x.id === id);
+      const j = act === "up" ? i - 1 : i + 1;
+      if (j < 0 || j >= list.length) return;
+      const a = list[i], b2 = list[j];
+      const oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      await sb.from("items").update({ sort_order: ob }).eq("id", a.id);
+      await sb.from("items").update({ sort_order: oa }).eq("id", b2.id);
+      toast("Порядок змінено");
+      await load();
+    }
+  }));
+}
+
+function openEditor(id) {
+  editingId = id || null;
+  window._edOrder = 0;
+  $("#hallLbl").style.display = cat === "paintings" ? "" : "none";
+  fillHallSelect();
+  if (!id) {
+    const list = rows.filter(x => (x.cat || "paintings") === cat);
+    let mx = 0;
+    list.forEach(d => { const o = d.sort_order || 0; if (o > mx) mx = o; });
+    window._edOrder = mx + 1;
+  }
+  $("#edTitle").textContent = id ? "Редагувати" : "Нова робота";
+  $("#edDelete").style.display = id ? "" : "none";
+  $("#edImg").value = "";
+  const prev = $("#edPrev");
+  prev.style.display = "none"; prev.removeAttribute("data-current");
+  $("#edImgNote").style.display = "";
+  $("#edTua").value = $("#edTen").value = $("#edPrice").value = $("#edSize").value = $("#edTech").value = $("#edYear").value = $("#edDesc").value = "";
+  $("#edHall").value = "";
+  $("#edHidden").checked = false;
+  if (id) {
+    const d = rows.find(x => x.id === id);
+    if (d) {
+      window._edOrder = d.sort_order || 0;
+      $("#edTua").value = d.title || "";
+      $("#edTen").value = (d.title_en && d.title_en !== d.title) ? d.title_en : "";
+      $("#edPrice").value = d.price || "";
+      $("#edSize").value = d.size || "";
+      $("#edTech").value = d.tech || "";
+      $("#edYear").value = d.year || "";
+      $("#edDesc").value = d.description || "";
+      $("#edHall").value = d.hall || "";
+      $("#edHidden").checked = !!d.hidden;
+      if (d.img) { prev.src = d.img; prev.style.display = ""; prev.setAttribute("data-current", d.img); $("#edImgNote").style.display = "none"; }
+    }
+  }
+  $("#editor").style.display = "flex";
+}
+function closeEditor() { $("#editor").style.display = "none"; editingId = null; }
+
+$("#edImg").addEventListener("change", () => {
+  const f = $("#edImg").files[0];
+  if (!f) return;
+  $("#edPrev").src = URL.createObjectURL(f);
+  $("#edPrev").style.display = "";
+  $("#edImgNote").style.display = "none";
+});
+
+async function load() {
+  const [itRes, hRes] = await Promise.all([
+    sb.from("items").select("*").order("sort_order", { ascending: true }),
+    sb.from("halls").select("*").order("sort_order", { ascending: true })
+  ]);
+  if (itRes.error) { toast("Помилка: " + itRes.error.message); return; }
+  rows = itRes.data || [];
+  halls = hRes.error ? [] : (hRes.data || []);
+  render();
+}
+
+function render() {
+  if (cat === "halls") renderHalls(); else renderList(rows);
+}
+
+function renderHalls() {
+  const list = halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  $("#count").textContent = list.length + " зал";
+  const el = $("#list");
+  if (!list.length) { el.innerHTML = '<p class="muted">Зал ще немає. Додайте першу.</p>'; return; }
+  el.innerHTML = list.map((h) => {
+    const cnt = rows.filter(r => (r.hall || "") === (h.name || "")).length;
+    return `<div class="item">
+      <div class="thumb" style="font-size:15px;">${h.num || '·'}</div>
+      <div>
+        <div class="t">${h.name || ''}</div>
+        <div class="s">${cnt} робіт</div>
+      </div>
+      <div class="ops">
+        <button data-act="up" data-id="${h.id}">↑</button>
+        <button data-act="down" data-id="${h.id}">↓</button>
+        <button data-act="edit" data-id="${h.id}">Редагувати</button>
+        <button data-act="del" data-id="${h.id}">Видалити</button>
+      </div>
+    </div>`;
+  }).join("");
+  bindHallOps(el);
+}
+
+function bindHallOps(el) {
+  el.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", async () => {
+    const act = b.dataset.act, id = b.dataset.id;
+    const h = halls.find(x => x.id === id);
+    if (!h) return;
+    if (act === "edit") { openHallEditor(id); return; }
+    if (act === "del") {
+      if (!confirm("Видалити залу? Роботи цієї зали стануть «Без зали».")) return;
+      await sb.from("items").update({ hall: "" }).eq("hall", h.name);
+      await sb.from("halls").delete().eq("id", id);
+      toast("Залу видалено");
+      await load();
+    } else {
+      const list = halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      const i = list.findIndex(x => x.id === id);
+      const j = act === "up" ? i - 1 : i + 1;
+      if (j < 0 || j >= list.length) return;
+      const a = list[i], b2 = list[j];
+      const oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      await sb.from("halls").update({ sort_order: ob }).eq("id", a.id);
+      await sb.from("halls").update({ sort_order: oa }).eq("id", b2.id);
+      toast("Порядок змінено");
+      await load();
+    }
+  }));
+}
+
+function openHallEditor(id) {
+  editingHallId = id || null;
+  $("#heTitle").textContent = id ? "Редагувати залу" : "Нова зала";
+  $("#heDelete").style.display = id ? "" : "none";
+  $("#heNum").value = $("#heName").value = $("#heNameEn").value = $("#heNote").value = $("#heNoteEn").value = "";
+  if (id) {
+    const h = halls.find(x => x.id === id);
+    if (h) {
+      $("#heNum").value = h.num || "";
+      $("#heName").value = h.name || "";
+      $("#heNameEn").value = h.name_en || "";
+      $("#heNote").value = h.note || "";
+      $("#heNoteEn").value = h.note_en || "";
+    }
+  }
+  $("#hallEditor").style.display = "flex";
+}
+function closeHallEditor() { $("#hallEditor").style.display = "none"; editingHallId = null; }
+
+async function saveHall() {
+  const name = $("#heName").value.trim();
+  if (!name) { toast("Вкажіть назву зали"); return; }
+  const id = editingHallId || newId();
+  const row = {
+    id, num: $("#heNum").value.trim(), name, name_en: $("#heNameEn").value.trim(),
+    note: $("#heNote").value.trim(), note_en: $("#heNoteEn").value.trim(),
+    sort_order: Number(window._heOrder || 0)
+  };
+  const { error } = await sb.from("halls").upsert(row, { onConflict: "id" });
+  if (error) { toast("Помилка: " + error.message); return; }
+  toast("Збережено");
+  closeHallEditor();
+  await load();
+}
+
+$("#heClose").addEventListener("click", closeHallEditor);
+$("#heCancel").addEventListener("click", closeHallEditor);
+$("#heSave").addEventListener("click", saveHall);
+$("#heDelete").addEventListener("click", async () => {
+  if (!editingHallId || !confirm("Видалити залу? Роботи стануть «Без зали».")) return;
+  const h = halls.find(x => x.id === editingHallId);
+  if (h) await sb.from("items").update({ hall: "" }).eq("hall", h.name);
+  await sb.from("halls").delete().eq("id", editingHallId);
+  toast("Залу видалено");
+  closeHallEditor();
+  await load();
+});
+
+function fillHallSelect() {
+  const sel = $("#edHall");
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Без зали</option>' + halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(h =>
+    `<option value="${(h.name || '').replace(/"/g, '&quot;')}">${h.num ? h.num + ' · ' : ''}${h.name || ''}</option>`
+  ).join("");
+  sel.value = prev;
+}
+
+$("#loginBtn").addEventListener("click", login);
+$("#email").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+$("#pass").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+async function login() {
+  const email = $("#email").value.trim(), pass = $("#pass").value;
+  $("#loginErr").textContent = "";
+  if (!email || !pass) { $("#loginErr").textContent = "Введіть пошту і пароль."; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) $("#loginErr").textContent = "Неправильна пошта або пароль.";
+}
+$("#logoutBtn").addEventListener("click", () => sb.auth.signOut());
+$("#addBtn").addEventListener("click", () => {
+  if (cat === "halls") {
+    window._heOrder = 0;
+    const mx = halls.reduce((m, h) => Math.max(m, h.sort_order || 0), 0);
+    window._heOrder = mx + 1;
+    openHallEditor(null);
+  } else {
+    openEditor(null);
+  }
+});
+$("#edClose").addEventListener("click", closeEditor);
+$("#edCancel").addEventListener("click", closeEditor);
+$("#edSave").addEventListener("click", saveItem);
+$("#edDelete").addEventListener("click", async () => {
+  if (!editingId || !confirm("Видалити безповоротно?")) return;
+  try {
+    await sb.storage.from(BUCKET).remove([editingId + "/full.webp"]);
+    const { error } = await sb.from("items").delete().eq("id", editingId);
+    if (error) throw error;
+    toast("Видалено");
+    closeEditor();
+    await load();
+  } catch (e) { toast("Помилка: " + e.message); }
+});
+$$("#tabs .tab").forEach(t => t.addEventListener("click", () => {
+  $$("#tabs .tab").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  cat = t.dataset.cat;
+  $("#addBtn").textContent = cat === "halls" ? "Додати залу" : "Додати";
+  render();
+}));
+
+function setUser(user) {
+  $("#login").style.display = user ? "none" : "";
+  $("#app").style.display = user ? "" : "none";
+  $("#whoami").textContent = user ? "Увійшла: " + (user.email || "") : "";
+  if (user) load();
+}
+
+async function sessionAlive() {
+  const { data } = await sb.auth.getUser().catch(() => ({ data: { user: null } }));
+  return !!(data && data.user);
+}
+
+function init() {
+  if (!CONFIG_OK) {
+    document.body.innerHTML = '<div class="wrap"><div class="card"><h1>Supabase не налаштовано</h1><p class="muted" style="margin-top:10px;">Заповніть <b>supabase-config.js</b> (url та anonKey з налаштувань проєкту).</p></div></div>';
+    return;
+  }
+  sb = window.supabase.createClient(CFG.url, CFG.anonKey);
+  sb.auth.getSession().then(({ data }) => setUser(data.session ? data.session.user : null));
+  sb.auth.onAuthStateChange((_e, session) => setUser(session ? session.user : null));
+}
+init();
+</script>
+</body>
+</html>
