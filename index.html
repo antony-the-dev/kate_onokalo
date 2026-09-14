@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{if(localStorage.getItem('ko_theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
 <script src="./support.js"></script>
 <script src="./supabase-config.js"></script>
 </head>
@@ -56,6 +57,18 @@
   a, button {
     transition: background-color .3s ease .05s, color .3s ease .05s, border-color .3s ease .05s;
   }
+  .dc-no-transition, .dc-no-transition * { transition: none !important; }
+  .dc-top {
+    position: fixed; bottom: 26px; right: 26px; z-index: 50;
+    width: 46px; height: 46px; border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg); color: var(--ink);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 12px 28px -14px rgba(0,0,0,.4);
+    transition: opacity .35s ease, transform .35s ease, background-color .3s ease .05s, color .3s ease .05s, border-color .3s ease .05s;
+  }
+  .dc-top:hover { background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg); }
   img { max-width: 100%; }
   section[id] { scroll-margin-top: 88px; }
   [data-theme="dark"] #artModal [style*="background: var(--bg)"] { background: #E9E4DC !important; color: #0A1C3B !important; }
@@ -564,6 +577,10 @@
   <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 120; background: var(--navy-bg); color: var(--cream-text); padding: 14px 26px; font-size: 12.5px; letter-spacing: .04em; box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); animation: floatIn .3s ease-out both; max-width: 90vw; text-align: center;">{{ toast }}</div>
   </sc-if>
+
+  <button class="dc-top" onClick="{{ scrollTop }}" aria-label="Вгору" title="Вгору" style="opacity: {{ topOpacity }}; transform: {{ topTransform }}; pointer-events: {{ topPointer }};">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
 </div>
 
 </x-dc>
@@ -571,7 +588,7 @@
 class Component extends DCLogic {
   rootRef = React.createRef();
   wallRef = React.createRef();
-  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '', menuOpen: false, paints: null, postcards: null, boxes: null, halls: null, theme: 'light' };
+  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '', menuOpen: false, paints: null, postcards: null, boxes: null, halls: null, theme: 'light', showTop: false };
 
   works = [
     { id: 1, img: 'img/paint-01-w1100.webp', thumb: 'img/paint-01-w600.webp', price: 34000, year: '2024',
@@ -798,6 +815,11 @@ class Component extends DCLogic {
     }
     this.onVis = () => { if (document.visibilityState === 'visible' && this._reload) this._reload(); };
     document.addEventListener('visibilitychange', this.onVis);
+    this.onWinScroll = () => {
+      const s = window.scrollY > 480;
+      if (s !== this.state.showTop) this.setState({ showTop: s });
+    };
+    window.addEventListener('scroll', this.onWinScroll, { passive: true });
     this.loadSupabase();
   }
 
@@ -810,6 +832,7 @@ class Component extends DCLogic {
     window.removeEventListener('keydown', this.onKey);
     if (this.rootRef.current) this.rootRef.current.removeEventListener('click', this.onNav);
     if (this.onVis) document.removeEventListener('visibilitychange', this.onVis);
+    if (this.onWinScroll) window.removeEventListener('scroll', this.onWinScroll);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
   }
 
@@ -953,11 +976,19 @@ class Component extends DCLogic {
       toggleLang: () => this.setState({ lang: l === 'ua' ? 'en' : 'ua' }),
       theme: this.state.theme,
       themeIco: this.state.theme === 'dark' ? '☀' : '☾',
+      showTop: this.state.showTop,
+      topOpacity: this.state.showTop ? '1' : '0',
+      topTransform: this.state.showTop ? 'translateY(0)' : 'translateY(14px)',
+      topPointer: this.state.showTop ? 'auto' : 'none',
+      scrollTop: () => this.scrollToId('top'),
       toggleTheme: () => {
         const next = this.state.theme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
+        const root = document.documentElement;
+        root.classList.add('dc-no-transition');
+        root.setAttribute('data-theme', next);
         try { localStorage.setItem('ko_theme', next); } catch (e) {}
         this.setState({ theme: next });
+        requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('dc-no-transition')));
       },
       tgHandle: this.handle,
       tgLink: this.tgUrl,
