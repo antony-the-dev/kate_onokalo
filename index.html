@@ -47,6 +47,30 @@
 @media (min-width: 901px) {
     .dc-mmenu { display: none !important; }
   }
+
+  /* ===== Темна тема (data-theme="dark") ===== */
+  [data-theme="dark"] body { background: #0A1C3B !important; color: #E9E4DC !important; }
+  [data-theme="dark"] [style*="background: #E9E4DC"] { background: #0A1C3B !important; }
+  [data-theme="dark"] [style*="background: #E3DDD3"] { background: #0F2340 !important; }
+  [data-theme="dark"] [style*="background: #DCD5C9"] { background: #0D1E38 !important; }
+  [data-theme="dark"] [style*="background: #0A1C3B"] { background: #E9E4DC !important; }
+  [data-theme="dark"] [style*="background: rgba(233,228,220,.86)"] { background: rgba(10,28,59,.9) !important; }
+  [data-theme="dark"] [style*="background: rgba(233,228,220,.97)"] { background: rgba(10,28,59,.97) !important; }
+  [data-theme="dark"] [style*="linear-gradient(180deg, #E9E4DC"] { background: linear-gradient(180deg, #0A1C3B 0%, #0F2340 60%, #0D1E38 100%) !important; }
+  [data-theme="dark"] [style*="color: #1B1A16"] { color: #E9E4DC !important; }
+  [data-theme="dark"] [style*="color: #3B3830"] { color: #E7E0D3 !important; }
+  [data-theme="dark"] [style*="color: #4A463E"] { color: #CFC9BC !important; }
+  [data-theme="dark"] [style*="color: #5A554C"] { color: #C2BBAC !important; }
+  [data-theme="dark"] [style*="color: #6A655B"] { color: #B3AB9C !important; }
+  [data-theme="dark"] [style*="color: #857F74"] { color: #A39C8D !important; }
+  [data-theme="dark"] [style*="color: #0A1C3B"] { color: #E9E4DC !important; }
+  [data-theme="dark"] [style*="color: #E9E4DC"] { color: #0A1C3B !important; }
+  [data-theme="dark"] [style*="color: #B4501C"] { color: #E07A4F !important; }
+  [data-theme="dark"] [style*="background: #B4501C"] { background: #E07A4F !important; }
+  [data-theme="dark"] [style*="border-bottom: 1px solid #B4501C"] { border-bottom-color: #E07A4F !important; }
+  [data-theme="dark"] [style*="rgba(27,26,22"] { border-color: rgba(233,228,220,.3) !important; }
+  [data-theme="dark"] #about, [data-theme="dark"] #contact { background: #0A1C3B !important; color: #E4DED4 !important; }
+  [data-theme="dark"] #artModal [style*="background: #E9E4DC"] { background: #E9E4DC !important; color: #0A1C3B !important; }
 </style>
 </helmet>
 
@@ -75,7 +99,8 @@
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
       <div style="display: flex; align-items: center; gap: 18px; flex: none;">
-        <button onClick="{{ toggleLang }}" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #4A463E; cursor: pointer;" style-hover="border-color: #1B1A16; color: #1B1A16;">{{ langLabel }}</button>
+        <button onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #4A463E; cursor: pointer;" style-hover="border-color: #1B1A16; color: #1B1A16;">{{ langLabel }}</button>
+        <button onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: #4A463E; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="border-color: #1B1A16;">{{ themeIco }}</button>
         <button onClick="{{ openCart }}" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #1B1A16; cursor: pointer; display: flex; align-items: center; gap: 8px;">
           <span data-en="Cart">Кошик</span>
           <span style="min-width: 20px; height: 20px; border-radius: 999px; background: #0A1C3B; color: #E9E4DC; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
@@ -510,7 +535,7 @@
 class Component extends DCLogic {
   rootRef = React.createRef();
   wallRef = React.createRef();
-  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '', menuOpen: false, paints: null, postcards: null, boxes: null, halls: null };
+  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '', menuOpen: false, paints: null, postcards: null, boxes: null, halls: null, theme: 'light' };
 
   works = [
     { id: 1, img: 'img/paint-01-w1100.webp', thumb: 'img/paint-01-w600.webp', price: 34000, year: '2024',
@@ -677,6 +702,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    try { const t = localStorage.getItem('ko_theme'); if (t === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); this.setState({ theme: 'dark' }); } } catch (e) {}
     this.applyLang();
     const w = this.wallRef.current;
     if (w) {
@@ -887,6 +913,14 @@ class Component extends DCLogic {
       ribbon: this.props.showCollabRibbon ?? true,
       langLabel: l === 'ua' ? 'EN' : 'UA',
       toggleLang: () => this.setState({ lang: l === 'ua' ? 'en' : 'ua' }),
+      theme: this.state.theme,
+      themeIco: this.state.theme === 'dark' ? '☀' : '☾',
+      toggleTheme: () => {
+        const next = this.state.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('ko_theme', next); } catch (e) {}
+        this.setState({ theme: next });
+      },
       tgHandle: this.handle,
       tgLink: this.tgUrl,
       instaHandle: this.insta,
