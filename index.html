@@ -24,13 +24,35 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <style>
   html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: #E9E4DC; color: #1B1A16; font-family: "Commissioner", system-ui, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
+  :root {
+    --bg: #E9E4DC; --cream2: #E3DDD3; --cream3: #DCD5C9;
+    --navy-bg: #0A1C3B; --navy-ink: #0A1C3B; --cream-text: #E9E4DC;
+    --ink: #1B1A16; --ink2: #3B3830; --ink3: #4A463E; --ink4: #5A554C; --ink5: #6A655B;
+    --muted: #857F74;
+    --terracotta: #B4501C;
+    --border: rgba(27,26,22,.18);
+    --header-bg: rgba(233,228,220,.86);
+    --menu-bg: rgba(233,228,220,.97);
+  }
+  [data-theme="dark"] {
+    --bg: #0A1C3B; --cream2: #0F2340; --cream3: #0D1E38;
+    --navy-bg: #E9E4DC; --navy-ink: #E9E4DC; --cream-text: #0A1C3B;
+    --ink: #E9E4DC; --ink2: #E7E0D3; --ink3: #CFC9BC; --ink4: #C2BBAC; --ink5: #B3AB9C;
+    --muted: #A39C8D;
+    --terracotta: #E07A4F;
+    --border: rgba(233,228,220,.3);
+    --header-bg: rgba(10,28,59,.9);
+    --menu-bg: rgba(10,28,59,.97);
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Commissioner", system-ui, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
   .dc-mmenu { overscroll-behavior: contain; }
   * { box-sizing: border-box; }
   a { color: inherit; text-decoration: none; }
-  a:hover { color: #B4501C; }
+  a:hover { color: var(--terracotta); }
   img { max-width: 100%; }
   section[id] { scroll-margin-top: 88px; }
+  [data-theme="dark"] #about, [data-theme="dark"] #contact { background: #0A1C3B !important; }
+  [data-theme="dark"] #artModal [style*="background: var(--bg)"] { background: #E9E4DC !important; color: #0A1C3B !important; }
   [data-wall]::-webkit-scrollbar { display: none; }
   [data-wall] { scrollbar-width: none; -ms-overflow-style: none; }
   @keyframes floatIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
@@ -47,50 +69,26 @@
 @media (min-width: 901px) {
     .dc-mmenu { display: none !important; }
   }
-
-  /* ===== Темна тема (data-theme="dark") ===== */
-  [data-theme="dark"] body { background: #0A1C3B !important; color: #E9E4DC !important; }
-  [data-theme="dark"] [style*="background: #E9E4DC"] { background: #0A1C3B !important; }
-  [data-theme="dark"] [style*="background: #E3DDD3"] { background: #0F2340 !important; }
-  [data-theme="dark"] [style*="background: #DCD5C9"] { background: #0D1E38 !important; }
-  [data-theme="dark"] [style*="background: #0A1C3B"] { background: #E9E4DC !important; }
-  [data-theme="dark"] [style*="background: rgba(233,228,220,.86)"] { background: rgba(10,28,59,.9) !important; }
-  [data-theme="dark"] [style*="background: rgba(233,228,220,.97)"] { background: rgba(10,28,59,.97) !important; }
-  [data-theme="dark"] [style*="linear-gradient(180deg, #E9E4DC"] { background: linear-gradient(180deg, #0A1C3B 0%, #0F2340 60%, #0D1E38 100%) !important; }
-  [data-theme="dark"] [style*="color: #1B1A16"] { color: #E9E4DC !important; }
-  [data-theme="dark"] [style*="color: #3B3830"] { color: #E7E0D3 !important; }
-  [data-theme="dark"] [style*="color: #4A463E"] { color: #CFC9BC !important; }
-  [data-theme="dark"] [style*="color: #5A554C"] { color: #C2BBAC !important; }
-  [data-theme="dark"] [style*="color: #6A655B"] { color: #B3AB9C !important; }
-  [data-theme="dark"] [style*="color: #857F74"] { color: #A39C8D !important; }
-  [data-theme="dark"] [style*="color: #0A1C3B"] { color: #E9E4DC !important; }
-  [data-theme="dark"] [style*="color: #E9E4DC"] { color: #0A1C3B !important; }
-  [data-theme="dark"] [style*="color: #B4501C"] { color: #E07A4F !important; }
-  [data-theme="dark"] [style*="background: #B4501C"] { background: #E07A4F !important; }
-  [data-theme="dark"] [style*="border-bottom: 1px solid #B4501C"] { border-bottom-color: #E07A4F !important; }
-  [data-theme="dark"] [style*="rgba(27,26,22"] { border-color: rgba(233,228,220,.3) !important; }
-  [data-theme="dark"] #about, [data-theme="dark"] #contact { background: #0A1C3B !important; color: #E4DED4 !important; }
-  [data-theme="dark"] #artModal [style*="background: #E9E4DC"] { background: #E9E4DC !important; color: #0A1C3B !important; }
 </style>
 </helmet>
 
-<div ref="{{ rootRef }}" style="background: #E9E4DC; overflow-x: hidden;">
+<div ref="{{ rootRef }}" style="background: var(--bg); overflow-x: hidden;">
 
   <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
-    <div style="background: #0A1C3B; color: #E9E4DC; padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
+    <div style="background: var(--navy-bg); color: var(--cream-text); padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
       <span data-en="Open to collaborations — merch, prints, joint projects">Відкрита до колаборацій — мерч, принти, спільні проєкти</span>
       <a href="#collab" style="color: #C7A17A; border-bottom: 1px solid rgba(199,161,122,.4);" data-en="Details">Детальніше</a>
     </div>
   </sc-if>
 
-  <header style="position: sticky; top: 0; z-index: 40; background: rgba(233,228,220,.86); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(27,26,22,.12);">
+  <header style="position: sticky; top: 0; z-index: 40; background: var(--header-bg); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);">
     <div class="dc-header-inner" style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px); height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
-      <button class="dc-burger" onClick="{{ toggleMenu }}" aria-label="Меню" aria-expanded="{{ menuOpen }}" style="display: none; background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: #1B1A16; cursor: pointer; align-items: center; justify-content: center;">{{ menuIco }}</button>
+      <button class="dc-burger" onClick="{{ toggleMenu }}" aria-label="Меню" aria-expanded="{{ menuOpen }}" style="display: none; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer; align-items: center; justify-content: center;">{{ menuIco }}</button>
       <a href="#top" class="dc-logo" style="display: flex; flex-direction: column; line-height: 1.05; flex: none;">
         <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;">Онокало</span>
-        <span style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: #857F74; padding-left: 2px;">Kateryna · Fine Art</span>
+        <span style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--muted); padding-left: 2px;">Kateryna · Fine Art</span>
       </a>
-      <nav class="dc-nav" style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #4A463E;">
+      <nav class="dc-nav" style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3);">
         <a href="#stock" data-en="Available">В наявності</a>
         <a href="#paper" data-en="Postcards">Листівки</a>
         <a href="#boxes" data-en="Gift boxes">Бокси</a>
@@ -99,55 +97,55 @@
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
       <div style="display: flex; align-items: center; gap: 18px; flex: none;">
-        <button onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #4A463E; cursor: pointer;" style-hover="border-color: #1B1A16; color: #1B1A16;">{{ langLabel }}</button>
-        <button onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: #4A463E; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="border-color: #1B1A16;">{{ themeIco }}</button>
-        <button onClick="{{ openCart }}" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: #1B1A16; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <button onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="border-color: #1B1A16; color: #1B1A16;">{{ langLabel }}</button>
+        <button onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="border-color: #1B1A16;">{{ themeIco }}</button>
+        <button onClick="{{ openCart }}" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;">
           <span data-en="Cart">Кошик</span>
-          <span style="min-width: 20px; height: 20px; border-radius: 999px; background: #0A1C3B; color: #E9E4DC; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
+          <span style="min-width: 20px; height: 20px; border-radius: 999px; background: var(--navy-bg); color: var(--cream-text); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
         </button>
       </div>
     </div>
   </header>
 
   <sc-if value="{{ menuOpen }}">
-    <div class="dc-mmenu" onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 55; background: #E9E4DC; display: flex; flex-direction: column; overflow-y: auto;">
+    <div class="dc-mmenu" onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 55; background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;">
       <div style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px; min-height: 68px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
-        <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid rgba(27,26,22,.2); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: #1B1A16; cursor: pointer;">✕</button>
+        <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer;">✕</button>
       </div>
       <nav aria-label="Меню" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
-        <a href="#stock" onClick="{{ closeMenu }}" data-en="Available" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16; border-bottom: 1px solid rgba(27,26,22,.1);" style-hover="color: #B4501C;">В наявності</a>
-        <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16; border-bottom: 1px solid rgba(27,26,22,.1);" style-hover="color: #B4501C;">Листівки</a>
-        <a href="#boxes" onClick="{{ closeMenu }}" data-en="Gift boxes" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16; border-bottom: 1px solid rgba(27,26,22,.1);" style-hover="color: #B4501C;">Бокси</a>
-        <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16; border-bottom: 1px solid rgba(27,26,22,.1);" style-hover="color: #B4501C;">На замовлення</a>
-        <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16; border-bottom: 1px solid rgba(27,26,22,.1);" style-hover="color: #B4501C;">Про мене</a>
-        <a href="#contact" onClick="{{ closeMenu }}" data-en="Contact" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #1B1A16;" style-hover="color: #B4501C;">Контакти</a>
+        <a href="#stock" onClick="{{ closeMenu }}" data-en="Available" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">В наявності</a>
+        <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
+        <a href="#boxes" onClick="{{ closeMenu }}" data-en="Gift boxes" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Бокси</a>
+        <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
+        <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
+        <a href="#contact" onClick="{{ closeMenu }}" data-en="Contact" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Контакти</a>
       </nav>
     </div>
   </sc-if>
 
   <section id="top" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
     <div style="animation: floatIn .9s ease-out both;">
-      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C; margin-bottom: 26px;" data-en="Abstraction · Oil · Acrylic">Абстракція · Олія · Акрил</div>
+      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 26px;" data-en="Abstraction · Oil · Acrylic">Абстракція · Олія · Акрил</div>
       <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(46px, 7.4vw, 108px); line-height: .95; letter-spacing: -.02em; margin: 0 0 28px;">
         <span data-en="Kateryna">Катерина</span><br><em style="font-style: italic;" data-en="Onokalo">Онокало</em>
       </h1>
-      <p style="font-size: clamp(16px, 1.35vw, 19px); line-height: 1.65; max-width: 40ch; color: #3B3830; margin: 0 0 36px; text-wrap: pretty;" data-en="I have been painting for fifteen years — around 1200 canvases have left the studio.">Я малюю п’ятнадцять років — близько 1200 полотен уже покинули студію.</p>
+      <p style="font-size: clamp(16px, 1.35vw, 19px); line-height: 1.65; max-width: 40ch; color: var(--ink2); margin: 0 0 36px; text-wrap: pretty;" data-en="I have been painting for fifteen years — around 1200 canvases have left the studio.">Я малюю п’ятнадцять років — близько 1200 полотен уже покинули студію.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 14px;">
-        <a href="#wall" style="background: #0A1C3B; color: #E9E4DC; padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: #B4501C; color: #F3EFE8;" data-en="Walk the gallery">Пройти галереєю</a>
-        <a href="#order" style="border: 1px solid rgba(27,26,22,.28); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="border-color: #1B1A16;" data-en="Commission a painting">Картина на замовлення</a>
+        <a href="#wall" style="background: var(--navy-bg); color: var(--cream-text); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: #B4501C; color: #F3EFE8;" data-en="Walk the gallery">Пройти галереєю</a>
+        <a href="#order" style="border: 1px solid var(--border); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="border-color: #1B1A16;" data-en="Commission a painting">Картина на замовлення</a>
       </div>
-      <div style="display: flex; gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 6vw, 68px); padding-top: 26px; border-top: 1px solid rgba(27,26,22,.14);">
+      <div style="display: flex; gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 6vw, 68px); padding-top: 26px; border-top: 1px solid var(--border);">
         <div>
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: #B4501C;">15</div>
-          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="years painting">років у фарбі</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">15</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;" data-en="years painting">років у фарбі</div>
         </div>
         <div>
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: #B4501C;">1200</div>
-          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="canvases">полотен</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">1200</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;" data-en="canvases">полотен</div>
         </div>
         <div>
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: #B4501C;">4</div>
-          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: #857F74; margin-top: 8px;" data-en="halls / series">зали серій</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">4</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;" data-en="halls / series">зали серій</div>
         </div>
       </div>
     </div>
@@ -160,21 +158,21 @@
   </section>
 
   <section id="wall" style="padding-bottom: clamp(56px, 8vw, 110px);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid rgba(27,26,22,.14);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid var(--border);">
       <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="The wall">Стіна</div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="The wall">Стіна</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0; letter-spacing: -.01em;" data-en="Four halls, one wall">Чотири зали, одна стіна</h2>
       </div>
       <div style="display: flex; align-items: center; gap: 14px; padding-bottom: 4px;">
-        <span style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
+        <span style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
         <div style="display: flex; gap: 8px;">
-          <button onClick="{{ wallPrev }}" aria-label="Назад" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟵</button>
-          <button onClick="{{ wallNext }}" aria-label="Далі" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(27,26,22,.24); background: none; color: #1B1A16; font-size: 14px; cursor: pointer; line-height: 1; animation: nudge 3s ease-in-out infinite;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟶</button>
+          <button onClick="{{ wallPrev }}" aria-label="Назад" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--ink); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟵</button>
+          <button onClick="{{ wallNext }}" aria-label="Далі" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--ink); font-size: 14px; cursor: pointer; line-height: 1; animation: nudge 3s ease-in-out infinite;" style-hover="border-color: #1B1A16; background: rgba(27,26,22,.05);">⟶</button>
         </div>
       </div>
     </div>
 
-    <div data-wall="1" ref="{{ wallRef }}" style="display: flex; align-items: center; gap: clamp(46px, 6vw, 110px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; padding: clamp(40px, 6vw, 76px) max(24px, 34vw) clamp(30px, 4vw, 56px); background: linear-gradient(180deg, #E9E4DC 0%, #E3DDD3 60%, #DCD5C9 100%);">
+    <div data-wall="1" ref="{{ wallRef }}" style="display: flex; align-items: center; gap: clamp(46px, 6vw, 110px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; padding: clamp(40px, 6vw, 76px) max(24px, 34vw) clamp(30px, 4vw, 56px); background: linear-gradient(180deg, var(--bg) 0%, var(--cream2) 60%, var(--cream3) 100%);">
 
       <sc-if value="{{ wallEmpty }}">
         <div style="flex: none; width: min(360px, 80vw); scroll-snap-align: center;">
@@ -185,10 +183,10 @@
       <sc-for list="{{ wall }}" as="it" hint-placeholder-count="11">
         <sc-if value="{{ it.isDiv }}">
           <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
-            <div style="height: 1px; background: #B4501C; width: 46px; margin-bottom: 20px;"></div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: #B4501C;">{{ it.num }}</div>
+            <div style="height: 1px; background: var(--terracotta); width: 46px; margin-bottom: 20px;"></div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: var(--terracotta);">{{ it.num }}</div>
             <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;">{{ it.title }}</h3>
-            <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0;">{{ it.note }}</p>
+            <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); margin: 0;">{{ it.note }}</p>
           </div>
         </sc-if>
         <sc-if value="{{ it.isWork }}">
@@ -197,7 +195,7 @@
             <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
               <div>
                 <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;">{{ it.title }}</div>
-                <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;">{{ it.meta }}</div>
+                <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.meta }}</div>
               </div>
               <div style="font-size: 14px; white-space: nowrap;">{{ it.price }}</div>
             </figcaption>
@@ -206,8 +204,8 @@
         <sc-if value="{{ it.isTail }}">
           <div style="flex: none; width: min(320px, 70vw); scroll-snap-align: center; align-self: center;">
             <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.25; margin-bottom: 18px;" data-en="This is a fraction of 1200 canvases.">Це частка з 1200 полотен.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #6A655B; margin: 0 0 22px;" data-en="Looking for a particular colour, size or mood — write to me and I will send what is in the studio right now.">Шукаєте певний колір, розмір чи настрій — напишіть, і я надішлю те, що зараз є у студії.</p>
-            <a href="#contact" style="border-bottom: 1px solid rgba(27,26,22,.35); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;" data-en="Write to me">Написати мені</a>
+            <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); margin: 0 0 22px;" data-en="Looking for a particular colour, size or mood — write to me and I will send what is in the studio right now.">Шукаєте певний колір, розмір чи настрій — напишіть, і я надішлю те, що зараз є у студії.</p>
+            <a href="#contact" style="border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;" data-en="Write to me">Написати мені</a>
           </div>
         </sc-if>
       </sc-for>
@@ -215,91 +213,91 @@
   </section>
 
   <section id="stock" style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(40px, 6vw, 80px);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(26px, 4vw, 44px);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
       <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="Catalogue">Каталог</div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Catalogue">Каталог</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original paintings available">Авторські картини в наявності</h2>
       </div>
-      <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; padding-bottom: 6px; white-space: nowrap;">{{ stockCount }}</div>
+      <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); padding-bottom: 6px; white-space: nowrap;">{{ stockCount }}</div>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 268px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
       <sc-for list="{{ catalog }}" as="it" hint-placeholder-count="7">
         <div style="display: flex; flex-direction: column;">
-          <div data-art="{{ it.id }}" onClick="{{ openWork }}" tabindex="0" role="button" style="background: #E3DDD3; overflow: hidden; cursor: pointer;">
+          <div data-art="{{ it.id }}" onClick="{{ openWork }}" tabindex="0" role="button" style="background: var(--cream2); overflow: hidden; cursor: pointer;">
             <img src="{{ it.thumb }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1);" style-hover="transform: scale(1.04);">
           </div>
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
             <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 21px; line-height: 1.15;">{{ it.title }}</div>
             <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
           </div>
-          <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;">{{ it.size }}</div>
-          <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid rgba(27,26,22,.24); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: #1B1A16; min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
+          <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
+          <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
         </div>
       </sc-for>
     </div>
   </section>
 
-  <section id="paper" style="background: #E3DDD3; border-top: 1px solid rgba(27,26,22,.12);">
+  <section id="paper" style="background: var(--cream2); border-top: 1px solid var(--border);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
-      <div style="padding-bottom: 26px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(26px, 4vw, 44px);">
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="Paper">Папір</div>
+      <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Paper">Папір</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original postcards and bookmarks">Авторські листівки і закладинки</h2>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 244px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
 
         <sc-for list="{{ paper }}" as="it" hint-placeholder-count="4">
           <div style="display: flex; flex-direction: column;">
-            <div style="aspect-ratio: 1; background: #DCD5C9; overflow: hidden;">
+            <div style="aspect-ratio: 1; background: var(--cream3); overflow: hidden;">
               <sc-if value="{{ it.hasImg }}">
                 <img src="{{ it.img }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 1; object-fit: cover;">
               </sc-if>
               <sc-if value="{{ it.noImg }}">
-                <div style="width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #B4501C;">◦</div>
+                <div style="width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">◦</div>
               </sc-if>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
               <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 21px; line-height: 1.15;">{{ it.title }}</div>
               <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
             </div>
-            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;">{{ it.size }}</div>
-            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid rgba(27,26,22,.24); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: #1B1A16; min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
+            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
           </div>
         </sc-for>
       </div>
     </div>
   </section>
 
-  <section id="boxes" style="border-top: 1px solid rgba(27,26,22,.12);">
+  <section id="boxes" style="border-top: 1px solid var(--border);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
-      <div style="padding-bottom: 26px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(26px, 4vw, 44px);">
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="Gifts">Подарунки</div>
+      <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Gifts">Подарунки</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gift boxes">Подарункові бокси</h2>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
 
         <sc-for list="{{ boxes }}" as="it" hint-placeholder-count="3">
           <div style="display: flex; flex-direction: column;">
-            <div style="aspect-ratio: 4 / 3; background: #E3DDD3; overflow: hidden;">
+            <div style="aspect-ratio: 4 / 3; background: var(--cream2); overflow: hidden;">
               <sc-if value="{{ it.hasImg }}">
                 <img src="{{ it.img }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover;">
               </sc-if>
               <sc-if value="{{ it.noImg }}">
-                <div style="width: 100%; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #B4501C;">◦</div>
+                <div style="width: 100%; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">◦</div>
               </sc-if>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
               <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; line-height: 1.15;">{{ it.title }}</div>
               <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
             </div>
-            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 7px;">{{ it.size }}</div>
-            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid rgba(27,26,22,.24); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: #1B1A16; min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
+            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lAddShort }}</button>
           </div>
         </sc-for>
       </div>
     </div>
   </section>
 
-  <section id="about" style="background: #0A1C3B; color: #E4DED4;">
+  <section id="about" style="background: var(--navy-bg); color: #E4DED4;">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <img src="img/kate-01.webp" alt="Катерина у студії" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
@@ -323,62 +321,62 @@
   </section>
 
   <section id="interior" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid rgba(27,26,22,.14); margin-bottom: clamp(28px, 4vw, 52px);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 52px);">
       <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C;" data-en="At home">В інтер’єрі</div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="At home">В інтер’єрі</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="How it lives on a real wall">Як це живе на справжній стіні</h2>
       </div>
-      <p style="font-size: 14px; line-height: 1.6; color: #6A655B; max-width: 34ch; margin: 0;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
+      <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 34ch; margin: 0;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
         <img src="img/paint-06-w1100.webp" alt="Картина у вітальні" style="display: block; width: 100%;">
-        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
+        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
       </figure>
       <figure style="margin: 0;">
         <img src="img/paint-03-w1100.webp" alt="Диптих у їдальні" style="display: block; width: 100%;">
-        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #857F74; margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
+        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
       </figure>
     </div>
   </section>
 
-  <section id="order" style="background: #E3DDD3; border-top: 1px solid rgba(27,26,22,.12); border-bottom: 1px solid rgba(27,26,22,.12);">
+  <section id="order" style="background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 76px);">
       <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C; margin-bottom: 22px;" data-en="Commission">На замовлення</div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Commission">На замовлення</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 26px;" data-en="A painting made for your room">Картина, яку я напишу під вашу кімнату</h2>
-        <p style="font-size: 16px; line-height: 1.75; color: #3B3830; max-width: 44ch; margin: 0 0 30px; text-wrap: pretty;" data-en="I take commissions. We start with a conversation about the mood, then I draw an individual sketch — and only after you approve it do I touch the canvas.">Беру замовлення. Починаємо з розмови про настрій, далі — індивідуальний ескіз, і тільки після вашого «так» пишу полотно.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ink2); max-width: 44ch; margin: 0 0 30px; text-wrap: pretty;" data-en="I take commissions. We start with a conversation about the mood, then I draw an individual sketch — and only after you approve it do I touch the canvas.">Беру замовлення. Починаємо з розмови про настрій, далі — індивідуальний ескіз, і тільки після вашого «так» пишу полотно.</p>
         <div style="display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
-          <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" style="background: #E9E4DC; border: 1px solid rgba(27,26,22,.2); padding: 14px 16px; font: inherit; font-size: 14.5px; color: #1B1A16; min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
-          <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" style="background: #E9E4DC; border: 1px solid rgba(27,26,22,.2); padding: 14px 16px; font: inherit; font-size: 14.5px; color: #1B1A16; min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
-          <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" style="background: #E9E4DC; border: 1px solid rgba(27,26,22,.2); padding: 14px 16px; font: inherit; font-size: 14.5px; color: #1B1A16; resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
+          <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
+          <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
+          <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
           <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px;">
-            <button onClick="{{ sendOrderTg }}" style="background: #0A1C3B; color: #E9E4DC; border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #B4501C;">{{ lSendTg }}</button>
-            <button onClick="{{ sendOrderMail }}" style="background: none; color: #1B1A16; border: 1px solid rgba(27,26,22,.28); padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lSendMail }}</button>
+            <button onClick="{{ sendOrderTg }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #B4501C;">{{ lSendTg }}</button>
+            <button onClick="{{ sendOrderMail }}" style="background: none; color: var(--ink); border: 1px solid var(--border); padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="border-color: #B4501C; color: #B4501C;">{{ lSendMail }}</button>
           </div>
-          <p style="font-size: 12px; line-height: 1.6; color: #857F74; margin: 6px 0 0;" data-en="The request goes to my Telegram — I answer myself and call you back.">Запит приходить мені в Telegram — відповідаю сама й перетелефоную.</p>
+          <p style="font-size: 12px; line-height: 1.6; color: var(--muted); margin: 6px 0 0;" data-en="The request goes to my Telegram — I answer myself and call you back.">Запит приходить мені в Telegram — відповідаю сама й перетелефоную.</p>
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 0;">
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #B4501C;">01</div>
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">01</div>
           <div>
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="A conversation">Розмова</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="Your room, the light, the colours you live with, and what the painting should do for you.">Ваша кімната, світло, кольори, з якими живете, і що картина має для вас робити.</p>
+            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Your room, the light, the colours you live with, and what the painting should do for you.">Ваша кімната, світло, кольори, з якими живете, і що картина має для вас робити.</p>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #B4501C;">02</div>
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">02</div>
           <div>
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="Individual sketch">Індивідуальний ескіз</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="I develop a sketch for the piece and show it in scale on a photo of your wall. Changes are normal at this stage.">Розробляю ескіз майбутньої роботи й показую в масштабі на фото вашої стіни. Правки на цьому етапі — норма.</p>
+            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="I develop a sketch for the piece and show it in scale on a photo of your wall. Changes are normal at this stage.">Розробляю ескіз майбутньої роботи й показую в масштабі на фото вашої стіни. Правки на цьому етапі — норма.</p>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid rgba(27,26,22,.16); border-bottom: 1px solid rgba(27,26,22,.16);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #B4501C;">03</div>
+        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">03</div>
           <div>
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="The canvas">Полотно</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: #5A554C; margin: 0;" data-en="Two to four weeks depending on size. I send progress photos, and the painting ships varnished and packed.">Два–чотири тижні залежно від розміру. Надсилаю фото процесу, відправляю полотно залакованим і запакованим.</p>
+            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Two to four weeks depending on size. I send progress photos, and the painting ships varnished and packed.">Два–чотири тижні залежно від розміру. Надсилаю фото процесу, відправляю полотно залакованим і запакованим.</p>
           </div>
         </div>
       </div>
@@ -387,32 +385,32 @@
 
   <section id="collab" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
     <div style="max-width: 76ch;">
-      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #B4501C; margin-bottom: 22px;" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
+      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
       <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.8vw, 52px); line-height: 1.1; margin: 0 0 26px;" data-en="The paintings can live beyond the canvas">Картини можуть жити далі за полотно</h2>
-      <p style="font-size: 16px; line-height: 1.75; color: #3B3830; margin: 0 0 40px; text-wrap: pretty;" data-en="I am open to merch and collaborations: prints, textiles, packaging, paintings for cafés, showrooms or hotels, and an individual pattern for your brand. Have an idea? Bring it — we will invent the format together.">Відкрита до мерчу й колаборацій: принти, текстиль, упаковка, картини для кафе, шоурумів чи готелів, індивідуальний патерн для вашого бренду. Є ідея — приносьте, формат придумаємо разом.</p>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: rgba(27,26,22,.14);">
-        <div style="background: #E9E4DC; padding: 26px 22px;">
+      <p style="font-size: 16px; line-height: 1.75; color: var(--ink2); margin: 0 0 40px; text-wrap: pretty;" data-en="I am open to merch and collaborations: prints, textiles, packaging, paintings for cafés, showrooms or hotels, and an individual pattern for your brand. Have an idea? Bring it — we will invent the format together.">Відкрита до мерчу й колаборацій: принти, текстиль, упаковка, картини для кафе, шоурумів чи готелів, індивідуальний патерн для вашого бренду. Є ідея — приносьте, формат придумаємо разом.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--border);">
+        <div style="background: var(--bg); padding: 26px 22px;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Prints &amp; merch">Принти й мерч</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Licensing a work for a print run.">Ліцензія на роботу для тиражу.</p>
+          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Licensing a work for a print run.">Ліцензія на роботу для тиражу.</p>
         </div>
-        <div style="background: #E9E4DC; padding: 26px 22px;">
+        <div style="background: var(--bg); padding: 26px 22px;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Spaces">Простори</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="Paintings on the walls of your café, hotel or showroom.">Картини на стінах вашого кафе, готелю чи шоуруму.</p>
+          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Paintings on the walls of your café, hotel or showroom.">Картини на стінах вашого кафе, готелю чи шоуруму.</p>
         </div>
-        <div style="background: #E9E4DC; padding: 26px 22px;">
+        <div style="background: var(--bg); padding: 26px 22px;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Brand pattern">Патерн для бренду</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: #6A655B; margin: 0;" data-en="An individual painted pattern, drawn by hand.">Індивідуальний мальований патерн, від руки.</p>
+          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="An individual painted pattern, drawn by hand.">Індивідуальний мальований патерн, від руки.</p>
         </div>
       </div>
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 34px;">
-        <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;" data-en="Proposals to">Пропозиції надсилайте на</span>
-        <a href="{{ tgLink }}" target="_blank" rel="noopener" style="border-bottom: 1px solid #B4501C; padding-bottom: 3px; font-size: 15px;">{{ tgHandle }}</a>
-        <a href="{{ mailLink }}" style="border-bottom: 1px solid #B4501C; padding-bottom: 3px; font-size: 15px;">{{ email }}</a>
+        <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);" data-en="Proposals to">Пропозиції надсилайте на</span>
+        <a href="{{ tgLink }}" target="_blank" rel="noopener" style="border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">{{ tgHandle }}</a>
+        <a href="{{ mailLink }}" style="border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">{{ email }}</a>
       </div>
     </div>
   </section>
 
-  <section id="contact" style="background: #0A1C3B; color: #E4DED4;">
+  <section id="contact" style="background: var(--navy-bg); color: #E4DED4;">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(32px, 5vw, 70px); align-items: end;">
         <div>
@@ -472,7 +470,7 @@
             <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #7C766C;">{{ lOne }}</div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-            <button onClick="{{ addToCart }}" style="background: #E9E4DC; color: #0A1C3B; border: none; padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lAdd }}</button>
+            <button onClick="{{ addToCart }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lAdd }}</button>
             <button onClick="{{ askTg }}" style="background: none; color: #E4DED4; border: 1px solid rgba(228,222,212,.32); padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="border-color: #E4DED4;">{{ lAsk }}</button>
           </div>
           <div style="display: flex; gap: 22px; margin-top: 34px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #9C958A;">
@@ -487,46 +485,46 @@
 
   <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeCart }}" style="position: fixed; inset: 0; z-index: 95; background: rgba(10,28,59,.6); display: flex; justify-content: flex-end;">
-      <aside onClick="{{ stop }}" style="width: min(440px, 100%); background: #E9E4DC; height: 100%; display: flex; flex-direction: column; box-shadow: -30px 0 60px rgba(0,0,0,.35); animation: floatIn .3s ease-out both;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px clamp(20px, 3vw, 32px); border-bottom: 1px solid rgba(27,26,22,.14);">
+      <aside onClick="{{ stop }}" style="width: min(440px, 100%); background: var(--bg); height: 100%; display: flex; flex-direction: column; box-shadow: -30px 0 60px rgba(0,0,0,.35); animation: floatIn .3s ease-out both;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px clamp(20px, 3vw, 32px); border-bottom: 1px solid var(--border);">
           <div style="font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">{{ lCart }}</div>
-          <button onClick="{{ closeCart }}" aria-label="Закрити" style="background: none; border: none; font-size: 17px; cursor: pointer; color: #1B1A16; width: 44px; height: 44px;">✕</button>
+          <button onClick="{{ closeCart }}" aria-label="Закрити" style="background: none; border: none; font-size: 17px; cursor: pointer; color: var(--ink); width: 44px; height: 44px;">✕</button>
         </div>
         <div style="flex: 1; overflow-y: auto; padding: clamp(16px, 2.4vw, 26px) clamp(20px, 3vw, 32px);">
           <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
-            <p style="font-size: 14.5px; line-height: 1.7; color: #6A655B;">{{ lEmpty }}</p>
+            <p style="font-size: 14.5px; line-height: 1.7; color: var(--ink5);">{{ lEmpty }}</p>
           </sc-if>
           <sc-for list="{{ cart }}" as="it" hint-placeholder-count="2">
-            <div style="display: grid; grid-template-columns: 68px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(27,26,22,.12);">
+            <div style="display: grid; grid-template-columns: 68px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border);">
               <sc-if value="{{ it.hasThumb }}" hint-placeholder-val="{{ true }}">
                 <img src="{{ it.thumb }}" alt="{{ it.title }}" style="display: block; width: 68px; height: 68px; object-fit: cover;">
               </sc-if>
               <sc-if value="{{ it.noThumb }}" hint-placeholder-val="{{ false }}">
-                <div style="width: 68px; height: 68px; background: #DCD5C9; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #B4501C;">◦</div>
+                <div style="width: 68px; height: 68px; background: var(--cream3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--terracotta);">◦</div>
               </sc-if>
               <div>
                 <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px;">{{ it.title }}</div>
-                <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #857F74; margin-top: 5px;">{{ it.size }}</div>
+                <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 5px;">{{ it.size }}</div>
                 <div style="font-size: 13.5px; margin-top: 6px;">{{ it.priceText }}</div>
               </div>
-              <button data-i="{{ it.idx }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid rgba(27,26,22,.2); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: #6A655B; font-size: 13px;" style-hover="border-color: #B4501C; color: #B4501C;">✕</button>
+              <button data-i="{{ it.idx }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: var(--ink5); font-size: 13px;" style-hover="border-color: #B4501C; color: #B4501C;">✕</button>
             </div>
           </sc-for>
         </div>
-        <div style="padding: clamp(18px, 2.6vw, 28px) clamp(20px, 3vw, 32px); border-top: 1px solid rgba(27,26,22,.14);">
+        <div style="padding: clamp(18px, 2.6vw, 28px) clamp(20px, 3vw, 32px); border-top: 1px solid var(--border);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px;">
-            <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #857F74;">{{ lTotal }}</span>
+            <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);">{{ lTotal }}</span>
             <span style="font-family: 'Cormorant Garamond', serif; font-size: 30px;">{{ totalText }}</span>
           </div>
-          <button onClick="{{ checkout }}" style="width: 100%; background: #0A1C3B; color: #E9E4DC; border: none; padding: 17px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 50px;" style-hover="background: #B4501C;">{{ lCheckout }}</button>
-          <p style="font-size: 12px; line-height: 1.6; color: #857F74; margin: 14px 0 0;">{{ lCheckoutNote }}</p>
+          <button onClick="{{ checkout }}" style="width: 100%; background: var(--navy-bg); color: var(--cream-text); border: none; padding: 17px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 50px;" style-hover="background: #B4501C;">{{ lCheckout }}</button>
+          <p style="font-size: 12px; line-height: 1.6; color: var(--muted); margin: 14px 0 0;">{{ lCheckoutNote }}</p>
         </div>
       </aside>
     </div>
   </sc-if>
 
   <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-    <div style="position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 120; background: #0A1C3B; color: #E9E4DC; padding: 14px 26px; font-size: 12.5px; letter-spacing: .04em; box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); animation: floatIn .3s ease-out both; max-width: 90vw; text-align: center;">{{ toast }}</div>
+    <div style="position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 120; background: var(--navy-bg); color: var(--cream-text); padding: 14px 26px; font-size: 12.5px; letter-spacing: .04em; box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); animation: floatIn .3s ease-out both; max-width: 90vw; text-align: center;">{{ toast }}</div>
   </sc-if>
 </div>
 
