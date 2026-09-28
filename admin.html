@@ -171,7 +171,7 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const CFG = window.SUPABASE_CONFIG || {};
 const CONFIG_OK = CFG.url && CFG.anonKey;
 const BUCKET = "items";
-const CATS = ["paintings", "postcards", "boxes", "projects"];
+const TOOLS = /[?&]tools\b/.test(location.search);
 const NEW_TITLE = { paintings: "Нова картина", postcards: "Нова листівка", boxes: "Новий бокс", projects: "Нове фото" };
 
 // English names of the original built-in halls (used when a hall has no English name in the «Зали» tab).
@@ -259,9 +259,13 @@ async function encodeImage(img, max) {
 async function putFile(path, enc) {
   const signed = await sb.storage.from(BUCKET).createSignedUploadUrl(path);
   if (signed.error) throw new Error("Створення посилання для фото: " + (signed.error.message || signed.error));
+  // The SDK sends multipart with a cacheControl field — the only way the long cache header is stored.
+  const up = await sb.storage.from(BUCKET).uploadToSignedUrl(path, signed.data.token, enc.blob, { cacheControl: "31536000", contentType: enc.type });
+  if (!up.error) return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  console.warn("uploadToSignedUrl failed, retrying with a plain PUT:", up.error.message || up.error);
   const res = await fetch(signed.data.signedUrl, {
     method: "PUT",
-    headers: { "Content-Type": enc.type, "Cache-Control": "max-age=31536000" },
+    headers: { "Content-Type": enc.type },
     body: enc.blob
   });
   if (!res.ok) {
@@ -280,15 +284,59 @@ async function uploadPhoto(id, source) {
   return putFile(base + "-full." + full.ext, full);
 }
 
-function storagePaths(id, url) {
-  const out = new Set([id + "/full.webp"]);
+// Bucket paths of the files behind an image URL (the full image and its thumb).
+function urlPaths(url) {
   const m = String(url || "").match(new RegExp("/object/public/" + BUCKET + "/([^?#]+)"));
-  if (m) {
-    const p = decodeURIComponent(m[1]);
-    out.add(p);
-    if (/-full\.(webp|jpe?g)$/i.test(p)) out.add(p.replace(/-full\.(webp|jpe?g)$/i, "-thumb.$1"));
+  if (!m) return [];
+  const p = decodeURIComponent(m[1]);
+  return /-full\.(webp|jpe?g)$/i.test(p) ? [p, p.replace(/-full\.(webp|jpe?g)$/i, "-thumb.$1")] : [p];
+}
+
+function storagePaths(id, url) {
+  return [...new Set([id + "/full.webp", ...urlPaths(url)])];
+}
+
+// One-off maintenance (admin.html?tools): delete bucket files no item points to any more.
+async function cleanupStorage() {
+  if (busy) return;
+  if (!(await requireAuth())) return;
+  const log = $("#cleanLog");
+  busy = true;
+  try {
+    const keep = new Set();
+    rows.forEach((r) => urlPaths(r.img).forEach((p) => keep.add(p)));
+    const top = await sb.storage.from(BUCKET).list("", { limit: 1000 });
+    if (top.error) throw top.error;
+    const folders = (top.data || []).filter((o) => !o.id).map((o) => o.name);
+    if (!folders.length && keep.size) throw new Error("немає доступу до списку файлів — виконайте SQL №3 з ДОКУМЕНТАЦІЯ.md");
+    const orphans = [];
+    for (const f of folders) {
+      log.textContent = "Перевіряю папку " + f + "…";
+      const ls = await sb.storage.from(BUCKET).list(f, { limit: 1000 });
+      if (ls.error) throw ls.error;
+      (ls.data || []).filter((o) => o.id).forEach((o) => {
+        const p = f + "/" + o.name;
+        if (!keep.has(p)) orphans.push({ p, size: (o.metadata && o.metadata.size) || 0 });
+      });
+    }
+    const mb = (orphans.reduce((s, o) => s + o.size, 0) / 1e6).toFixed(1);
+    if (!orphans.length) { log.textContent = "Зайвих файлів немає."; return; }
+    if (!confirm("Видалити " + orphans.length + " зайвих файлів (" + mb + " МБ)? Файли, на які посилаються роботи, не зачіпаються.")) { log.textContent = ""; return; }
+    let removed = 0;
+    for (let i = 0; i < orphans.length; i += 100) {
+      const rm = await sb.storage.from(BUCKET).remove(orphans.slice(i, i + 100).map((o) => o.p));
+      if (rm.error) throw rm.error;
+      removed += (rm.data || []).length;
+    }
+    log.textContent = removed
+      ? "Видалено файлів: " + removed + " з " + orphans.length + " (" + mb + " МБ)."
+      : "Supabase нічого не видалив — немає дозволу на видалення. Виконайте SQL №3 з ДОКУМЕНТАЦІЯ.md.";
+  } catch (e) {
+    console.error(e);
+    log.textContent = "Помилка: " + (e && e.message ? e.message : e);
+  } finally {
+    busy = false;
   }
-  return [...out];
 }
 
 async function removeFiles(paths) {
@@ -554,22 +602,48 @@ function renderExtra() {
       <button class="btn btn-dark" id="stEtsySave" ${settingsOk ? "" : "disabled"}>Зберегти</button>
     </div>
     <div class="card">
+      <h2>Пароль до адмінки</h2>
+      <p class="muted" style="margin-bottom:14px;">Придумайте свій пароль (мінімум 8 символів). Після зміни входьте вже з новим.</p>
+      <div class="grid2">
+        <label>Новий пароль<input id="pw1" type="password" autocomplete="new-password"></label>
+        <label>Ще раз<input id="pw2" type="password" autocomplete="new-password"></label>
+      </div>
+      <button class="btn btn-dark" id="pwSave">Змінити пароль</button>
+    </div>
+    ${legacy.length ? `<div class="card">
       <h2>Оптимізація фото</h2>
-      <p class="muted" style="margin-bottom:14px;">${legacy.length
-        ? "Фото, завантажені раніше, важать по 1–3 МБ і гальмують сайт на телефонах. Кнопка перестисне їх (" + legacy.length + " шт.) — займе кілька хвилин, сторінку не закривайте. Краще робити з комп'ютера."
-        : "Усі фото вже оптимізовані."}</p>
-      ${legacy.length ? '<button class="btn btn-dark" id="optBtn">Перестиснути ' + legacy.length + ' фото</button>' : ""}
+      <p class="muted" style="margin-bottom:14px;">Фото, завантажені раніше, важать по 1–3 МБ і гальмують сайт на телефонах. Кнопка перестисне їх (${legacy.length} шт.) — займе кілька хвилин, сторінку не закривайте. Краще робити з комп'ютера.</p>
+      <button class="btn btn-dark" id="optBtn">Перестиснути ${legacy.length} фото</button>
       <p class="muted" id="optLog" style="margin-top:10px;"></p>
-    </div>`;
+    </div>` : ""}
+    ${TOOLS ? `<div class="card">
+      <h2>Сховище фото</h2>
+      <p class="muted" style="margin-bottom:14px;">Шукає у сховищі файли, на які вже не посилається жодна робота (старі версії фото, видалені роботи), і прибирає їх.</p>
+      <button class="btn btn-line" id="cleanBtn">Знайти й прибрати зайві файли</button>
+      <p class="muted" id="cleanLog" style="margin-top:10px;"></p>
+    </div>` : ""}`;
     $("#stEtsySave").addEventListener("click", () => {
       const v = $("#stEtsy").value.trim();
       if (v && !/^https?:\/\//i.test(v)) { toast("Посилання має починатися з https://"); return; }
       saveSettings({ etsy_url: v });
     });
+    $("#pwSave").addEventListener("click", changePassword);
     if ($("#optBtn")) $("#optBtn").addEventListener("click", optimizeLegacy);
+    if ($("#cleanBtn")) $("#cleanBtn").addEventListener("click", cleanupStorage);
   } else {
     el.innerHTML = "";
   }
+}
+
+async function changePassword() {
+  const p1 = $("#pw1").value, p2 = $("#pw2").value;
+  if (p1.length < 8) { toast("Пароль має бути щонайменше 8 символів"); return; }
+  if (p1 !== p2) { toast("Паролі не збігаються"); return; }
+  if (!(await requireAuth())) return;
+  const { error } = await sb.auth.updateUser({ password: p1 });
+  if (error) { toast("Помилка: " + error.message); return; }
+  $("#pw1").value = $("#pw2").value = "";
+  toast("Пароль змінено");
 }
 
 async function saveSettings(obj) {
