@@ -2,3 +2,4 @@
 uploads/
 .image-slots.state.json
 node_modules/
+.claude/

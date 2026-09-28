@@ -3,7 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>try{if(localStorage.getItem('ko_theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+<title>Катерина Онокало — абстрактний живопис, авторські картини</title>
+<meta name="description" content="Катерина Онокало — українська художниця. Авторські картини в наявності, листівки, подарункові бокси. Олія та акрил, 15 років, 1200 робіт. Картина на замовлення.">
+<meta name="theme-color" content="#E9E4DC">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="uk_UA">
+<meta property="og:site_name" content="Катерина Онокало">
+<meta property="og:title" content="Катерина Онокало — абстрактний живопис">
+<meta property="og:description" content="Авторські картини в наявності, листівки та подарункові бокси. Олія та акрил. Картина на замовлення з авторським ескізом.">
+<meta property="og:url" content="https://antony-the-dev.github.io/kate_onokalo/">
+<meta property="og:image" content="https://antony-the-dev.github.io/kate_onokalo/img/og-1200.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<link rel="preconnect" href="https://gdekiqdwjyaxvnxnbvpc.supabase.co" crossorigin>
+<script>try{if(localStorage.getItem('ko_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name="theme-color"]').setAttribute('content','#0A1C3B');}}catch(e){}</script>
 <script src="./support.js"></script>
 <script src="./supabase-config.js"></script>
 </head>
@@ -13,16 +30,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Commissioner:wght@200;300;400;500&display=swap" rel="stylesheet">
-<title>Катерина Онокало — абстрактний живопис, авторські картини</title>
-<meta name="description" content="Катерина Онокало — українська художниця. Авторські картини в наявності, листівки, закладинки, подарункові бокси. Олія та акрил, 15 років, 1200 робіт. Картина на замовлення.">
-<meta name="theme-color" content="#E9E4DC">
-<meta property="og:type" content="website">
-<meta property="og:locale" content="uk_UA">
-<meta property="og:title" content="Катерина Онокало — абстрактний живопис">
-<meta property="og:description" content="Авторські картини в наявності, листівки, закладинки та подарункові бокси. Олія та акрил. Картина на замовлення з авторським ескізом.">
-<meta property="og:image" content="img/hero-1600.webp">
-<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
-<link rel="apple-touch-icon" href="img/favicon-180.png">
 <style>
   html { -webkit-text-size-adjust: 100%; }
   :root {
@@ -50,6 +57,7 @@
     --menu-bg: rgba(10,28,59,.97);
   }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Commissioner", system-ui, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-anchor: none; }
+  .dc-root { overflow-x: hidden; overflow-x: clip; }
   .dc-mmenu { overscroll-behavior: contain; }
   * { box-sizing: border-box; }
   a { color: inherit; text-decoration: none; }
@@ -71,13 +79,11 @@
   .dc-top:hover { background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg); }
   img { max-width: 100%; }
   section[id] { scroll-margin-top: 88px; }
-  [data-theme="dark"] #artModal [style*="background: var(--bg)"] { background: #E9E4DC !important; color: #0A1C3B !important; }
-  [data-theme="dark"] #artModal [style*="color: var(--ltext)"] { color: #E4DED4 !important; }
-  [data-theme="dark"] #artModal [style*="color: var(--ltext2)"] { color: #C4BDB2 !important; }
-  [data-theme="dark"] #artModal [style*="color: var(--lmut)"] { color: #9C958A !important; }
-  [data-theme="dark"] #artModal [style*="color: var(--lgold)"] { color: #C7A17A !important; }
-  [data-theme="dark"] #artModal [style*="color: var(--ldim)"] { color: #7C766C !important; }
-  [data-theme="dark"] #artModal [style*="var(--lnav-b)"] { border-color: rgba(228,222,212,.2) !important; }
+  [data-theme="dark"] .dc-modal {
+    --bg: #E9E4DC; --navy-ink: #0A1C3B;
+    --ltext: #E4DED4; --ltext2: #C4BDB2; --lmut: #9C958A; --lgold: #C7A17A; --ldim: #7C766C;
+    --lnav-b: rgba(228,222,212,.2);
+  }
   [data-theme="dark"] #order {
     color: #1B1A16 !important;
     --bg: #FBF6EA !important; --cream2: #E9E4DC !important;
@@ -87,26 +93,67 @@
     --navy-bg: #0A1C3B !important; --cream-text: #E9E4DC !important;
     --border: rgba(27,26,22,.18) !important;
   }
-  [data-wall]::-webkit-scrollbar { display: none; }
-  [data-wall] { scrollbar-width: none; -ms-overflow-style: none; }
+  .dc-nav a { white-space: nowrap; }
+  .dc-dd { position: relative; display: inline-flex; align-items: center; }
+  .dc-dd-toggle::after { content: "▾"; margin-left: 6px; font-size: 9px; letter-spacing: 0; opacity: .55; }
+  .dc-dd-menu {
+    position: absolute; top: 100%; left: -22px; padding-top: 24px; z-index: 45;
+    visibility: hidden; opacity: 0; transform: translateY(-6px);
+    transition: opacity .25s ease, transform .25s ease, visibility 0s linear .25s;
+  }
+  .dc-dd:hover .dc-dd-menu, .dc-dd:focus-within .dc-dd-menu {
+    visibility: visible; opacity: 1; transform: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .dc-dd-box { min-width: 300px; background: var(--menu-bg); border: 1px solid var(--border); box-shadow: 0 26px 50px -26px rgba(0,0,0,.4); padding: 8px 0; }
+  .dc-dd-box a { display: flex; gap: 14px; align-items: baseline; padding: 11px 22px; font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: 0; text-transform: none; color: var(--ink); white-space: normal; }
+  .dc-dd-box a:hover { color: var(--terracotta); }
+  .dc-dd-num { flex: none; min-width: 28px; font-size: 13px; letter-spacing: .22em; color: var(--terracotta); }
+  .dc-dd-box .dc-dd-all { margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--border); font-family: "Commissioner", system-ui, sans-serif; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink3); }
+  .dc-frame { aspect-ratio: 4 / 5; display: flex; align-items: flex-end; justify-content: center; cursor: pointer; }
+  .dc-frame img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; box-shadow: 0 26px 40px -24px rgba(20,19,15,.5), 0 2px 6px rgba(20,19,15,.12); transition: transform .8s cubic-bezier(.2,.7,.2,1); transform-origin: 50% 100%; }
+  .dc-frame:hover img, .dc-hallcard:hover .dc-frame img { transform: scale(1.025); }
+  .dc-frame-empty { width: 100%; height: 100%; background: var(--cream3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta); }
+  .dc-hallcard:hover .dc-hallgo { color: var(--terracotta); }
+  .dc-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
+  .dc-chips::-webkit-scrollbar { display: none; }
+  .dc-chip { flex: none; display: inline-flex; align-items: center; min-height: 40px; white-space: nowrap; border: 1px solid var(--border); border-radius: 999px; padding: 0 18px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink3); }
+  .dc-chip:hover { border-color: var(--navy-bg); color: var(--ink); }
+  .dc-chip[data-active="true"] { background: var(--navy-bg); border-color: var(--navy-bg); color: var(--cream-text); }
+  .dc-proj { column-width: 250px; column-gap: clamp(10px, 1.6vw, 22px); }
+  .dc-proj figure { break-inside: avoid; margin: 0 0 clamp(10px, 1.6vw, 22px); cursor: zoom-in; overflow: hidden; background: var(--cream2); }
+  .dc-proj img { display: block; width: 100%; height: auto; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
+  .dc-proj figure:hover img { transform: scale(1.03); }
+  .dc-lb-img { display: block; max-width: 100%; max-height: calc(100vh - 200px); max-height: calc(100svh - 200px); object-fit: contain; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
+  .dc-skel { background: var(--cream3); animation: pulse 1.6s ease-in-out infinite; }
   @keyframes floatIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   @keyframes breathe { 0%,100% { transform: translateY(10px); } 50% { transform: translateY(-12px); } }
-  @keyframes nudge { 0%,100% { transform: translateX(0); opacity: .5; } 50% { transform: translateX(9px); opacity: 1; } }
   @keyframes menuDrop { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 0%,100% { opacity: .45; } 50% { opacity: .9; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-  @media (max-width: 900px) {
+  @media (max-width: 1180px) {
     .dc-nav { display: none !important; }
     .dc-burger { display: inline-flex !important; align-items: center; justify-content: center; }
     .dc-header-inner { display: grid !important; grid-template-columns: 44px 1fr auto; justify-content: normal !important; gap: 10px; }
     .dc-logo { justify-self: center; }
   }
-@media (min-width: 901px) {
+  @media (min-width: 1181px) {
     .dc-mmenu { display: none !important; }
+  }
+  .dc-cart-ico { display: none; }
+  @media (max-width: 560px) {
+    .dc-add { padding: 10px 14px !important; }
+    .dc-hright { gap: 10px !important; }
+    .dc-header-inner { gap: 8px !important; }
+    .dc-logo-sub { letter-spacing: .2em !important; }
+    .dc-cart-label { display: none; }
+    .dc-cart-ico { display: block; }
+    .dc-proj { column-count: 2; column-width: auto; }
   }
 </style>
 </helmet>
 
-<div ref="{{ rootRef }}" style="background: var(--bg); overflow-x: hidden;">
+<div ref="{{ rootRef }}" class="dc-root" style="background: var(--bg);">
 
   <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
     <div style="background: var(--navy-bg); color: var(--cream-text); padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
@@ -120,21 +167,33 @@
       <button class="dc-burger" onClick="{{ toggleMenu }}" aria-label="Меню" aria-expanded="{{ menuOpen }}" style="display: none; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer; align-items: center; justify-content: center;">{{ menuIco }}</button>
       <a href="#top" class="dc-logo" style="display: flex; flex-direction: column; line-height: 1.05; flex: none;">
         <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;">Онокало</span>
-        <span style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--muted); padding-left: 2px;">Kateryna · Fine Art</span>
+        <span class="dc-logo-sub" style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--muted); padding-left: 2px; white-space: nowrap;">Kateryna · Fine Art</span>
       </a>
-      <nav class="dc-nav" style="display: flex; gap: clamp(16px, 2.4vw, 34px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3);">
-        <a href="#stock" data-en="Available">В наявності</a>
-        <a href="#paper" data-en="Postcards">Листівки</a>
-        <a href="#boxes" data-en="Gift boxes">Бокси</a>
+      <nav class="dc-nav" style="display: flex; align-items: center; gap: clamp(14px, 1.7vw, 30px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3);">
+        <div class="dc-dd">
+          <a href="#halls" class="dc-dd-toggle" data-en="Halls">Зали</a>
+          <div class="dc-dd-menu">
+            <div class="dc-dd-box">
+              <sc-for list="{{ hallNav }}" as="h">
+                <a href="{{ h.href }}"><span class="dc-dd-num">{{ h.num }}</span><span>{{ h.title }}</span></a>
+              </sc-for>
+              <a href="#halls" class="dc-dd-all" data-en="All halls ⟶">Усі зали ⟶</a>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ hasProjects }}"><a href="#projects" data-en="Projects">Реалізовані</a></sc-if>
+        <sc-if value="{{ hasPaper }}"><a href="#paper" data-en="Postcards">Листівки</a></sc-if>
+        <sc-if value="{{ hasBoxes }}"><a href="#boxes" data-en="Gift boxes">Бокси</a></sc-if>
         <a href="#order" data-en="Commission">На замовлення</a>
         <a href="#about" data-en="About">Про мене</a>
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
-      <div style="display: flex; align-items: center; gap: 18px; flex: none;">
+      <div class="dc-hright" style="display: flex; align-items: center; gap: 18px; flex: none;">
         <button onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ langLabel }}</button>
         <button onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ themeIco }}</button>
-        <button onClick="{{ openCart }}" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
-          <span data-en="Cart">Кошик</span>
+        <button onClick="{{ openCart }}" aria-label="Кошик" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
+          <svg class="dc-cart-ico" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          <span class="dc-cart-label" data-en="Cart">Кошик</span>
           <span style="min-width: 20px; height: 20px; border-radius: 999px; background: var(--navy-bg); color: var(--cream-text); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
         </button>
       </div>
@@ -147,9 +206,21 @@
         <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer;">✕</button>
       </div>
       <nav aria-label="Меню" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
-        <a href="#stock" onClick="{{ closeMenu }}" data-en="Available" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">В наявності</a>
-        <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
-        <a href="#boxes" onClick="{{ closeMenu }}" data-en="Gift boxes" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Бокси</a>
+        <a href="#halls" onClick="{{ closeMenu }}" data-en="Halls" style="padding: 14px 0 8px; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Зали</a>
+        <div style="display: flex; flex-direction: column; padding: 0 0 12px 4px; border-bottom: 1px solid var(--border);">
+          <sc-for list="{{ hallNav }}" as="h">
+            <a href="{{ h.href }}" onClick="{{ closeMenu }}" style="display: flex; gap: 12px; align-items: baseline; padding: 8px 0; font-family: 'Cormorant Garamond', serif; font-size: 20px; line-height: 1.2; color: var(--ink2);" style-hover="color: #B4501C;"><span style="flex: none; min-width: 28px; font-size: 12px; letter-spacing: .22em; color: var(--terracotta);">{{ h.num }}</span><span>{{ h.title }}</span></a>
+          </sc-for>
+        </div>
+        <sc-if value="{{ hasProjects }}">
+          <a href="#projects" onClick="{{ closeMenu }}" data-en="Completed projects" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Реалізовані проєкти</a>
+        </sc-if>
+        <sc-if value="{{ hasPaper }}">
+          <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
+        </sc-if>
+        <sc-if value="{{ hasBoxes }}">
+          <a href="#boxes" onClick="{{ closeMenu }}" data-en="Gift boxes" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Бокси</a>
+        </sc-if>
         <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
         <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
         <a href="#contact" onClick="{{ closeMenu }}" data-en="Contact" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Контакти</a>
@@ -165,7 +236,7 @@
       </h1>
       <p style="font-size: clamp(16px, 1.35vw, 19px); line-height: 1.65; max-width: 40ch; color: var(--ink2); margin: 0 0 36px; text-wrap: pretty;" data-en="I have been painting for fifteen years — around 1200 canvases have left the studio.">Я малюю п’ятнадцять років — близько 1200 полотен уже покинули студію.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 14px;">
-        <a href="#wall" style="background: var(--navy-bg); color: var(--cream-text); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: var(--terracotta); color: #F3EFE8;" data-en="Walk the gallery">Пройти галереєю</a>
+        <a href="#halls" style="background: var(--navy-bg); color: var(--cream-text); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: var(--terracotta); color: #F3EFE8;" data-en="Walk the gallery">Пройти галереєю</a>
         <a href="#order" style="border: 1px solid var(--border); padding: 15px 30px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; min-height: 46px; display: inline-flex; align-items: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);" data-en="Commission a painting">Картина на замовлення</a>
       </div>
       <div style="display: flex; gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 6vw, 68px); padding-top: 26px; border-top: 1px solid var(--border);">
@@ -177,165 +248,210 @@
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">1200</div>
           <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;" data-en="canvases">полотен</div>
         </div>
-        <div>
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">4</div>
-          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;" data-en="halls / series">зали серій</div>
-        </div>
+        <a href="#halls" style="display: block;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 34px; line-height: 1; color: var(--terracotta);">{{ hallsNum }}</div>
+          <div style="font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-top: 8px;">{{ hallsWord }}</div>
+        </a>
       </div>
     </div>
     <div style="position: relative; display: flex; justify-content: center; animation: floatIn 1.1s .1s ease-out both;">
       <div style="animation: breathe 6.3s ease-in-out infinite;">
-        <img src="img/hero-1600.webp" alt="Течія, олія на полотні" style="display: block; width: min(560px, 82vw); box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
+        <img src="img/hero-1600.webp" alt="Абстракція, олія на полотні" width="1582" height="1600" style="display: block; width: min(560px, 82vw); height: auto; box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
       </div>
       <div style="position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); width: min(620px, 90vw); height: 60px; background: radial-gradient(ellipse at center, rgba(20,19,15,.16), transparent 70%);"></div>
     </div>
   </section>
 
-  <section id="wall" style="padding-bottom: clamp(56px, 8vw, 110px);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px) 30px; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 1px solid var(--border);">
-      <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="The wall">Стіна</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0; letter-spacing: -.01em;" data-en="Four halls, one wall">Чотири зали, одна стіна</h2>
-      </div>
-      <div style="display: flex; align-items: center; gap: 14px; padding-bottom: 4px;">
-        <span style="font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);" data-en="Drag or swipe sideways">Тягніть або листайте вбік</span>
-        <div style="display: flex; gap: 8px;">
-          <button onClick="{{ wallPrev }}" aria-label="Назад" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--ink); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="background: var(--navy-bg); border-color: var(--navy-bg); color: var(--cream-text);">⟵</button>
-          <button onClick="{{ wallNext }}" aria-label="Далі" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--ink); font-size: 14px; cursor: pointer; line-height: 1; animation: nudge 3s ease-in-out infinite;" style-hover="background: var(--navy-bg); border-color: var(--navy-bg); color: var(--cream-text);">⟶</button>
+  <section id="halls" style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
+
+    <sc-if value="{{ hallOverview }}">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+        <div>
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Available">В наявності</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gallery halls">Зали галереї</h2>
         </div>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 40ch; margin: 0;" data-en="Everything in the halls is in stock or ready to ship within 2–3 days.">Усе, що в залах, — у наявності або буде готове до відправки за 2–3 дні.</p>
       </div>
-    </div>
 
-    <div data-wall="1" ref="{{ wallRef }}" style="display: flex; align-items: center; gap: clamp(46px, 6vw, 110px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; padding: clamp(40px, 6vw, 76px) max(24px, 34vw) clamp(30px, 4vw, 56px); background: linear-gradient(180deg, var(--bg) 0%, var(--cream2) 60%, var(--cream3) 100%);">
-
-      <sc-if value="{{ wallEmpty }}">
-        <div style="flex: none; width: min(360px, 80vw); scroll-snap-align: center;">
-          <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.3; margin-bottom: 14px;" data-en="The gallery is being filled — come back soon.">Галерея наповнюється — загляньте трохи згодом.</div>
+      <sc-if value="{{ dataLoading }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(44%, 250px), 1fr)); gap: clamp(28px, 3.4vw, 48px) clamp(14px, 2vw, 32px);">
+          <div><div class="dc-skel" style="aspect-ratio: 4 / 5;"></div><div class="dc-skel" style="height: 22px; width: 64%; margin-top: 20px;"></div></div>
+          <div><div class="dc-skel" style="aspect-ratio: 4 / 5;"></div><div class="dc-skel" style="height: 22px; width: 52%; margin-top: 20px;"></div></div>
+          <div><div class="dc-skel" style="aspect-ratio: 4 / 5;"></div><div class="dc-skel" style="height: 22px; width: 70%; margin-top: 20px;"></div></div>
         </div>
       </sc-if>
+      <sc-if value="{{ dataError }}">
+        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.3; margin: 0; max-width: 34ch;" data-en="The gallery did not load. Refresh the page or write to me in Telegram.">Галерея не завантажилась. Оновіть сторінку або напишіть мені в Telegram.</p>
+      </sc-if>
+      <sc-if value="{{ hallsEmpty }}">
+        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.3; margin: 0;" data-en="The gallery is being filled — come back soon.">Галерея наповнюється — загляньте трохи згодом.</p>
+      </sc-if>
 
-      <sc-for list="{{ wall }}" as="it" hint-placeholder-count="11">
-        <sc-if value="{{ it.isDiv }}">
-          <div style="flex: none; width: min(280px, 64vw); scroll-snap-align: center;">
-            <div style="height: 1px; background: var(--terracotta); width: 46px; margin-bottom: 20px;"></div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .32em; color: var(--terracotta);">{{ it.num }}</div>
-            <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3vw, 40px); margin: 8px 0 14px;">{{ it.title }}</h3>
-            <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); margin: 0;">{{ it.note }}</p>
-          </div>
-        </sc-if>
-        <sc-if value="{{ it.isWork }}">
-          <figure data-art="{{ it.artId }}" onClick="{{ openWork }}" tabindex="0" role="button" style="flex: none; margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 20px; scroll-snap-align: center; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s ease; will-change: transform;">
-            <img src="{{ it.img }}" alt="{{ it.title }}" style="display: block; height: clamp(280px, 54vh, 620px); width: auto; max-width: 84vw; box-shadow: 0 40px 70px -30px rgba(20,19,15,.5), 0 2px 8px rgba(20,19,15,.16);">
-            <figcaption style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
-              <div>
-                <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 23px; line-height: 1.1;">{{ it.title }}</div>
-                <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.meta }}</div>
-              </div>
-              <div style="font-size: 14px; white-space: nowrap;">{{ it.price }}</div>
-            </figcaption>
-          </figure>
-        </sc-if>
-        <sc-if value="{{ it.isTail }}">
-          <div style="flex: none; width: min(320px, 70vw); scroll-snap-align: center; align-self: center;">
-            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.25; margin-bottom: 18px;" data-en="This is a fraction of 1200 canvases.">Це частка з 1200 полотен.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); margin: 0 0 22px;" data-en="Looking for a particular colour, size or mood — write to me and I will send what is in the studio right now.">Шукаєте певний колір, розмір чи настрій — напишіть, і я надішлю те, що зараз є у студії.</p>
-            <a href="#contact" style="border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;" data-en="Write to me">Написати мені</a>
-          </div>
-        </sc-if>
-      </sc-for>
-    </div>
-  </section>
-
-  <section id="stock" style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(40px, 6vw, 80px);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
-      <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Catalogue">Каталог</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original paintings available">Авторські картини в наявності</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(44%, 250px), 1fr)); gap: clamp(34px, 3.6vw, 52px) clamp(14px, 2vw, 32px); align-items: start;">
+        <sc-for list="{{ hallCards }}" as="h" hint-placeholder-count="4">
+          <a href="{{ h.href }}" class="dc-hallcard" style="display: flex; flex-direction: column; min-width: 0; color: var(--ink);">
+            <div class="dc-frame">
+              <img src="{{ h.cover }}" alt="{{ h.title }}" width="{{ h.w }}" height="{{ h.h }}" loading="lazy" decoding="async">
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 22px;">
+              <span style="flex: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: .26em; color: var(--terracotta);">{{ h.num }}</span>
+              <span style="font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2.1vw, 30px); line-height: 1.12;">{{ h.title }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);">
+              <span>{{ h.count }}</span>
+              <span class="dc-hallgo" data-en="Enter ⟶">Увійти ⟶</span>
+            </div>
+          </a>
+        </sc-for>
       </div>
-      <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); padding-bottom: 6px; white-space: nowrap;">{{ stockCount }}</div>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 268px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
-      <sc-for list="{{ catalog }}" as="it" hint-placeholder-count="7">
-        <div style="display: flex; flex-direction: column;">
-          <div data-art="{{ it.id }}" onClick="{{ openWork }}" tabindex="0" role="button" style="background: var(--cream2); overflow: hidden; cursor: pointer;">
-            <img src="{{ it.thumb }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1);" style-hover="transform: scale(1.04);">
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
-            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 21px; line-height: 1.15;">{{ it.title }}</div>
-            <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
-          </div>
-          <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
-          <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
+    </sc-if>
+
+    <sc-if value="{{ hallOpen }}">
+      <div class="dc-chips" style="margin-bottom: clamp(24px, 3vw, 36px);">
+        <a href="#halls" class="dc-chip" data-en="⟵ All halls">⟵ Усі зали</a>
+        <sc-for list="{{ hallChips }}" as="c">
+          <a href="{{ c.href }}" class="dc-chip" data-active="{{ c.active }}">{{ c.title }}</a>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+        <div style="max-width: 64ch;">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);">{{ hEyebrow }}</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 3.8vw, 52px); line-height: 1.08; margin: 12px 0 0;">{{ hTitle }}</h2>
+          <sc-if value="{{ hNote }}">
+            <p style="font-size: 15px; line-height: 1.7; color: var(--ink4); margin: 16px 0 0; text-wrap: pretty;">{{ hNote }}</p>
+          </sc-if>
         </div>
-      </sc-for>
-    </div>
-  </section>
-
-  <section id="paper" style="background: var(--cream2); border-top: 1px solid var(--border);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
-      <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Paper">Папір</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original postcards and bookmarks">Авторські листівки і закладинки</h2>
+        <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); white-space: nowrap;">{{ hCount }}</div>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 244px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
-
-        <sc-for list="{{ paper }}" as="it" hint-placeholder-count="4">
-          <div style="display: flex; flex-direction: column;">
-            <div style="aspect-ratio: 1; background: var(--cream3); overflow: hidden;">
-              <sc-if value="{{ it.hasImg }}">
-                <img src="{{ it.img }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 1; object-fit: cover;">
-              </sc-if>
-              <sc-if value="{{ it.noImg }}">
-                <div style="width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">◦</div>
-              </sc-if>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 240px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
+        <sc-for list="{{ hallWorks }}" as="it">
+          <div style="display: flex; flex-direction: column; min-width: 0;">
+            <div class="dc-frame" data-art="{{ it.id }}" onClick="{{ openWork }}" tabindex="0" role="button" aria-label="{{ it.title }}">
+              <img src="{{ it.img }}" alt="{{ it.title }}" width="{{ it.w }}" height="{{ it.h }}" loading="lazy" decoding="async">
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
-              <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 21px; line-height: 1.15;">{{ it.title }}</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.15; margin-top: 18px;">{{ it.title }}</div>
+            <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 7px; line-height: 1.55;">{{ it.meta }}</div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-top: 14px;">
               <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
+              <sc-if value="{{ it.canBuy }}">
+                <button class="dc-add" data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
+              </sc-if>
+              <sc-if value="{{ it.onRequest }}">
+                <button class="dc-add" data-title="{{ it.title }}" onClick="{{ askWork }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAskShort }}</button>
+              </sc-if>
             </div>
-            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
-            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
           </div>
         </sc-for>
       </div>
-    </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 18px 40px; margin-top: clamp(44px, 6vw, 72px); padding-top: 28px; border-top: 1px solid var(--border);">
+        <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(20px, 2vw, 26px); line-height: 1.3; margin: 0; max-width: 44ch;" data-en="Looking for a particular colour, size or mood — write to me and I will send what is in the studio right now.">Шукаєте певний колір, розмір чи настрій — напишіть, і я надішлю те, що зараз є у студії.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          <a href="#halls" class="dc-chip" data-en="⟵ All halls">⟵ Усі зали</a>
+          <a href="#contact" class="dc-chip" data-en="Write to me">Написати мені</a>
+        </div>
+      </div>
+    </sc-if>
   </section>
 
-  <section id="boxes" style="border-top: 1px solid var(--border);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
-      <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(26px, 4vw, 44px);">
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Gifts">Подарунки</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gift boxes">Подарункові бокси</h2>
+  <sc-if value="{{ hasPaper }}">
+    <section id="paper" style="background: var(--cream2); border-top: 1px solid var(--border);">
+      <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
+        <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Paper">Папір</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original postcards and bookmarks">Авторські листівки і закладинки</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 240px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
+          <sc-for list="{{ paper }}" as="it" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+              <div class="dc-frame" style="cursor: default;">
+                <sc-if value="{{ it.hasImg }}">
+                  <img src="{{ it.img }}" alt="{{ it.title }}" width="{{ it.w }}" height="{{ it.h }}" loading="lazy" decoding="async">
+                </sc-if>
+                <sc-if value="{{ it.noImg }}">
+                  <div class="dc-frame-empty">◦</div>
+                </sc-if>
+              </div>
+              <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.15; margin-top: 18px;">{{ it.title }}</div>
+              <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 7px; line-height: 1.55;">{{ it.size }}</div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-top: 14px;">
+                <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
+                <sc-if value="{{ it.canBuy }}">
+                  <button class="dc-add" data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
+                </sc-if>
+                <sc-if value="{{ it.onRequest }}">
+                  <button class="dc-add" data-title="{{ it.title }}" onClick="{{ askWork }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAskShort }}</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: clamp(20px, 2.6vw, 40px) clamp(16px, 2vw, 28px);">
+    </section>
+  </sc-if>
 
-        <sc-for list="{{ boxes }}" as="it" hint-placeholder-count="3">
-          <div style="display: flex; flex-direction: column;">
-            <div style="aspect-ratio: 4 / 3; background: var(--cream2); overflow: hidden;">
-              <sc-if value="{{ it.hasImg }}">
-                <img src="{{ it.img }}" alt="{{ it.title }}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover;">
-              </sc-if>
-              <sc-if value="{{ it.noImg }}">
-                <div style="width: 100%; aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">◦</div>
-              </sc-if>
+  <sc-if value="{{ hasBoxes }}">
+    <section id="boxes" style="border-top: 1px solid var(--border);">
+      <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
+        <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Gifts">Подарунки</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gift boxes">Подарункові бокси</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 280px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
+          <sc-for list="{{ boxes }}" as="it" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+              <div class="dc-frame" style="cursor: default;">
+                <sc-if value="{{ it.hasImg }}">
+                  <img src="{{ it.img }}" alt="{{ it.title }}" width="{{ it.w }}" height="{{ it.h }}" loading="lazy" decoding="async">
+                </sc-if>
+                <sc-if value="{{ it.noImg }}">
+                  <div class="dc-frame-empty">◦</div>
+                </sc-if>
+              </div>
+              <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.15; margin-top: 18px;">{{ it.title }}</div>
+              <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 7px; line-height: 1.55;">{{ it.size }}</div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-top: 14px;">
+                <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
+                <sc-if value="{{ it.canBuy }}">
+                  <button class="dc-add" data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
+                </sc-if>
+                <sc-if value="{{ it.onRequest }}">
+                  <button class="dc-add" data-title="{{ it.title }}" onClick="{{ askWork }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAskShort }}</button>
+                </sc-if>
+              </div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px;">
-              <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; line-height: 1.15;">{{ it.title }}</div>
-              <div style="font-size: 14px; white-space: nowrap;">{{ it.priceText }}</div>
-            </div>
-            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 7px;">{{ it.size }}</div>
-            <button data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="margin-top: 14px; align-self: flex-start; background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasProjects }}">
+    <section id="projects" style="border-top: 1px solid var(--border);">
+      <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px 40px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+          <div style="max-width: 62ch;">
+            <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Portfolio">Портфоліо</div>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Completed projects">Реалізовані проєкти</h2>
+            <p style="font-size: 15.5px; line-height: 1.7; color: var(--ink2); margin: 18px 0 0; text-wrap: pretty; white-space: pre-line;">{{ projIntro }}</p>
           </div>
-        </sc-for>
+          <button onClick="{{ askRepeat }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: var(--terracotta); color: #F3EFE8;">{{ lRepeat }}</button>
+        </div>
+        <div class="dc-proj">
+          <sc-for list="{{ projects }}" as="p">
+            <figure data-proj="{{ p.i }}" onClick="{{ openProj }}" tabindex="0" role="button" aria-label="{{ p.alt }}">
+              <img src="{{ p.thumb }}" alt="{{ p.alt }}" width="{{ p.w }}" height="{{ p.h }}" loading="lazy" decoding="async">
+            </figure>
+          </sc-for>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </sc-if>
 
   <section id="about" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <img src="img/kate-01.webp" alt="Катерина у студії" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
-        <img src="img/kate-02.webp" alt="Катерина Онокало" style="display: block; width: 100%;">
+        <img src="img/kate-01.webp" alt="Катерина у студії" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
+        <img src="img/kate-02.webp" alt="Катерина Онокало" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <div style="border: 1px solid var(--lnav-b); padding: 18px; display: flex; flex-direction: column; justify-content: flex-end;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .3em; color: #D9662A;">2011</div>
           <div style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--lmut); margin-top: 8px;" data-en="first canvas">перше полотно</div>
@@ -364,11 +480,11 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
-        <img src="img/paint-06-w1100.webp" alt="Картина у вітальні" style="display: block; width: 100%;">
+        <img src="img/paint-06-w1100.webp" alt="Картина у вітальні" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
       </figure>
       <figure style="margin: 0;">
-        <img src="img/paint-03-w1100.webp" alt="Диптих у їдальні" style="display: block; width: 100%;">
+        <img src="img/paint-03-w1100.webp" alt="Диптих у їдальні" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
       </figure>
     </div>
@@ -384,6 +500,7 @@
           <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
           <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
           <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
+          <p style="font-size: 12.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Have a reference or a photo of your wall? Send it in the Telegram chat after the request.">Є референс чи фото стіни? Надішліть його в Telegram-чаті після запиту.</p>
           <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px;">
             <button onClick="{{ sendOrderTg }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: var(--terracotta);">{{ lSendTg }}</button>
             <button onClick="{{ sendOrderMail }}" style="background: none; color: var(--ink); border: 1px solid var(--border); padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ lSendMail }}</button>
@@ -478,6 +595,12 @@
             <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">Instagram</span>
             <span>{{ instaHandle }}</span>
           </a>
+          <sc-if value="{{ hasEtsy }}">
+            <a href="{{ etsyUrl }}" target="_blank" rel="noopener" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; border-top: 1px solid var(--lnav-b); font-size: 15px;" style-hover="color: #C7A17A;">
+              <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">Etsy</span>
+              <span style="text-align: right;" data-en="orders from abroad ↗">замовлення з-за кордону ↗</span>
+            </a>
+          </sc-if>
           <a href="{{ mailLink }}" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid var(--lnav-b); border-bottom: 1px solid var(--lnav-b); font-size: 15px;" style-hover="color: #C7A17A;">
             <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">Email</span>
             <span>{{ email }}</span>
@@ -496,24 +619,26 @@
   </section>
 
   <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
-      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; color: var(--ltext);">
+    <div class="dc-modal" onClick="{{ closeWork }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
+      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; margin: auto 0; color: var(--ltext);">
         <div style="display: flex; justify-content: center;">
-          <img src="{{ aImg }}" alt="{{ aTitle }}" style="display: block; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
+          <img src="{{ aImg }}" alt="{{ aTitle }}" width="{{ aW }}" height="{{ aH }}" loading="lazy" decoding="async" style="display: block; width: auto; height: auto; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
         </div>
         <div style="max-width: 460px;">
           <div style="font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--lgold); margin-bottom: 18px;">{{ aHall }}</div>
           <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(32px, 4vw, 54px); line-height: 1.05; margin: 0 0 22px;">{{ aTitle }}</h3>
-          <p style="font-size: 15.5px; line-height: 1.7; color: var(--ltext2); margin: 0 0 28px; text-wrap: pretty;">{{ aDesc }}</p>
+          <sc-if value="{{ aDesc }}">
+            <p style="font-size: 15.5px; line-height: 1.7; color: var(--ltext2); margin: 0 0 28px; text-wrap: pretty;">{{ aDesc }}</p>
+          </sc-if>
           <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 30px;">
-            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lSize }}</span><span>{{ aSize }}</span>
+            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
+              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lSize }}</span><span style="text-align: right;">{{ aSize }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lTech }}</span><span>{{ aTech }}</span>
+            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
+              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lTech }}</span><span style="text-align: right;">{{ aTech }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid var(--lnav-b); border-bottom: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lYear }}</span><span>{{ aYear }}</span>
+            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); border-bottom: 1px solid var(--lnav-b); font-size: 13.5px;">
+              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lYear }}</span><span style="text-align: right;">{{ aYear }}</span>
             </div>
           </div>
           <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 24px;">
@@ -521,7 +646,9 @@
             <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldim);">{{ lOne }}</div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-            <button onClick="{{ addToCart }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lAdd }}</button>
+            <sc-if value="{{ aCanBuy }}">
+              <button onClick="{{ addToCart }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lAdd }}</button>
+            </sc-if>
             <button onClick="{{ askTg }}" style="background: none; color: var(--ltext); border: 1px solid var(--lnav-b); padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="border-color: #E4DED4;">{{ lAsk }}</button>
           </div>
           <div style="display: flex; gap: 22px; margin-top: 34px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">
@@ -531,6 +658,19 @@
         </div>
       </div>
       <button onClick="{{ closeWork }}" aria-label="Закрити" style="position: fixed; top: 22px; right: 24px; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.1); border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.2);">✕</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ projOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dc-modal" onClick="{{ closeProj }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeProj }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 76px clamp(14px, 3vw, 44px) 26px; animation: floatIn .35s ease-out both;">
+      <img class="dc-lb-img" src="{{ pImg }}" alt="{{ pAlt }}" width="{{ pW }}" height="{{ pH }}" loading="lazy" decoding="async" onClick="{{ stop }}">
+      <div onClick="{{ stop }}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; color: var(--ltext);">
+        <button onClick="{{ projPrev }}" aria-label="Попереднє фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #E4DED4;">⟵</button>
+        <span style="min-width: 64px; text-align: center; font-size: 11px; letter-spacing: .22em; color: var(--lmut);">{{ pCounter }}</span>
+        <button onClick="{{ projNext }}" aria-label="Наступне фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #E4DED4;">⟶</button>
+        <button onClick="{{ askProj }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lSimilar }}</button>
+      </div>
+      <button onClick="{{ closeProj }}" aria-label="Закрити" style="position: fixed; top: 22px; right: 24px; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.1); border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.2);">✕</button>
     </div>
   </sc-if>
 
@@ -548,7 +688,7 @@
           <sc-for list="{{ cart }}" as="it" hint-placeholder-count="2">
             <div style="display: grid; grid-template-columns: 68px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border);">
               <sc-if value="{{ it.hasThumb }}" hint-placeholder-val="{{ true }}">
-                <img src="{{ it.thumb }}" alt="{{ it.title }}" style="display: block; width: 68px; height: 68px; object-fit: cover;">
+                <img src="{{ it.thumb }}" alt="{{ it.title }}" loading="lazy" decoding="async" style="display: block; width: 68px; height: 68px; object-fit: cover;">
               </sc-if>
               <sc-if value="{{ it.noThumb }}" hint-placeholder-val="{{ false }}">
                 <div style="width: 68px; height: 68px; background: var(--cream3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--terracotta);">◦</div>
@@ -558,7 +698,7 @@
                 <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 5px;">{{ it.size }}</div>
                 <div style="font-size: 13.5px; margin-top: 6px;">{{ it.priceText }}</div>
               </div>
-              <button data-i="{{ it.idx }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: var(--ink5); font-size: 13px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">✕</button>
+              <button data-sku="{{ it.sku }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: var(--ink5); font-size: 13px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">✕</button>
             </div>
           </sc-for>
         </div>
@@ -569,6 +709,9 @@
           </div>
           <button onClick="{{ checkout }}" style="width: 100%; background: var(--navy-bg); color: var(--cream-text); border: none; padding: 17px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 50px;" style-hover="background: var(--terracotta);">{{ lCheckout }}</button>
           <p style="font-size: 12px; line-height: 1.6; color: var(--muted); margin: 14px 0 0;">{{ lCheckoutNote }}</p>
+          <sc-if value="{{ hasEtsy }}">
+            <a href="{{ etsyUrl }}" target="_blank" rel="noopener" style="display: inline-block; font-size: 12px; line-height: 1.6; color: var(--ink4); margin-top: 10px; border-bottom: 1px solid var(--border);">{{ lEtsy }}</a>
+          </sc-if>
         </div>
       </aside>
     </div>
@@ -584,12 +727,22 @@
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;telegramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;@kate_art_tort&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;katetortart@gmail.com&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;instagramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;katetortart&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;galleryDepth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.5,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Стіна&quot;},&quot;showCollabRibbon&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Хедер&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;telegramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;@kate_art_tort&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;katetortart@gmail.com&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;instagramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;katetortart&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакти&quot;},&quot;showCollabRibbon&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Хедер&quot;}}">
 class Component extends DCLogic {
   rootRef = React.createRef();
-  wallRef = React.createRef();
-  state = { lang: 'ua', activeId: null, cart: [], drawer: false, toast: '', menuOpen: false, paints: null, postcards: null, boxes: null, halls: null, theme: 'light', showTop: false };
+  fName = React.createRef();
+  fContact = React.createRef();
+  fIdea = React.createRef();
 
+  state = {
+    lang: 'ua', activeId: null, projIdx: null, cart: [], drawer: false, toast: '', menuOpen: false,
+    paints: null, postcards: null, boxes: null, projects: null, halls: null, settings: {},
+    dataMode: (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) ? 'loading' : 'demo',
+    hall: /^#hall-/.test(location.hash) ? location.hash.slice(1) : null,
+    theme: 'light', showTop: false
+  };
+
+  // Demo content — shown only when Supabase is not configured (local preview).
   works = [
     { id: 1, img: 'img/paint-01-w1100.webp', thumb: 'img/paint-01-w600.webp', price: 34000, year: '2024',
       ua: { t: 'Течія', hall: 'Зала I · Абстракція', size: '80 × 80 см', tech: 'Олія на полотні',
@@ -638,25 +791,51 @@ class Component extends DCLogic {
     b3: { price: 2500, ua: { t: 'Бокс на замовлення', size: 'Збираємо разом' }, en: { t: 'Box made to order', size: 'Assembled together' } }
   };
 
-  fName = React.createRef();
-  fContact = React.createRef();
-  fIdea = React.createRef();
+  // Hall texts for the demo works (and for legacy rows whose hall is not in the halls table).
+  HALLS = {
+    'Зала I · Абстракція': { num: 'I', ua: { t: 'Абстракція', n: 'Тут фарба сама і є сюжетом. Я даю їй текти й лише вирішую, коли зупинитись.' }, en: { t: 'Abstraction', n: 'Here the paint is the subject. I let it flow and only decide when to stop.' } },
+    'Зала II · Квіти й поля': { num: 'II', ua: { t: 'Квіти й поля', n: 'Густе імпасто, покладене мастихіном. Ці полотна варто розглядати зблизька.' }, en: { t: 'Flowers & Fields', n: 'Thick impasto, laid with a palette knife. These canvases are worth touching with your eyes up close.' } },
+    'Зала III · Україна': { num: 'III', ua: { t: 'Україна', n: 'Роботи, які я спершу писала для себе. Частина ціни кожної йде на військо.' }, en: { t: 'Ukraine', n: 'Works I painted for myself first. Part of the price of each one goes to the army.' } },
+    'Зала IV · Поп-образи': { num: 'IV', ua: { t: 'Поп-образи', n: 'Легкіше — для дитячих, кафе й подарунків, з яких смішно.' }, en: { t: 'Pop & Characters', n: 'Lighter work — for kids’ rooms, cafés, and gifts that make people laugh.' } }
+  };
 
   dict = {
     ua: { size: 'Розмір', tech: 'Техніка', year: 'Рік', one: 'Єдиний екземпляр', add: 'Додати в кошик', ask: 'Запитати в Telegram',
-      prev: 'Попередня', next: 'Наступна', cart: 'Кошик', empty: 'У кошику поки порожньо. Відкрийте будь-яку роботу зі стіни й додайте її сюди.',
+      prev: 'Попередня', next: 'Наступна', cart: 'Кошик', empty: 'У кошику поки порожньо. Зайдіть у будь-яку залу й додайте роботу сюди.',
       total: 'Разом', checkout: 'Оформити в Telegram', note: 'Повідомлення з готовим текстом відкриється в Telegram — залишиться лише надіслати. Оплата і доставка узгоджуються там.',
       copied: 'Замовлення відкрито в Telegram', added: 'Додано в кошик',
-      addShort: 'В кошик', stock: 'робіт у наявності', sendTg: 'Надіслати в Telegram', sendMail: 'Написати на пошту',
+      addShort: 'В кошик', askShort: 'Запитати', onRequest: 'Ціна за запитом',
+      sendTg: 'Надіслати в Telegram', sendMail: 'Написати на пошту',
       phName: 'Ваше ім’я', phContact: 'Телефон або @telegram', phIdea: 'Розмір, кольори, кімната — кілька слів',
-      sent: 'Запит відкрито в Telegram', needName: 'Напишіть, будь ласка, ім’я і контакт' },
+      sent: 'Запит відкрито в Telegram', needName: 'Напишіть, будь ласка, ім’я і контакт',
+      hall: 'Зала', works: ['робота', 'роботи', 'робіт'], halls: ['зала', 'зали', 'зал'], other: 'Інші роботи',
+      repeat: 'Замовити повтор', similar: 'Хочу таку',
+      askMsg: 'Вітаю! Розкажіть детальніше про ',
+      repeatMsg: 'Вітаю! Хочу замовити роботу, як у ваших реалізованих проєктах.',
+      similarMsg: 'Вітаю! Хочу замовити роботу, як ця з ваших реалізованих проєктів:',
+      projAlt: 'Реалізований проєкт',
+      projIntro: 'Ці роботи вже живуть у своїх власників. Будь-яку з них я можу написати для вас ще раз — у вашому розмірі, зі змінами в кольорах чи деталях.',
+      etsy: 'Живете за кордоном? Можна замовити й через мій магазин на Etsy ↗',
+      orderHead: 'Вітаю! Хочу замовити:', totalLine: 'Разом: ',
+      commHead: 'Вітаю! Хочу замовити картину.', name: 'Ім’я: ', contact: 'Контакт: ', idea: 'Ідея: ', mailSubj: 'Запит на картину на замовлення' },
     en: { size: 'Size', tech: 'Technique', year: 'Year', one: 'One of a kind', add: 'Add to cart', ask: 'Ask in Telegram',
-      prev: 'Previous', next: 'Next', cart: 'Cart', empty: 'Your cart is empty. Open any work on the wall and add it here.',
+      prev: 'Previous', next: 'Next', cart: 'Cart', empty: 'Your cart is empty. Enter any hall and add a work here.',
       total: 'Total', checkout: 'Order via Telegram', note: 'A message with the ready text opens in Telegram — just send it. Payment and delivery are agreed there.',
       copied: 'Order opened in Telegram', added: 'Added to cart',
-      addShort: 'Add', stock: 'works available', sendTg: 'Send via Telegram', sendMail: 'Send an email',
+      addShort: 'Add', askShort: 'Ask', onRequest: 'Price on request',
+      sendTg: 'Send via Telegram', sendMail: 'Send an email',
       phName: 'Your name', phContact: 'Phone or @telegram', phIdea: 'Size, colours, room — a few words',
-      sent: 'Request opened in Telegram', needName: 'Please add your name and contact' }
+      sent: 'Request opened in Telegram', needName: 'Please add your name and contact',
+      hall: 'Hall', works: ['work', 'works', 'works'], halls: ['hall', 'halls', 'halls'], other: 'Other works',
+      repeat: 'Order a repeat', similar: 'I want one like this',
+      askMsg: 'Hello! Tell me more about ',
+      repeatMsg: 'Hello! I would like to commission a piece like the ones in your completed projects.',
+      similarMsg: 'Hello! I would like to commission a piece like this one from your completed projects:',
+      projAlt: 'Completed project',
+      projIntro: 'These works already live with their owners. I can paint any of them again for you — in your size, with changes to the colours or details.',
+      etsy: 'Outside Ukraine? You can also order via my Etsy shop ↗',
+      orderHead: 'Hello! I would like to order:', totalLine: 'Total: ',
+      commHead: 'Hello! I would like to commission a painting.', name: 'Name: ', contact: 'Contact: ', idea: 'Idea: ', mailSubj: 'Commission request' }
   };
 
   get handle() { return this.props.telegramHandle || '@kate_art_tort'; }
@@ -666,72 +845,189 @@ class Component extends DCLogic {
   get instaUrl() { return 'https://www.instagram.com/' + this.insta.replace('@', ''); }
   get L() { return this.dict[this.state.lang]; }
 
+  byOrder(a, b) { return (a.order || 0) - (b.order || 0); }
+
   paints() {
     if (this.state.paints) return this.state.paints;
+    if (this.state.dataMode !== 'demo') return [];
     return this.works.map(w => ({ id: 'w' + w.id, img: w.img, thumb: w.thumb, price: w.price, year: w.year, ua: w.ua, en: w.en, order: w.id, hidden: false }));
+  }
+  goodsOf(prefix) {
+    return Object.keys(this.goods).filter(k => k.charAt(0) === prefix).map(k => ({ id: k, img: '', thumb: '', price: this.goods[k].price, ua: this.goods[k].ua, en: this.goods[k].en, order: 0, hidden: false }));
   }
   posts() {
     if (this.state.postcards) return this.state.postcards;
-    return Object.keys(this.goods).filter(k => k.charAt(0) === 'p').map(k => ({ id: k, img: '', price: this.goods[k].price, ua: this.goods[k].ua, en: this.goods[k].en, order: 0, hidden: false }));
+    return this.state.dataMode === 'demo' ? this.goodsOf('p') : [];
   }
   boxes() {
     if (this.state.boxes) return this.state.boxes;
-    return Object.keys(this.goods).filter(k => k.charAt(0) === 'b').map(k => ({ id: k, img: '', price: this.goods[k].price, ua: this.goods[k].ua, en: this.goods[k].en, order: 0, hidden: false }));
+    return this.state.dataMode === 'demo' ? this.goodsOf('b') : [];
   }
+  visible(list) { return list.filter(x => !x.hidden).sort(this.byOrder); }
+  visibleProjects() { return this.visible(this.state.projects || []).filter(p => p.img); }
   loc(it, l) { return (it && it[l] && it[l].t) ? it[l] : (it ? it.ua : {}); }
+  setting(k) { return (this.state.settings && this.state.settings[k]) || ''; }
+  etsyUrl() { const u = this.setting('etsy_url').trim(); return /^https?:\/\//i.test(u) ? u : ''; }
+
+  // Admin uploads are named "<stamp>-<w>x<h>-full.<ext>" with a sibling "-thumb" file.
+  thumbOf(url) { return String(url || '').replace(/-full\.(webp|jpe?g)(?=$|\?)/i, '-thumb.$1'); }
+  dims(url) {
+    const m = String(url || '').match(/-(\d{2,5})x(\d{2,5})-(?:full|thumb)\./);
+    return m ? { w: Number(m[1]), h: Number(m[2]) } : { w: undefined, h: undefined };
+  }
+
+  plural(n, forms) {
+    if (this.state.lang === 'en') return n === 1 ? forms[0] : forms[2];
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return forms[0];
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return forms[1];
+    return forms[2];
+  }
+
+  // "40x40" → "40 × 40 см", "10х15см" → "10 × 15 см"; leaves free text alone.
+  fmtSize(s, l) {
+    let t = String(s || '').trim();
+    if (!t) return '';
+    t = t.replace(/(\d)\s*[xXхХ×*]\s*(?=\d)/g, '$1 × ');
+    t = t.replace(/(\d)\s*(см|cm)\.?/gi, '$1 см');
+    if (/^\d+(?:[.,]\d+)?(?: × \d+(?:[.,]\d+)?)+$/.test(t)) t += ' см';
+    if (l === 'en') t = t.replace(/ см/g, ' cm');
+    return t;
+  }
+
+  money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
+  priceText(n) { return n > 0 ? this.money(n) : this.L.onRequest; }
+
+  tgSend(msg) { return this.tgUrl + '?text=' + encodeURIComponent(msg); }
+  openTg(msg) { window.open(this.tgSend(msg), '_blank', 'noopener'); }
+
+  async rest(path) {
+    const cfg = window.SUPABASE_CONFIG;
+    const r = await fetch(cfg.url + '/rest/v1/' + path, { headers: { apikey: cfg.anonKey } });
+    if (!r.ok) throw new Error(path + ': HTTP ' + r.status);
+    return r.json();
+  }
 
   loadSupabase() {
     const cfg = window.SUPABASE_CONFIG;
     if (!cfg || !cfg.url || !cfg.anonKey) return;
-    const boot = async () => {
+    const load = async () => {
       try {
-        if (!this._sb) this._sb = window.supabase.createClient(cfg.url, cfg.anonKey);
-        const sb = this._sb;
-        const load = async () => {
-          const [itRes, hRes] = await Promise.all([
-            sb.from('items').select('*').order('sort_order', { ascending: true }),
-            sb.from('halls').select('*').order('sort_order', { ascending: true })
-          ]);
-          if (itRes.error) { console.warn('Supabase items:', itRes.error.message); return; }
-          if (!itRes.data) return;
-          this.applyRows(itRes.data);
-          this.setState({ halls: (hRes.data && hRes.data.length) ? hRes.data : null });
-        };
-        this._reload = load;
-        await load();
-        if (this._chan) return;
-        this._chan = sb.channel('items-live')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => load())
+        const [items, halls, settings] = await Promise.all([
+          this.rest('items?select=*&order=sort_order.asc'),
+          this.rest('halls?select=*&order=sort_order.asc').catch((e) => { console.warn('Supabase halls:', e.message); return null; }),
+          this.rest('settings?select=*').catch(() => null)
+        ]);
+        this.applyRows(items || []);
+        const st = {};
+        (settings || []).forEach((s) => { st[s.key] = s.value || ''; });
+        this.setState({ halls: (halls && halls.length) ? halls : null, settings: st, dataMode: 'live' }, () => this.flushHash());
+      } catch (e) {
+        console.warn('Supabase items:', e);
+        if (this.state.dataMode !== 'live') this.setState({ dataMode: 'error' });
+      }
+    };
+    this._reload = load;
+    load();
+    // Realtime is a nicety (updates an open page while Kateryna edits) — load the SDK after the content.
+    this._rtTimer = setTimeout(() => this.subscribeLive(cfg), 3000);
+  }
+
+  subscribeLive(cfg) {
+    const boot = () => {
+      try {
+        if (!window.supabase || this._chan) return;
+        this._sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+        this._chan = this._sb.channel('items-live')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => this._reload && this._reload())
           .subscribe();
-      } catch (e) { console.warn('Supabase init:', e); }
+      } catch (e) { console.warn('Supabase realtime:', e); }
     };
     if (window.supabase) { boot(); return; }
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.async = true;
     s.onload = boot;
     s.onerror = () => console.warn('Supabase SDK load failed');
     document.head.appendChild(s);
   }
 
   applyRows(rows) {
-    const paints = [], postcards = [], boxes = [];
+    const paints = [], postcards = [], boxes = [], projects = [];
     rows.forEach((r) => {
       const item = {
-        id: r.id, img: r.img || '', thumb: r.img || '', price: r.price || 0, year: r.year || '',
+        id: r.id, img: r.img || '', thumb: this.thumbOf(r.img), price: r.price || 0, year: r.year || '',
         order: r.sort_order || 0, hidden: !!r.hidden,
         ua: { t: r.title || '', hall: r.hall || '', size: r.size || '', tech: r.tech || '', d: r.description || '' },
         en: { t: r.title_en || r.title || '', hall: r.hall_en || r.hall || '', size: r.size_en || r.size || '', tech: r.tech_en || r.tech || '', d: r.description_en || r.description || '' }
       };
       if (r.cat === 'postcards') postcards.push(item);
       else if (r.cat === 'boxes') boxes.push(item);
+      else if (r.cat === 'projects') projects.push(item);
       else paints.push(item);
     });
-    this.setState({ paints, postcards, boxes });
+    this.setState({ paints, postcards, boxes, projects });
   }
 
-  money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
+  translit(s) {
+    const m = { а: 'a', б: 'b', в: 'v', г: 'h', ґ: 'g', д: 'd', е: 'e', є: 'ie', ж: 'zh', з: 'z', и: 'y', і: 'i', ї: 'i', й: 'i', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ь: '', ю: 'iu', я: 'ia', ы: 'y', э: 'e', ё: 'io', ъ: '' };
+    return String(s || '').toLowerCase().split('').map(c => (m[c] !== undefined ? m[c] : c)).join('')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+  }
 
-  tgSend(msg) { return this.tgUrl + '?text=' + encodeURIComponent(msg); }
+  // Visible paintings grouped into halls: halls-table order first, then halls only referenced by works,
+  // then works without a hall ("Інші роботи"). Empty halls are skipped.
+  hallGroups() {
+    const strip = (s, re) => String(s || '').replace(re, '').trim();
+    const groups = new Map();
+    const add = (key, meta) => {
+      if (!groups.has(key)) groups.set(key, Object.assign({ key, works: [] }, meta));
+      return groups.get(key);
+    };
+    (this.state.halls || []).slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).forEach((h) => add(h.name || '', {
+      num: h.num || '',
+      ua: { t: strip(h.name, /^Зала\s+\S+\s*·\s*/) || h.name || '', n: h.note || '' },
+      en: { t: strip(h.name_en, /^Hall\s+\S+\s*·\s*/), n: h.note_en || '' }
+    }));
+    this.visible(this.paints()).forEach((p) => {
+      const key = (p.ua && p.ua.hall) || '';
+      let g = groups.get(key);
+      if (!g) {
+        const legacy = this.HALLS[key];
+        if (legacy) g = add(key, { num: legacy.num, ua: legacy.ua, en: legacy.en });
+        else if (key) g = add(key, { num: '', ua: { t: key, n: '' }, en: { t: (p.en && p.en.hall !== key) ? p.en.hall : '', n: '' } });
+        else g = add('', { num: '', ua: { t: this.dict.ua.other, n: '' }, en: { t: this.dict.en.other, n: '' }, other: true });
+      }
+      g.works.push(p);
+    });
+    const list = [...groups.values()].filter(g => g.works.length).sort((a, b) => (a.other ? 1 : 0) - (b.other ? 1 : 0));
+    const used = new Set();
+    list.forEach((g, i) => {
+      let slug = 'hall-' + (this.translit(g.ua.t) || String(i + 1));
+      while (used.has(slug)) slug += '-' + (i + 1);
+      used.add(slug);
+      g.slug = slug;
+    });
+    return list;
+  }
+
+  hallText(g, l) {
+    const en = l === 'en';
+    return { t: (en && g.en.t) || g.ua.t, n: (en && g.en.n) || g.ua.n };
+  }
+
+  groupOf(id, groups) {
+    const s = String(id);
+    return (groups || this.hallGroups()).find(g => g.works.some(w => String(w.id) === s)) || null;
+  }
+
+  flushHash() {
+    const id = this._pendingHash;
+    this._pendingHash = null;
+    if (!id) return;
+    const target = (id === 'halls' || id.indexOf('hall-') === 0) ? 'halls' : id;
+    setTimeout(() => { if (document.getElementById(target)) this.scrollToId(target); }, 60);
+  }
 
   scrollToId(id) {
     const el = document.getElementById(id);
@@ -756,46 +1052,22 @@ class Component extends DCLogic {
 
   componentDidMount() {
     try { const t = localStorage.getItem('ko_theme'); if (t === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); this.setState({ theme: 'dark' }); } } catch (e) {}
+    try {
+      const c = JSON.parse(localStorage.getItem('ko_cart') || '[]');
+      if (Array.isArray(c) && c.length) { this._savedCart = JSON.stringify(c); this.setState({ cart: c.filter(x => typeof x === 'string').slice(0, 60) }); }
+    } catch (e) {}
     this.applyLang();
-    const w = this.wallRef.current;
-    if (w) {
-      w.style.cursor = 'grab';
-      let down = false, sx = 0, sl = 0, moved = false;
-      this.onDown = (e) => {
-        if (e.pointerType === 'touch') return;
-        down = true; moved = false; sx = e.clientX; sl = w.scrollLeft;
-        w.style.scrollSnapType = 'none';
-        w.style.cursor = 'grabbing';
-      };
-      this.onMove = (e) => {
-        if (!down) return;
-        const dx = e.clientX - sx;
-        if (Math.abs(dx) > 4) moved = true;
-        w.scrollLeft = sl - dx;
-      };
-      this.onUp = () => {
-        down = false; w.style.cursor = 'grab';
-        w.style.scrollSnapType = '';
-        if (moved) { this.dragged = true; setTimeout(() => { this.dragged = false; }, 60); }
-      };
-      w.addEventListener('pointerdown', this.onDown);
-      window.addEventListener('pointermove', this.onMove);
-      window.addEventListener('pointerup', this.onUp);
-      this.onScroll = () => {
-        if (this.raf) return;
-        this.raf = requestAnimationFrame(() => { this.raf = null; this.depth(); });
-      };
-      w.addEventListener('scroll', this.onScroll, { passive: true });
-      window.addEventListener('resize', this.onScroll);
-      this.depth();
-    }
     this.onKey = (e) => {
-      if (e.key === 'Escape') { this.setState({ activeId: null, drawer: false, menuOpen: false }); document.body.style.overflow = ''; }
-      if (this.state.activeId && e.key === 'ArrowRight') this.step(1);
-      if (this.state.activeId && e.key === 'ArrowLeft') this.step(-1);
-      if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.closest && e.target.closest('[data-art]')) {
-        e.preventDefault();
-        this.openWork({ currentTarget: e.target.closest('[data-art]') });
+      if (e.key === 'Escape') { this.setState({ activeId: null, projIdx: null, drawer: false, menuOpen: false }); return; }
+      if (this.state.projIdx !== null && e.key === 'ArrowRight') this.stepProj(1);
+      else if (this.state.projIdx !== null && e.key === 'ArrowLeft') this.stepProj(-1);
+      else if (this.state.activeId && e.key === 'ArrowRight') this.step(1);
+      else if (this.state.activeId && e.key === 'ArrowLeft') this.step(-1);
+      if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.closest) {
+        const art = e.target.closest('[data-art]');
+        const proj = e.target.closest('[data-proj]');
+        if (art) { e.preventDefault(); this.setState({ activeId: String(art.dataset.art) }); }
+        else if (proj) { e.preventDefault(); this.setState({ projIdx: Number(proj.dataset.proj) }); }
       }
     };
     window.addEventListener('keydown', this.onKey);
@@ -803,16 +1075,29 @@ class Component extends DCLogic {
       const a = e.target && e.target.closest && e.target.closest('a[href^="#"]');
       if (!a) return;
       const id = (a.getAttribute('href') || '').slice(1);
-      if (!id || !document.getElementById(id)) return;
+      if (!id) return;
+      if (id === 'halls' || id.indexOf('hall-') === 0) {
+        e.preventDefault();
+        if (a.blur) a.blur();
+        this.setState({ hall: id === 'halls' ? null : id, menuOpen: false });
+        this.scrollToId('halls');
+        if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+        return;
+      }
+      if (!document.getElementById(id)) return;
       e.preventDefault();
+      if (a.blur) a.blur();
       this.scrollToId(id);
       if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
     };
     if (this.rootRef.current) this.rootRef.current.addEventListener('click', this.onNav);
-    if (location.hash) {
-      const id = location.hash.slice(1);
-      if (document.getElementById(id)) setTimeout(() => this.scrollToId(id), 300);
-    }
+    this.onPop = () => {
+      const h = location.hash.slice(1);
+      this.setState({ hall: h.indexOf('hall-') === 0 ? h : null });
+    };
+    window.addEventListener('popstate', this.onPop);
+    this._pendingHash = location.hash ? location.hash.slice(1) : null;
+    if (this.state.dataMode === 'demo') setTimeout(() => this.flushHash(), 300);
     this.onVis = () => { if (document.visibilityState === 'visible' && this._reload) this._reload(); };
     document.addEventListener('visibilitychange', this.onVis);
     this.onWinScroll = () => {
@@ -824,24 +1109,34 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
-    const w = this.wallRef.current;
-    if (w) { w.removeEventListener('pointerdown', this.onDown); w.removeEventListener('scroll', this.onScroll); }
-    window.removeEventListener('pointermove', this.onMove);
-    window.removeEventListener('pointerup', this.onUp);
-    window.removeEventListener('resize', this.onScroll);
     window.removeEventListener('keydown', this.onKey);
+    window.removeEventListener('popstate', this.onPop);
     if (this.rootRef.current) this.rootRef.current.removeEventListener('click', this.onNav);
     if (this.onVis) document.removeEventListener('visibilitychange', this.onVis);
     if (this.onWinScroll) window.removeEventListener('scroll', this.onWinScroll);
+    clearTimeout(this._rtTimer);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
+    document.body.style.overflow = '';
   }
 
-  componentDidUpdate() { this.applyLang(); }
+  componentDidUpdate() {
+    this.applyLang();
+    if (this.state.hall !== this._chipHall) {
+      this._chipHall = this.state.hall;
+      const chip = this.rootRef.current && this.rootRef.current.querySelector('.dc-chips [data-active="true"]');
+      if (chip) { const box = chip.parentElement; box.scrollLeft += chip.getBoundingClientRect().left - box.getBoundingClientRect().left - 24; }
+    }
+    const lock = !!(this.state.menuOpen || this.state.drawer || this.state.activeId || this.state.projIdx !== null);
+    if (lock !== this._locked) { this._locked = lock; document.body.style.overflow = lock ? 'hidden' : ''; }
+    const c = JSON.stringify(this.state.cart);
+    if (c !== this._savedCart) { this._savedCart = c; try { localStorage.setItem('ko_cart', c); } catch (e) {} }
+  }
 
   applyLang() {
     const r = this.rootRef.current;
     if (!r) return;
     const en = this.state.lang === 'en';
+    document.documentElement.lang = en ? 'en' : 'uk';
     r.querySelectorAll('[data-en]').forEach(el => {
       if (!el.hasAttribute('data-ua')) el.setAttribute('data-ua', el.textContent);
       const t = en ? el.getAttribute('data-en') : el.getAttribute('data-ua');
@@ -849,113 +1144,80 @@ class Component extends DCLogic {
     });
   }
 
-  depth() {
-    const w = this.wallRef.current;
-    if (!w) return;
-    const amount = this.props.galleryDepth ?? 0.5;
-    const cx = window.innerWidth / 2;
-    w.querySelectorAll('[data-art]').forEach(el => {
-      const r = el.getBoundingClientRect();
-      const d = Math.min(Math.abs(r.left + r.width / 2 - cx) / cx, 1);
-      const k = 1 - d;
-      el.style.transform = 'scale(' + (1 - 0.12 * amount * (1 - k)).toFixed(4) + ')';
-      el.style.opacity = (0.62 + 0.38 * k).toFixed(3);
-    });
-  }
-
-  nudgeWall(dir) {
-    const w = this.wallRef.current;
-    if (!w) return;
-    w.scrollBy({ left: dir * Math.min(w.clientWidth * 0.62, 760), behavior: 'smooth' });
-  }
-
   find(id) {
     const s = String(id);
-    return [...this.paints(), ...this.posts(), ...this.boxes()].find(x => String(x.id) === s) || null;
+    return this.paints().find(x => String(x.id) === s) || null;
   }
 
+  // Prev/next inside the hall of the open work.
   step(dir) {
-    const arr = this.paints();
+    const g = this.groupOf(this.state.activeId);
+    const arr = g ? g.works : this.visible(this.paints());
+    if (!arr.length) return;
     const i = arr.findIndex(x => String(x.id) === String(this.state.activeId));
     const n = (i + dir + arr.length) % arr.length;
     this.setState({ activeId: String(arr[n].id) });
   }
 
+  stepProj(dir) {
+    const n = this.visibleProjects().length;
+    if (!n || this.state.projIdx === null) return;
+    this.setState({ projIdx: (this.state.projIdx + dir + n) % n });
+  }
+
+  swipe(e, fn) {
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t || !this._touch) return;
+    const dx = t.clientX - this._touch.x, dy = t.clientY - this._touch.y;
+    this._touch = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 2) fn(dx < 0 ? 1 : -1);
+  }
+
+  // Cart line for a SKU (w<id> painting, p<id> postcard, b<id> box); hidden/unknown items resolve to an empty title.
   item(sku, l) {
     const s = String(sku);
     const kind = s.charAt(0);
     const id = s.slice(1);
-    let it = null;
-    if (kind === 'w') it = this.paints().find(x => String(x.id) === id);
-    else if (kind === 'p') it = this.posts().find(x => String(x.id) === id);
-    else if (kind === 'b') it = this.boxes().find(x => String(x.id) === id);
-    if (!it) return { title: '', size: '', price: 0, thumb: '' };
+    const src = kind === 'w' ? this.paints() : kind === 'p' ? this.posts() : kind === 'b' ? this.boxes() : [];
+    const it = src.find(x => String(x.id) === id);
+    if (!it || it.hidden || !(it.price > 0)) return { title: '', size: '', price: 0, thumb: '' };
     const t = this.loc(it, l);
-    return { title: t.t || '', size: t.size || '', price: it.price || 0, thumb: it.thumb || it.img || '' };
+    return { title: t.t || '', size: this.fmtSize(t.size, l), price: it.price, thumb: it.thumb || it.img || '' };
   }
 
-  buildWall() {
-    const l = this.state.lang;
-    const HALLS = {
-      'Зала I · Абстракція': { num: 'I', ua: { t: 'Абстракція', n: 'Тут фарба сама і є сюжетом. Я даю їй текти й лише вирішую, коли зупинитись.' }, en: { t: 'Abstraction', n: 'Here the paint is the subject. I let it flow and only decide when to stop.' } },
-      'Зала II · Квіти й поля': { num: 'II', ua: { t: 'Квіти й поля', n: 'Густе імпасто, покладене мастихіном. Ці полотна варто розглядати зблизька.' }, en: { t: 'Flowers & Fields', n: 'Thick impasto, laid with a palette knife. These canvases are worth touching with your eyes up close.' } },
-      'Зала III · Україна': { num: 'III', ua: { t: 'Україна', n: 'Роботи, які я спершу писала для себе. Частина ціни кожної йде на військо.' }, en: { t: 'Ukraine', n: 'Works I painted for myself first. Part of the price of each one goes to the army.' } },
-      'Зала IV · Поп-образи': { num: 'IV', ua: { t: 'Поп-образи', n: 'Легкіше — для дитячих, кафе й подарунків, з яких смішно.' }, en: { t: 'Pop & Characters', n: 'Lighter work — for kids’ rooms, cafés, and gifts that make people laugh.' } }
+  cartLines(l) {
+    return this.state.cart.map(sku => Object.assign({ sku }, this.item(sku, l))).filter(x => x.title);
+  }
+
+  card(it, prefix, l) {
+    const t = this.loc(it, l);
+    const d = this.dims(it.img);
+    const img = it.thumb || it.img || '';
+    const buy = it.price > 0;
+    return {
+      id: String(it.id), sku: prefix + it.id, img, hasImg: !!img, noImg: !img, w: d.w, h: d.h,
+      title: t.t || '', size: this.fmtSize(t.size, l),
+      meta: [t.tech, this.fmtSize(t.size, l), it.year].filter(Boolean).join(' · '),
+      priceText: this.priceText(it.price), canBuy: buy, onRequest: !buy
     };
-    const hallMap = {};
-    (this.state.halls || []).forEach((h) => {
-      const stripUa = (s) => (s || '').replace(/^Зала\s+\S+\s*·\s*/, '').trim();
-      const stripEn = (s) => (s || '').replace(/^Hall\s+\S+\s*·\s*/, '').trim();
-      hallMap[h.name] = {
-        num: h.num || '',
-        ua: { t: stripUa(h.name) || h.name, n: h.note || '' },
-        en: { t: stripEn(h.name_en) || h.name_en || h.name, n: h.note_en || '' }
-      };
-    });
-    const paints = this.paints().filter(p => !p.hidden && p.ua && p.ua.hall).sort((a, b) => (a.order || 0) - (b.order || 0));
-    if (!paints.length) return [];
-    const out = [];
-    const seen = new Set();
-    paints.forEach((w) => {
-      const hall = w.ua.hall;
-      if (!seen.has(hall)) {
-        seen.add(hall);
-        const meta = hallMap[hall] || HALLS[hall] || { num: '', ua: { t: hall, n: '' }, en: { t: hall, n: '' } };
-        const t = (l === 'en' && meta.en && meta.en.t) ? meta.en : meta.ua;
-        out.push({ isDiv: true, num: meta.num || '', title: t.t, note: t.n });
-      }
-      const wl = this.loc(w, l);
-      out.push({ isWork: true, artId: String(w.id), img: w.img, title: wl.t || '', meta: [wl.tech, wl.size, w.year].filter(Boolean).join(' · '), price: this.money(w.price) });
-    });
-    out.push({ isTail: true });
-    return out;
   }
 
   orderText() {
-    const l = this.state.lang;
-    const lines = this.state.cart.map(sku => {
-      const it = this.item(sku, l);
-      return '— ' + it.title + ', ' + it.size + ', ' + this.money(it.price);
-    });
-    const head = l === 'en' ? 'Hello! I would like to order:' : 'Вітаю! Хочу замовити:';
-    const tot = (l === 'en' ? 'Total: ' : 'Разом: ') + this.money(this.total());
-    return head + '\n' + lines.join('\n') + '\n' + tot;
+    const L = this.L;
+    const lines = this.cartLines(this.state.lang).map(it => '— ' + it.title + (it.size ? ', ' + it.size : '') + ', ' + this.money(it.price));
+    return L.orderHead + '\n' + lines.join('\n') + '\n' + L.totalLine + this.money(this.total());
   }
 
   commissionText() {
-    const l = this.state.lang;
+    const L = this.L;
     const v = (r) => (r.current && r.current.value ? r.current.value.trim() : '');
-    const head = l === 'en' ? 'Hello! I would like to commission a painting.' : 'Вітаю! Хочу замовити картину.';
-    const rows = [
-      (l === 'en' ? 'Name: ' : 'Ім’я: ') + v(this.fName),
-      (l === 'en' ? 'Contact: ' : 'Контакт: ') + v(this.fContact)
-    ];
+    const rows = [L.name + v(this.fName), L.contact + v(this.fContact)];
     const idea = v(this.fIdea);
-    if (idea) rows.push((l === 'en' ? 'Idea: ' : 'Ідея: ') + idea);
-    return head + '\n' + rows.join('\n');
+    if (idea) rows.push(L.idea + idea);
+    return L.commHead + '\n' + rows.join('\n');
   }
 
-  total() { return this.state.cart.reduce((s, sku) => s + this.item(sku, 'ua').price, 0); }
+  total() { return this.cartLines('ua').reduce((s, it) => s + it.price, 0); }
 
   flash(msg) {
     this.setState({ toast: msg });
@@ -963,14 +1225,34 @@ class Component extends DCLogic {
     this.tt = setTimeout(() => this.setState({ toast: '' }), 3200);
   }
 
+  addToCartSku(sku) {
+    this.setState(s => ({ cart: s.cart.indexOf(sku) === -1 ? s.cart.concat(sku) : s.cart, activeId: null, drawer: true }));
+    this.flash(this.L.added);
+  }
+
   renderVals() {
     const l = this.state.lang;
     const L = this.L;
+    const mode = this.state.dataMode;
+    const groups = this.hallGroups();
+    const realHalls = groups.filter(g => !g.other).length;
+    const cur = this.state.hall ? (groups.find(g => g.slug === this.state.hall) || null) : null;
+    const curText = cur ? this.hallText(cur, l) : null;
     const a = this.state.activeId ? this.find(this.state.activeId) : null;
     const av = a ? this.loc(a, l) : null;
+    const aGroup = a ? this.groupOf(a.id, groups) : null;
+    const aDims = a ? this.dims(a.img) : {};
+    const projs = this.visibleProjects();
+    const pi = this.state.projIdx;
+    const pa = (pi !== null && projs[pi]) ? projs[pi] : null;
+    const paDims = pa ? this.dims(pa.img) : {};
+    const lines = this.cartLines(l);
+    const etsy = this.etsyUrl();
+    const paper = this.visible(this.posts()).map(g => this.card(g, 'p', l));
+    const boxes = this.visible(this.boxes()).map(g => this.card(g, 'b', l));
+    const customIntro = l === 'en' ? this.setting('projects_intro_en') : this.setting('projects_intro');
     return {
       rootRef: this.rootRef,
-      wallRef: this.wallRef,
       ribbon: this.props.showCollabRibbon ?? true,
       langLabel: l === 'ua' ? 'EN' : 'UA',
       toggleLang: () => this.setState({ lang: l === 'ua' ? 'en' : 'ua' }),
@@ -986,6 +1268,8 @@ class Component extends DCLogic {
         const root = document.documentElement;
         root.classList.add('dc-no-transition');
         root.setAttribute('data-theme', next);
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', next === 'dark' ? '#0A1C3B' : '#E9E4DC');
         try { localStorage.setItem('ko_theme', next); } catch (e) {}
         this.setState({ theme: next });
         requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('dc-no-transition')));
@@ -994,48 +1278,92 @@ class Component extends DCLogic {
       tgLink: this.tgUrl,
       instaHandle: this.insta,
       instaUrl: this.instaUrl,
-      cartCount: this.state.cart.length,
+      email: this.mail,
+      mailLink: 'mailto:' + this.mail,
+      hasEtsy: !!etsy,
+      etsyUrl: etsy,
+      lEtsy: L.etsy,
+      cartCount: lines.length,
       openCart: () => this.setState({ drawer: true }),
       closeCart: () => this.setState({ drawer: false }),
       menuOpen: this.state.menuOpen,
-      toggleMenu: () => {
-        const next = !this.state.menuOpen;
-        this.setState({ menuOpen: next });
-        document.body.style.overflow = (next || this.state.drawer || this.state.activeId) ? 'hidden' : '';
-      },
-      closeMenu: () => {
-        this.setState({ menuOpen: false });
-        document.body.style.overflow = (this.state.drawer || this.state.activeId) ? 'hidden' : '';
-      },
+      toggleMenu: () => this.setState({ menuOpen: !this.state.menuOpen }),
+      closeMenu: () => this.setState({ menuOpen: false }),
       menuIco: this.state.menuOpen ? '✕' : '☰',
       drawer: this.state.drawer,
       stop: (e) => e.stopPropagation(),
-      openWork: (e) => { if (this.dragged) return; this.setState({ activeId: String(e.currentTarget.dataset.art) }); },
-      wallPrev: () => this.nudgeWall(-1),
-      wallNext: () => this.nudgeWall(1),
+
+      hallsNum: realHalls ? String(realHalls) : '—',
+      hallsWord: this.plural(realHalls || 5, L.halls),
+      hallNav: groups.map(g => ({ href: '#' + g.slug, num: g.num, title: this.hallText(g, l).t })),
+      hallOverview: !cur,
+      hallOpen: !!cur,
+      dataLoading: !cur && mode === 'loading',
+      dataError: !cur && mode === 'error',
+      hallsEmpty: !cur && (mode === 'live' || mode === 'demo') && !groups.length,
+      hallCards: groups.map((g) => {
+        const c = g.works[0];
+        const d = this.dims(c.img);
+        return {
+          href: '#' + g.slug, num: g.num, title: this.hallText(g, l).t,
+          cover: c.thumb || c.img, w: d.w, h: d.h,
+          count: g.works.length + ' ' + this.plural(g.works.length, L.works)
+        };
+      }),
+      hallChips: groups.map(g => ({ href: '#' + g.slug, title: this.hallText(g, l).t, active: !!cur && g.slug === cur.slug })),
+      hEyebrow: cur ? (cur.other ? L.other : L.hall + (cur.num ? ' ' + cur.num : '')) : '',
+      hTitle: curText ? curText.t : '',
+      hNote: curText ? curText.n : '',
+      hCount: cur ? cur.works.length + ' ' + this.plural(cur.works.length, L.works) : '',
+      hallWorks: cur ? cur.works.map(w => this.card(w, 'w', l)) : [],
+
+      hasPaper: paper.length > 0,
+      paper,
+      hasBoxes: boxes.length > 0,
+      boxes,
+
+      hasProjects: projs.length > 0,
+      projIntro: customIntro || L.projIntro,
+      projects: projs.map((p, i) => { const d = this.dims(p.img); return { i, thumb: p.thumb || p.img, w: d.w, h: d.h, alt: (this.loc(p, l).t || L.projAlt) }; }),
+      openProj: (e) => this.setState({ projIdx: Number(e.currentTarget.dataset.proj) }),
+      closeProj: () => this.setState({ projIdx: null }),
+      projPrev: () => this.stepProj(-1),
+      projNext: () => this.stepProj(1),
+      projOpen: !!pa,
+      pImg: pa ? pa.img : '',
+      pW: paDims.w, pH: paDims.h,
+      pAlt: pa ? (this.loc(pa, l).t || L.projAlt) : '',
+      pCounter: pa ? (pi + 1) + ' / ' + projs.length : '',
+      askProj: () => { if (pa) this.openTg(L.similarMsg + '\n' + pa.img); },
+      askRepeat: () => this.openTg(L.repeatMsg),
+      lRepeat: L.repeat,
+      lSimilar: L.similar,
+      swipeStart: (e) => { const t = e.touches && e.touches[0]; this._touch = t ? { x: t.clientX, y: t.clientY } : null; },
+      swipeProj: (e) => this.swipe(e, (d) => this.stepProj(d)),
+      swipeWork: (e) => this.swipe(e, (d) => this.step(d)),
+
+      openWork: (e) => this.setState({ activeId: String(e.currentTarget.dataset.art) }),
       closeWork: () => this.setState({ activeId: null }),
       prevWork: () => this.step(-1),
       nextWork: () => this.step(1),
       active: !!a,
       aImg: a ? a.img : '',
+      aW: aDims.w, aH: aDims.h,
       aTitle: av ? av.t : '',
-      aHall: av ? av.hall : '',
+      aHall: aGroup ? this.hallText(aGroup, l).t : '',
       aDesc: av ? av.d : '',
-      aSize: av ? av.size : '',
+      aSize: av ? this.fmtSize(av.size, l) : '',
       aTech: av ? av.tech : '',
       aYear: a ? a.year : '',
-      aPrice: a ? this.money(a.price) : '',
-      addToCart: () => {
-        const sku = 'w' + this.state.activeId;
-        this.setState(s => ({ cart: s.cart.indexOf(sku) === -1 ? s.cart.concat(sku) : s.cart, activeId: null, drawer: true }));
-        this.flash(L.added);
-      },
-      addSku: (e) => {
-        e.stopPropagation();
-        const sku = e.currentTarget.dataset.sku;
-        this.setState(s => ({ cart: s.cart.indexOf(sku) === -1 ? s.cart.concat(sku) : s.cart, drawer: true }));
-        this.flash(L.added);
-      },
+      aPrice: a ? this.priceText(a.price) : '',
+      aCanBuy: !!a && a.price > 0,
+      addToCart: () => this.addToCartSku('w' + this.state.activeId),
+      askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»'); },
+      addSku: (e) => { e.stopPropagation(); this.addToCartSku(e.currentTarget.dataset.sku); },
+      askWork: (e) => { e.stopPropagation(); this.openTg(L.askMsg + '«' + e.currentTarget.dataset.title + '»'); },
+      lAddShort: L.addShort,
+      lAskShort: L.askShort,
+
       fName: this.fName,
       fContact: this.fContact,
       fIdea: this.fIdea,
@@ -1044,56 +1372,27 @@ class Component extends DCLogic {
       phIdea: L.phIdea,
       lSendTg: L.sendTg,
       lSendMail: L.sendMail,
-      lAddShort: L.addShort,
-      stockCount: this.paints().filter(p => !p.hidden).length + ' ' + L.stock,
-      catalog: this.paints().filter(p => !p.hidden).sort((a, b) => (a.order || 0) - (b.order || 0)).map(w => {
-        const wl = this.loc(w, l);
-        return { id: String(w.id), sku: 'w' + w.id, thumb: w.thumb || w.img, title: wl.t || '', size: wl.size || '', priceText: this.money(w.price) };
-      }),
-      wall: this.buildWall(),
-      wallEmpty: !this.paints().some(p => !p.hidden && p.ua && p.ua.hall),
-      paper: this.posts().filter(p => !p.hidden).sort((a, b) => (a.order || 0) - (b.order || 0)).map(g => {
-        const gl = this.loc(g, l);
-        return { sku: 'p' + g.id, img: g.img || '', hasImg: !!g.img, noImg: !g.img, title: gl.t || '', size: gl.size || '', priceText: this.money(g.price) };
-      }),
-      boxes: this.boxes().filter(b => !b.hidden).sort((a, b) => (a.order || 0) - (b.order || 0)).map(g => {
-        const gl = this.loc(g, l);
-        return { sku: 'b' + g.id, img: g.img || '', hasImg: !!g.img, noImg: !g.img, title: gl.t || '', size: gl.size || '', priceText: this.money(g.price) };
-      }),
-      email: this.mail,
-      mailLink: 'mailto:' + this.mail,
       sendOrderTg: () => {
         if (!(this.fName.current && this.fName.current.value.trim()) || !(this.fContact.current && this.fContact.current.value.trim())) {
           this.flash(L.needName); return;
         }
-        window.open(this.tgSend(this.commissionText()), '_blank', 'noopener');
+        this.openTg(this.commissionText());
         this.flash(L.sent);
       },
       sendOrderMail: () => {
-        const subj = l === 'en' ? 'Commission request' : 'Запит на картину на замовлення';
-        window.location.href = 'mailto:' + this.mail + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(this.commissionText());
+        window.location.href = 'mailto:' + this.mail + '?subject=' + encodeURIComponent(L.mailSubj) + '&body=' + encodeURIComponent(this.commissionText());
       },
-      askTg: () => {
-        const msg = (l === 'en' ? 'Hello! Tell me more about ' : 'Вітаю! Розкажіть детальніше про ') + '«' + av.t + '»';
-        window.open(this.tgSend(msg), '_blank', 'noopener');
-      },
-      orderTg: () => {
-        const msg = l === 'en' ? 'Hello! I would like to commission a painting.' : 'Вітаю! Хочу замовити картину.';
-        window.open(this.tgSend(msg), '_blank', 'noopener');
-      },
-      cart: this.state.cart.map((sku, i) => {
-        const it = this.item(sku, l);
-        return { idx: i, thumb: it.thumb, hasThumb: !!it.thumb, noThumb: !it.thumb, title: it.title, size: it.size, priceText: this.money(it.price) };
-      }),
-      empty: this.state.cart.length === 0,
+
+      cart: lines.map(it => ({ sku: it.sku, thumb: it.thumb, hasThumb: !!it.thumb, noThumb: !it.thumb, title: it.title, size: it.size, priceText: this.money(it.price) })),
+      empty: lines.length === 0,
       removeItem: (e) => {
-        const i = Number(e.currentTarget.dataset.i);
-        this.setState(s => ({ cart: s.cart.filter((_, j) => j !== i) }));
+        const sku = e.currentTarget.dataset.sku;
+        this.setState(s => ({ cart: s.cart.filter(x => x !== sku) }));
       },
       totalText: this.money(this.total()),
       checkout: () => {
-        if (!this.state.cart.length) return;
-        window.open(this.tgSend(this.orderText()), '_blank', 'noopener');
+        if (!this.cartLines(l).length) return;
+        this.openTg(this.orderText());
         this.flash(L.copied);
       },
       toast: this.state.toast,

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Адмін · Катерина Онокало</title>
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
 <script src="./supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,8 +14,10 @@
   .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
   .card { background: #F4F0E8; border: 1px solid rgba(27,26,22,.12); border-radius: 14px; padding: 22px; }
   h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 26px; letter-spacing: .02em; }
-  .muted { color: #857F74; font-size: 13.5px; }
+  h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 19px; margin-bottom: 6px; }
+  .muted { color: #857F74; font-size: 13.5px; line-height: 1.5; }
   input, select, textarea { width: 100%; background: #E9E4DC; border: 1px solid rgba(27,26,22,.25); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 15px; color: #1B1A16; margin-top: 6px; }
+  textarea { line-height: 1.5; resize: vertical; }
   label { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #5A554C; margin-bottom: 14px; }
   button { font: inherit; font-weight: 500; cursor: pointer; }
   .btn { border: none; border-radius: 10px; padding: 13px 22px; font-size: 13px; letter-spacing: .08em; }
@@ -36,11 +39,14 @@
   .ops button { border: 1px solid rgba(27,26,22,.25); background: none; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
   .ops button:hover { border-color: #0A1C3B; }
   .hidden-tag { color: #B4501C; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-left: 8px; }
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0A1C3B; color: #E9E4DC; padding: 12px 22px; border-radius: 999px; font-size: 13.5px; display: none; z-index: 50; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0A1C3B; color: #E9E4DC; padding: 12px 22px; border-radius: 999px; font-size: 13.5px; display: none; z-index: 50; max-width: 92vw; text-align: center; }
+  .note { background: #F6E7DC; border: 1px solid rgba(180,80,28,.25); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; color: #5A3A26; }
+  .extra { margin-bottom: 16px; }
+  .extra .card + .card { margin-top: 12px; }
   #editor, #hallEditor { position: fixed; inset: 0; background: rgba(10,28,59,.6); display: none; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; z-index: 40; }
   #editor .card, #hallEditor .card { max-width: 620px; width: 100%; max-height: 92vh; overflow-y: auto; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
-  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } .item { grid-template-columns: 52px 1fr; } .item img, .item .thumb { width: 52px; height: 52px; } }
+  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } .item { grid-template-columns: 52px 1fr; } .item img, .item .thumb { width: 52px; height: 52px; } .item .ops { grid-column: 1 / -1; } }
 </style>
 </head>
 <body>
@@ -58,7 +64,7 @@
   </div>
 
   <div id="app" style="display:none;">
-    <div class="row" style="justify-content:space-between; align-items:center;">
+    <div class="row" style="justify-content:space-between; align-items:center; flex-wrap:wrap;">
       <h1>Адмін · Катерина Онокало</h1>
       <div class="row">
         <span class="muted" id="whoami"></span>
@@ -70,15 +76,20 @@
       <button class="tab active" data-cat="paintings">Картини</button>
       <button class="tab" data-cat="postcards">Листівки і закладинки</button>
       <button class="tab" data-cat="boxes">Подарункові бокси</button>
+      <button class="tab" data-cat="projects">Реалізовані проєкти</button>
       <button class="tab" data-cat="halls">Зали</button>
+      <button class="tab" data-cat="settings">Налаштування</button>
     </div>
 
-    <div class="row" style="justify-content:space-between; margin-bottom:16px;">
+    <div id="extra" class="extra"></div>
+
+    <div class="row" id="listBar" style="justify-content:space-between; margin-bottom:16px;">
       <span class="muted" id="count"></span>
       <button class="btn btn-dark" id="addBtn">Додати</button>
     </div>
 
     <div id="list"></div>
+    <input type="file" id="multiImg" accept="image/*" multiple style="display:none;">
   </div>
 </div>
 
@@ -93,24 +104,26 @@
       <img id="edPrev" class="thumb" style="width:88px; height:88px; display:none;" alt="">
       <span class="muted" id="edImgNote">Оберіть фото з телефону чи комп'ютера — стиснеться автоматично.</span>
     </div>
-    <div class="grid2">
-      <label>Назва *<input id="edTua" type="text"></label>
-      <label>Назва англ. (необов.)<input id="edTen" type="text"></label>
-      <label>Ціна, грн *<input id="edPrice" type="number" min="0"></label>
-      <label>Розмір<input id="edSize" type="text" placeholder="80 × 80 см"></label>
-    </div>
-    <label id="hallLbl">Зала<select id="edHall">
-      <option value="">Без зали</option>
-      <option value="Зала I · Абстракція">Зала I · Абстракція</option>
-      <option value="Зала II · Квіти й поля">Зала II · Квіти й поля</option>
-      <option value="Зала III · Україна">Зала III · Україна</option>
-      <option value="Зала IV · Поп-образи">Зала IV · Поп-образи</option>
+    <label>Розділ<select id="edCat">
+      <option value="paintings">Картини</option>
+      <option value="postcards">Листівки і закладинки</option>
+      <option value="boxes">Подарункові бокси</option>
+      <option value="projects">Реалізовані проєкти (тільки фото)</option>
     </select></label>
-    <div class="grid2">
+    <div id="fMain">
+      <div class="grid2">
+        <label>Назва *<input id="edTua" type="text"></label>
+        <label>Назва англ. (необов.)<input id="edTen" type="text"></label>
+        <label>Ціна, грн<input id="edPrice" type="number" min="0" placeholder="0 — «ціна за запитом»"></label>
+        <label>Розмір<input id="edSize" type="text" placeholder="80 × 80 см"></label>
+      </div>
+    </div>
+    <label id="hallLbl">Зала<select id="edHall"></select></label>
+    <div id="fTech" class="grid2">
       <label>Техніка<input id="edTech" type="text" placeholder="Олія на полотні"></label>
       <label>Рік<input id="edYear" type="text" placeholder="2026"></label>
     </div>
-    <label>Опис (необов.)<textarea id="edDesc" rows="3" placeholder="Кілька слів про роботу — показується у вікні картини"></textarea></label>
+    <label id="fDesc">Опис (необов.)<textarea id="edDesc" rows="3" placeholder="Кілька слів про роботу — показується у вікні картини"></textarea></label>
     <div class="row" style="margin-bottom:14px;">
       <label style="margin:0; display:flex; align-items:center; gap:8px; font-size:14px; text-transform:none; letter-spacing:0;">
         <input type="checkbox" id="edHidden" style="width:auto; margin:0;">Сховати з сайту
@@ -139,7 +152,7 @@
       <label>Назва укр. *<input id="heName" type="text" placeholder="Залишки літа"></label>
     </div>
     <label>Назва англ.<input id="heNameEn" type="text" placeholder="Late Summer"></label>
-    <label>Опис укр.<textarea id="heNote" rows="2" placeholder="Кілька слів — показується на «Стіні»"></textarea></label>
+    <label>Опис укр.<textarea id="heNote" rows="2" placeholder="Кілька слів — показується, коли відкривають залу"></textarea></label>
     <label>Опис англ.<textarea id="heNoteEn" rows="2"></textarea></label>
     <div class="row" style="justify-content:space-between;">
       <button class="btn btn-danger" id="heDelete" style="display:none;">Видалити</button>
@@ -158,7 +171,10 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const CFG = window.SUPABASE_CONFIG || {};
 const CONFIG_OK = CFG.url && CFG.anonKey;
 const BUCKET = "items";
+const CATS = ["paintings", "postcards", "boxes", "projects"];
+const NEW_TITLE = { paintings: "Нова картина", postcards: "Нова листівка", boxes: "Новий бокс", projects: "Нове фото" };
 
+// English names of the original built-in halls (used when a hall has no English name in the «Зали» tab).
 const HALLS = {
   "Зала I · Абстракція": "Hall I · Abstraction",
   "Зала II · Квіти й поля": "Hall II · Flowers & Fields",
@@ -172,8 +188,21 @@ let editingId = null;
 let editingHallId = null;
 let rows = [];
 let halls = [];
+let settings = {};
+let settingsOk = true;
+let busy = false;
 
-function toast(msg) { const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toast._t); toast._t = setTimeout(() => t.style.display = "none", 2800); }
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function toast(msg, sticky) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(toast._t);
+  if (!sticky) toast._t = setTimeout(() => t.style.display = "none", 3200);
+}
 
 function newId() {
   if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -183,104 +212,210 @@ function newId() {
   });
 }
 
-function resizeTo(file, max) {
+function byOrder(a, b) { return (a.sort_order || 0) - (b.sort_order || 0); }
+function ofCat(c) { return rows.filter(x => (x.cat || "paintings") === c).sort(byOrder); }
+function nextOrder(c) { return ofCat(c).reduce((m, d) => Math.max(m, d.sort_order || 0), 0) + 1; }
+
+// ---------- Photos ----------
+// Every upload is stored as "<id>/<stamp>-<w>x<h>-full.<ext>" plus a "-thumb" copy (800px) for grids.
+// A fresh name per upload means no overwrite conflicts and no stale caches; the site reads the size from the name.
+
+function thumbOf(url) { return String(url || "").replace(/-full\.(webp|jpe?g)(?=$|\?)/i, "-thumb.$1"); }
+function isOptimized(url) { return /-\d+x\d+-full\.(webp|jpe?g)(?=$|\?)/i.test(String(url || "")); }
+
+function loadImage(blob) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        const w = Math.max(1, Math.round(img.width * scale));
-        const h = Math.max(1, Math.round(img.height * scale));
-        const c = document.createElement("canvas");
-        c.width = w; c.height = h;
-        c.getContext("2d").drawImage(img, 0, 0, w, h);
-        c.toBlob((blob) => blob ? resolve(blob) : reject(new Error("no blob")), "image/webp", 0.82);
-      };
-      img.onerror = reject;
-      img.src = reader.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("браузер не зміг відкрити це фото (спробуйте JPG або PNG)")); };
+    img.src = url;
   });
 }
 
+function canvasBlob(canvas, type, quality) {
+  return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+}
+
+// Safari cannot encode WebP (toBlob silently returns PNG), so fall back to JPEG there.
+async function encodeImage(img, max) {
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const scale = Math.min(1, max / Math.max(iw, ih));
+  const w = Math.max(1, Math.round(iw * scale)), h = Math.max(1, Math.round(ih * scale));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, w, h);
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, w, h);
+  let blob = await canvasBlob(c, "image/webp", 0.82);
+  if (blob && blob.type === "image/webp") return { blob, w, h, ext: "webp", type: "image/webp" };
+  blob = await canvasBlob(c, "image/jpeg", 0.85);
+  if (!blob) throw new Error("не вдалося стиснути фото");
+  return { blob, w, h, ext: "jpg", type: "image/jpeg" };
+}
+
+async function putFile(path, enc) {
+  const signed = await sb.storage.from(BUCKET).createSignedUploadUrl(path);
+  if (signed.error) throw new Error("Створення посилання для фото: " + (signed.error.message || signed.error));
+  const res = await fetch(signed.data.signedUrl, {
+    method: "PUT",
+    headers: { "Content-Type": enc.type, "Cache-Control": "max-age=31536000" },
+    body: enc.blob
+  });
+  if (!res.ok) {
+    const body = (await res.text().catch(() => "")).slice(0, 160);
+    throw new Error("Завантаження фото: HTTP " + res.status + " " + body);
+  }
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+async function uploadPhoto(id, source) {
+  const img = await loadImage(source);
+  const full = await encodeImage(img, 1600);
+  const thumb = await encodeImage(img, 800);
+  const base = id + "/" + Date.now().toString(36) + "-" + full.w + "x" + full.h;
+  await putFile(base + "-thumb." + thumb.ext, thumb);
+  return putFile(base + "-full." + full.ext, full);
+}
+
+function storagePaths(id, url) {
+  const out = new Set([id + "/full.webp"]);
+  const m = String(url || "").match(new RegExp("/object/public/" + BUCKET + "/([^?#]+)"));
+  if (m) {
+    const p = decodeURIComponent(m[1]);
+    out.add(p);
+    if (/-full\.(webp|jpe?g)$/i.test(p)) out.add(p.replace(/-full\.(webp|jpe?g)$/i, "-thumb.$1"));
+  }
+  return [...out];
+}
+
+async function removeFiles(paths) {
+  if (!paths.length) return null;
+  const rm = await sb.storage.from(BUCKET).remove(paths);
+  if (rm.error) console.warn("storage remove:", rm.error.message || rm.error);
+  return rm.error || null;
+}
+
+function blankRow(id, c) {
+  return {
+    id, cat: c, sort_order: 0, price: 0, year: "", img: "", hidden: false,
+    title: "", title_en: "", hall: "", hall_en: "", size: "", size_en: "",
+    tech: "", tech_en: "", description: "", description_en: ""
+  };
+}
+
+// ---------- Items ----------
+
 async function saveItem() {
+  if (busy) return;
   if (!(await requireAuth())) return;
   const id = editingId || newId();
+  const icat = $("#edCat").value;
+  const isProj = icat === "projects";
   const file = $("#edImg").files[0];
-  const price = Number($("#edPrice").value);
   const titleUa = $("#edTua").value.trim();
-  if (!titleUa) { toast("Вкажіть назву"); return; }
+  const oldImg = editingId ? ($("#edPrev").dataset.current || "") : "";
+  if (!titleUa && !isProj) { toast("Вкажіть назву"); return; }
+  if (isProj && !file && !oldImg) { toast("Оберіть фото"); return; }
   const btn = $("#edSave");
-  btn.disabled = true;
-  let img = editingId ? (document.getElementById("edPrev").dataset.current || "") : "";
+  btn.disabled = true; busy = true;
   try {
-    if (file) {
-      const blob = await resizeTo(file, 1600);
-      const path = id + "/full.webp";
-      const signed = await sb.storage.from(BUCKET).createSignedUploadUrl(path);
-      if (signed.error) throw new Error("Створення посилання для фото: " + (signed.error.message || signed.error));
-      const res = await fetch(signed.data.signedUrl, {
-        method: "PUT",
-        headers: { "Content-Type": "image/webp" },
-        body: blob
-      });
-      if (!res.ok) {
-        const body = (await res.text().catch(() => "")).slice(0, 160);
-        throw new Error("Завантаження фото: HTTP " + res.status + " " + body);
-      }
-      img = sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
-    }
-    const hallUa = $("#edHall").value.trim();
+    let img = oldImg;
+    if (file) { toast("Стискаю і завантажую фото…", true); img = await uploadPhoto(id, file); }
+    const prev = rows.find(x => x.id === id);
+    const sort = (prev && (prev.cat || "paintings") === icat) ? (prev.sort_order || 0) : nextOrder(icat);
+    const price = Number($("#edPrice").value);
+    const hallUa = icat === "paintings" ? $("#edHall").value.trim() : "";
+    const hallRow = halls.find(h => h.name === hallUa);
     const techUa = $("#edTech").value.trim();
     const sizeUa = $("#edSize").value.trim();
     const descUa = $("#edDesc").value.trim();
     const titleEn = $("#edTen").value.trim() || titleUa;
-    const row = {
-      id, cat, sort_order: Number(window._edOrder || 0), price: isNaN(price) ? 0 : price,
+    const row = Object.assign(blankRow(id, icat), {
+      sort_order: sort, price: isNaN(price) ? 0 : price,
       year: $("#edYear").value.trim(), img, hidden: $("#edHidden").checked,
       title: titleUa, title_en: titleEn,
-      hall: hallUa, hall_en: HALLS[hallUa] || hallUa,
+      hall: hallUa, hall_en: hallUa ? ((hallRow && hallRow.name_en) || HALLS[hallUa] || hallUa) : "",
       size: sizeUa, size_en: sizeUa, tech: techUa, tech_en: techUa,
       description: descUa, description_en: descUa
-    };
+    });
     const { error } = await sb.from("items").upsert(row, { onConflict: "id" });
     if (error) {
       const alive = await sessionAlive();
       throw new Error("Збереження в базу: " + error.message + (alive ? "" : " — ви не увійшли"));
     }
-    toast("Збережено");
+    if (file && oldImg && oldImg !== img) await removeFiles(storagePaths(id, oldImg));
+    toast(prev && (prev.cat || "paintings") !== icat ? "Збережено й перенесено в інший розділ" : "Збережено");
     closeEditor();
     await load();
   } catch (e) {
     console.error(e);
     toast("Помилка: " + (e && e.message ? e.message : e));
   }
-  btn.disabled = false;
+  btn.disabled = false; busy = false;
+}
+
+async function deleteItem(d) {
+  const err = await removeFiles(storagePaths(d.id, d.img));
+  const { error } = await sb.from("items").delete().eq("id", d.id);
+  if (error) throw error;
+  toast("Видалено" + (err ? " (фото не стерлося: " + (err.message || "помилка") + ")" : ""));
+}
+
+async function addProjectPhotos(files) {
+  if (busy || !files.length) return;
+  if (!(await requireAuth())) return;
+  busy = true;
+  $("#addBtn").disabled = true;
+  let done = 0, failed = 0;
+  let order = nextOrder("projects");
+  for (const f of files) {
+    toast("Завантажую фото " + (done + failed + 1) + " з " + files.length + "…", true);
+    const id = newId();
+    try {
+      const img = await uploadPhoto(id, f);
+      const { error } = await sb.from("items").upsert(Object.assign(blankRow(id, "projects"), { img, sort_order: order++ }), { onConflict: "id" });
+      if (error) { await removeFiles(storagePaths(id, img)); throw error; }
+      done++;
+    } catch (e) {
+      console.error(e);
+      failed++;
+    }
+  }
+  busy = false;
+  $("#addBtn").disabled = false;
+  toast("Додано фото: " + done + (failed ? " · не вдалося: " + failed : ""));
+  await load();
 }
 
 function renderList(data) {
-  const list = data
-    .filter(d => (d.cat || "paintings") === cat)
-    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  const list = data.filter(d => (d.cat || "paintings") === cat).sort(byOrder);
   $("#count").textContent = list.length + " шт.";
   const el = $("#list");
-  if (!list.length) { el.innerHTML = '<p class="muted">Тут поки порожньо. Натисніть «Додати».</p>'; return; }
-  el.innerHTML = list.map((d) => {
+  if (!list.length) {
+    el.innerHTML = '<p class="muted">Тут поки порожньо. Натисніть «' + esc($("#addBtn").textContent) + '».</p>';
+    return;
+  }
+  const isProj = cat === "projects";
+  el.innerHTML = list.map((d, i) => {
+    const title = d.title || (isProj ? "Фото " + (i + 1) : "");
+    const sub = isProj ? "" : [d.size, cat === "paintings" ? (d.hall || "без зали") : ""].filter(Boolean).join(" · ");
+    const price = isProj ? "" : (d.price ? Number(d.price).toLocaleString("uk-UA") + " грн" : "ціна за запитом");
     return `<div class="item">
-      ${d.img ? `<img src="${d.img}" alt="">` : '<div class="thumb">◦</div>'}
+      ${d.img ? `<img src="${esc(thumbOf(d.img))}" alt="" loading="lazy">` : '<div class="thumb">◦</div>'}
       <div>
-        <div class="t">${d.title || ''}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}</div>
-        <div class="s">${d.size || ''}</div>
-        <div class="price">${d.price ? Number(d.price).toLocaleString("uk-UA") : ''} грн</div>
+        <div class="t">${esc(title)}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}</div>
+        ${sub ? `<div class="s">${esc(sub)}</div>` : ""}
+        ${price ? `<div class="price">${esc(price)}</div>` : ""}
       </div>
       <div class="ops">
-        <button data-act="up" data-id="${d.id}">↑</button>
-        <button data-act="down" data-id="${d.id}">↓</button>
-        <button data-act="hide" data-id="${d.id}">${d.hidden ? "Показати" : "Сховати"}</button>
-        <button data-act="edit" data-id="${d.id}">Редагувати</button>
-        <button data-act="del" data-id="${d.id}" style="color:#B4501C;">Видалити</button>
+        <button data-act="up" data-id="${esc(d.id)}">↑</button>
+        <button data-act="down" data-id="${esc(d.id)}">↓</button>
+        <button data-act="hide" data-id="${esc(d.id)}">${d.hidden ? "Показати" : "Сховати"}</button>
+        <button data-act="edit" data-id="${esc(d.id)}">Редагувати</button>
+        <button data-act="del" data-id="${esc(d.id)}" style="color:#B4501C;">Видалити</button>
       </div>
     </div>`;
   }).join("");
@@ -295,12 +430,8 @@ function bindOps(el) {
     if (act === "edit") { openEditor(id); return; }
     if (!(await requireAuth())) return;
     if (act === "del") {
-      if (!confirm("Видалити «" + (d.title || "") + "» безповоротно?")) return;
-      const rm = await sb.storage.from(BUCKET).remove([id + "/full.webp"]);
-      if (rm.error) console.warn("storage remove:", rm.error.message || rm.error);
-      const { error } = await sb.from("items").delete().eq("id", id);
-      if (error) { toast(error.message); return; }
-      toast("Видалено" + (rm.error ? " (фото не стерлося: " + (rm.error.message || "помилка") + ")" : ""));
+      if (!confirm("Видалити «" + (d.title || "фото") + "» безповоротно?")) return;
+      try { await deleteItem(d); } catch (e) { toast("Помилка: " + e.message); return; }
       await load();
       return;
     }
@@ -310,12 +441,13 @@ function bindOps(el) {
       toast(d.hidden ? "Показано" : "Сховано");
       await load();
     } else {
-      const list = rows.filter(x => (x.cat || "paintings") === cat).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      const list = ofCat(cat);
       const i = list.findIndex(x => x.id === id);
       const j = act === "up" ? i - 1 : i + 1;
       if (j < 0 || j >= list.length) return;
       const a = list[i], b2 = list[j];
-      const oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      let oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      if (oa === ob) ob = oa + (act === "up" ? -1 : 1);
       await sb.from("items").update({ sort_order: ob }).eq("id", a.id);
       await sb.from("items").update({ sort_order: oa }).eq("id", b2.id);
       toast("Порядок змінено");
@@ -324,45 +456,46 @@ function bindOps(el) {
   }));
 }
 
+function applyCatFields(c) {
+  const proj = c === "projects";
+  $("#fMain").style.display = proj ? "none" : "";
+  $("#fTech").style.display = proj ? "none" : "";
+  $("#fDesc").style.display = proj ? "none" : "";
+  $("#hallLbl").style.display = c === "paintings" ? "" : "none";
+}
+
 function openEditor(id) {
   editingId = id || null;
-  window._edOrder = 0;
-  $("#hallLbl").style.display = cat === "paintings" ? "" : "none";
-  fillHallSelect();
-  if (!id) {
-    const list = rows.filter(x => (x.cat || "paintings") === cat);
-    let mx = 0;
-    list.forEach(d => { const o = d.sort_order || 0; if (o > mx) mx = o; });
-    window._edOrder = mx + 1;
-  }
-  $("#edTitle").textContent = id ? "Редагувати" : "Нова робота";
+  const d = id ? rows.find(x => x.id === id) : null;
+  const c = d ? (d.cat || "paintings") : cat;
+  $("#edCat").value = c;
+  applyCatFields(c);
+  fillHallSelect(d ? d.hall : "");
+  $("#edTitle").textContent = id ? "Редагувати" : NEW_TITLE[c];
   $("#edDelete").style.display = id ? "" : "none";
   $("#edImg").value = "";
   const prev = $("#edPrev");
   prev.style.display = "none"; prev.removeAttribute("data-current");
   $("#edImgNote").style.display = "";
   $("#edTua").value = $("#edTen").value = $("#edPrice").value = $("#edSize").value = $("#edTech").value = $("#edYear").value = $("#edDesc").value = "";
-  $("#edHall").value = "";
   $("#edHidden").checked = false;
-  if (id) {
-    const d = rows.find(x => x.id === id);
-    if (d) {
-      window._edOrder = d.sort_order || 0;
-      $("#edTua").value = d.title || "";
-      $("#edTen").value = (d.title_en && d.title_en !== d.title) ? d.title_en : "";
-      $("#edPrice").value = d.price || "";
-      $("#edSize").value = d.size || "";
-      $("#edTech").value = d.tech || "";
-      $("#edYear").value = d.year || "";
-      $("#edDesc").value = d.description || "";
-      $("#edHall").value = d.hall || "";
-      $("#edHidden").checked = !!d.hidden;
-      if (d.img) { prev.src = d.img; prev.style.display = ""; prev.setAttribute("data-current", d.img); $("#edImgNote").style.display = "none"; }
-    }
+  if (d) {
+    $("#edTua").value = d.title || "";
+    $("#edTen").value = (d.title_en && d.title_en !== d.title) ? d.title_en : "";
+    $("#edPrice").value = d.price || "";
+    $("#edSize").value = d.size || "";
+    $("#edTech").value = d.tech || "";
+    $("#edYear").value = d.year || "";
+    $("#edDesc").value = d.description || "";
+    $("#edHall").value = d.hall || "";
+    $("#edHidden").checked = !!d.hidden;
+    if (d.img) { prev.src = thumbOf(d.img); prev.style.display = ""; prev.setAttribute("data-current", d.img); $("#edImgNote").style.display = "none"; }
   }
   $("#editor").style.display = "flex";
 }
 function closeEditor() { $("#editor").style.display = "none"; editingId = null; }
+
+$("#edCat").addEventListener("change", () => applyCatFields($("#edCat").value));
 
 $("#edImg").addEventListener("change", () => {
   const f = $("#edImg").files[0];
@@ -372,65 +505,164 @@ $("#edImg").addEventListener("change", () => {
   $("#edImgNote").style.display = "none";
 });
 
+// ---------- Data ----------
+
 async function load() {
-  const [itRes, hRes] = await Promise.all([
+  const [itRes, hRes, sRes] = await Promise.all([
     sb.from("items").select("*").order("sort_order", { ascending: true }),
-    sb.from("halls").select("*").order("sort_order", { ascending: true })
+    sb.from("halls").select("*").order("sort_order", { ascending: true }),
+    sb.from("settings").select("*")
   ]);
   if (itRes.error) { toast("Помилка: " + itRes.error.message); return; }
   rows = itRes.data || [];
   halls = hRes.error ? [] : (hRes.data || []);
+  settingsOk = !sRes.error;
+  settings = {};
+  (sRes.data || []).forEach((s) => { settings[s.key] = s.value || ""; });
   render();
 }
 
 function render() {
-  if (cat === "halls") renderHalls(); else renderList(rows);
+  $("#listBar").style.display = cat === "settings" ? "none" : "";
+  renderExtra();
+  if (cat === "halls") renderHalls();
+  else if (cat === "settings") $("#list").innerHTML = "";
+  else renderList(rows);
 }
 
+const SETTINGS_NOTE = '<p class="note">Це поле запрацює після разового налаштування бази — попросіть Антона (SQL у файлі ДОКУМЕНТАЦІЯ.md, розділ 8).</p>';
+
+function renderExtra() {
+  const el = $("#extra");
+  if (cat === "projects") {
+    el.innerHTML = `<div class="card">
+      <h2>Текст над реалізованими проєктами</h2>
+      <p class="muted" style="margin-bottom:14px;">Показується на сайті над фото. Порожнє поле — стандартний текст («Ці роботи вже живуть у своїх власників…»).</p>
+      ${settingsOk ? "" : SETTINGS_NOTE}
+      <label style="margin-top:12px;">Українською<textarea id="stIntro" rows="3" placeholder="Кожну з цих робіт можна повторити за вашим бажанням…">${esc(settings.projects_intro)}</textarea></label>
+      <label>Англійською (необов.)<textarea id="stIntroEn" rows="3">${esc(settings.projects_intro_en)}</textarea></label>
+      <button class="btn btn-dark" id="stIntroSave" ${settingsOk ? "" : "disabled"}>Зберегти текст</button>
+    </div>`;
+    $("#stIntroSave").addEventListener("click", () => saveSettings({ projects_intro: $("#stIntro").value.trim(), projects_intro_en: $("#stIntroEn").value.trim() }));
+  } else if (cat === "settings") {
+    const legacy = rows.filter(r => r.img && !isOptimized(r.img));
+    el.innerHTML = `<div class="card">
+      <h2>Магазин на Etsy</h2>
+      <p class="muted" style="margin-bottom:14px;">Посилання з'явиться в «Контактах» і в кошику з підписом «замовлення з-за кордону». Порожнє поле — Etsy не показується.</p>
+      ${settingsOk ? "" : SETTINGS_NOTE}
+      <label style="margin-top:12px;">Посилання<input id="stEtsy" type="url" placeholder="https://www.etsy.com/shop/…" value="${esc(settings.etsy_url)}"></label>
+      <button class="btn btn-dark" id="stEtsySave" ${settingsOk ? "" : "disabled"}>Зберегти</button>
+    </div>
+    <div class="card">
+      <h2>Оптимізація фото</h2>
+      <p class="muted" style="margin-bottom:14px;">${legacy.length
+        ? "Фото, завантажені раніше, важать по 1–3 МБ і гальмують сайт на телефонах. Кнопка перестисне їх (" + legacy.length + " шт.) — займе кілька хвилин, сторінку не закривайте. Краще робити з комп'ютера."
+        : "Усі фото вже оптимізовані."}</p>
+      ${legacy.length ? '<button class="btn btn-dark" id="optBtn">Перестиснути ' + legacy.length + ' фото</button>' : ""}
+      <p class="muted" id="optLog" style="margin-top:10px;"></p>
+    </div>`;
+    $("#stEtsySave").addEventListener("click", () => {
+      const v = $("#stEtsy").value.trim();
+      if (v && !/^https?:\/\//i.test(v)) { toast("Посилання має починатися з https://"); return; }
+      saveSettings({ etsy_url: v });
+    });
+    if ($("#optBtn")) $("#optBtn").addEventListener("click", optimizeLegacy);
+  } else {
+    el.innerHTML = "";
+  }
+}
+
+async function saveSettings(obj) {
+  if (!(await requireAuth())) return;
+  const payload = Object.keys(obj).map((k) => ({ key: k, value: obj[k] }));
+  const { error } = await sb.from("settings").upsert(payload, { onConflict: "key" });
+  if (error) { toast("Помилка: " + error.message); return; }
+  toast("Збережено");
+  await load();
+}
+
+async function optimizeLegacy() {
+  if (busy) return;
+  if (!(await requireAuth())) return;
+  const legacy = rows.filter(r => r.img && !isOptimized(r.img));
+  if (!legacy.length) return;
+  busy = true;
+  $("#optBtn").disabled = true;
+  const log = $("#optLog");
+  let done = 0, failed = 0;
+  for (const r of legacy) {
+    log.textContent = "Обробляю " + (done + failed + 1) + " з " + legacy.length + ": " + (r.title || "фото") + "…";
+    try {
+      const res = await fetch(r.img, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const img = await uploadPhoto(r.id, await res.blob());
+      const { error } = await sb.from("items").update({ img }).eq("id", r.id);
+      if (error) { await removeFiles(storagePaths(r.id, img)); throw error; }
+      await removeFiles(storagePaths(r.id, r.img));
+      done++;
+    } catch (e) {
+      console.error(r.id, e);
+      failed++;
+    }
+  }
+  busy = false;
+  log.textContent = "Готово: " + done + (failed ? " · не вдалося: " + failed + " (спробуйте ще раз)" : "");
+  toast("Фото оптимізовано: " + done);
+  await load();
+}
+
+// ---------- Halls ----------
+
 function renderHalls() {
-  const list = halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  const list = halls.slice().sort(byOrder);
   $("#count").textContent = list.length + " зал";
   const el = $("#list");
   if (!list.length) { el.innerHTML = '<p class="muted">Зал ще немає. Додайте першу.</p>'; return; }
   el.innerHTML = list.map((h) => {
-    const cnt = rows.filter(r => (r.hall || "") === (h.name || "")).length;
+    const cnt = rows.filter(r => (r.cat || "paintings") === "paintings" && (r.hall || "") === (h.name || "")).length;
     return `<div class="item">
-      <div class="thumb" style="font-size:15px;">${h.num || '·'}</div>
+      <div class="thumb" style="font-size:15px;">${esc(h.num || '·')}</div>
       <div>
-        <div class="t">${h.name || ''}</div>
-        <div class="s">${cnt} робіт</div>
+        <div class="t">${esc(h.name)}</div>
+        <div class="s">${cnt} робіт${h.name_en ? " · " + esc(h.name_en) : ""}</div>
       </div>
       <div class="ops">
-        <button data-act="up" data-id="${h.id}">↑</button>
-        <button data-act="down" data-id="${h.id}">↓</button>
-        <button data-act="edit" data-id="${h.id}">Редагувати</button>
-        <button data-act="del" data-id="${h.id}">Видалити</button>
+        <button data-act="up" data-id="${esc(h.id)}">↑</button>
+        <button data-act="down" data-id="${esc(h.id)}">↓</button>
+        <button data-act="edit" data-id="${esc(h.id)}">Редагувати</button>
+        <button data-act="del" data-id="${esc(h.id)}">Видалити</button>
       </div>
     </div>`;
   }).join("");
   bindHallOps(el);
 }
 
+async function deleteHall(h) {
+  await sb.from("items").update({ hall: "", hall_en: "" }).eq("hall", h.name);
+  const { error } = await sb.from("halls").delete().eq("id", h.id);
+  if (error) throw error;
+  toast("Залу видалено");
+}
+
 function bindHallOps(el) {
   el.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", async () => {
-    if (!(await requireAuth())) return;
     const act = b.dataset.act, id = b.dataset.id;
     const h = halls.find(x => x.id === id);
     if (!h) return;
     if (act === "edit") { openHallEditor(id); return; }
+    if (!(await requireAuth())) return;
     if (act === "del") {
       if (!confirm("Видалити залу? Роботи цієї зали стануть «Без зали».")) return;
-      await sb.from("items").update({ hall: "" }).eq("hall", h.name);
-      await sb.from("halls").delete().eq("id", id);
-      toast("Залу видалено");
+      try { await deleteHall(h); } catch (e) { toast("Помилка: " + e.message); return; }
       await load();
     } else {
-      const list = halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      const list = halls.slice().sort(byOrder);
       const i = list.findIndex(x => x.id === id);
       const j = act === "up" ? i - 1 : i + 1;
       if (j < 0 || j >= list.length) return;
       const a = list[i], b2 = list[j];
-      const oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      let oa = a.sort_order || 0, ob = b2.sort_order || 0;
+      if (oa === ob) ob = oa + (act === "up" ? -1 : 1);
       await sb.from("halls").update({ sort_order: ob }).eq("id", a.id);
       await sb.from("halls").update({ sort_order: oa }).eq("id", b2.id);
       toast("Порядок змінено");
@@ -462,14 +694,21 @@ async function saveHall() {
   if (!(await requireAuth())) return;
   const name = $("#heName").value.trim();
   if (!name) { toast("Вкажіть назву зали"); return; }
+  if (halls.some(h => h.name === name && h.id !== editingHallId)) { toast("Зала з такою назвою вже є"); return; }
+  const prev = editingHallId ? halls.find(h => h.id === editingHallId) : null;
   const id = editingHallId || newId();
   const row = {
     id, num: $("#heNum").value.trim(), name, name_en: $("#heNameEn").value.trim(),
     note: $("#heNote").value.trim(), note_en: $("#heNoteEn").value.trim(),
-    sort_order: Number(window._heOrder || 0)
+    sort_order: prev ? (prev.sort_order || 0) : Number(window._heOrder || 0)
   };
   const { error } = await sb.from("halls").upsert(row, { onConflict: "id" });
   if (error) { toast("Помилка: " + error.message); return; }
+  // Works are linked to a hall by its name, so carry a rename (and the English name) over to them.
+  if (prev) {
+    const up = await sb.from("items").update({ hall: name, hall_en: row.name_en || name }).eq("hall", prev.name);
+    if (up.error) { toast("Залу збережено, але роботи не оновились: " + up.error.message); closeHallEditor(); await load(); return; }
+  }
   toast("Збережено");
   closeHallEditor();
   await load();
@@ -482,21 +721,24 @@ $("#heDelete").addEventListener("click", async () => {
   if (!(await requireAuth())) return;
   if (!editingHallId || !confirm("Видалити залу? Роботи стануть «Без зали».")) return;
   const h = halls.find(x => x.id === editingHallId);
-  if (h) await sb.from("items").update({ hall: "" }).eq("hall", h.name);
-  await sb.from("halls").delete().eq("id", editingHallId);
-  toast("Залу видалено");
+  if (!h) return;
+  try { await deleteHall(h); } catch (e) { toast("Помилка: " + e.message); return; }
   closeHallEditor();
   await load();
 });
 
-function fillHallSelect() {
+function fillHallSelect(current) {
   const sel = $("#edHall");
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">Без зали</option>' + halls.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(h =>
-    `<option value="${(h.name || '').replace(/"/g, '&quot;')}">${h.num ? h.num + ' · ' : ''}${h.name || ''}</option>`
-  ).join("");
-  sel.value = prev;
+  const opts = halls.slice().sort(byOrder).map(h =>
+    `<option value="${esc(h.name)}">${h.num ? esc(h.num) + " · " : ""}${esc(h.name)}</option>`
+  );
+  // Keep an unknown (e.g. renamed outside the admin) hall selectable so saving doesn't silently drop it.
+  if (current && !halls.some(h => h.name === current)) opts.push(`<option value="${esc(current)}">${esc(current)} (немає у «Залах»)</option>`);
+  sel.innerHTML = '<option value="">Без зали (на сайті — «Інші роботи»)</option>' + opts.join("");
+  sel.value = current || "";
 }
+
+// ---------- Auth & wiring ----------
 
 $("#loginBtn").addEventListener("click", login);
 $("#email").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
@@ -511,25 +753,26 @@ async function login() {
 $("#logoutBtn").addEventListener("click", () => sb.auth.signOut());
 $("#addBtn").addEventListener("click", () => {
   if (cat === "halls") {
-    window._heOrder = 0;
-    const mx = halls.reduce((m, h) => Math.max(m, h.sort_order || 0), 0);
-    window._heOrder = mx + 1;
+    window._heOrder = halls.reduce((m, h) => Math.max(m, h.sort_order || 0), 0) + 1;
     openHallEditor(null);
+  } else if (cat === "projects") {
+    $("#multiImg").value = "";
+    $("#multiImg").click();
   } else {
     openEditor(null);
   }
 });
+$("#multiImg").addEventListener("change", () => addProjectPhotos([...$("#multiImg").files]));
 $("#edClose").addEventListener("click", closeEditor);
 $("#edCancel").addEventListener("click", closeEditor);
 $("#edSave").addEventListener("click", saveItem);
 $("#edDelete").addEventListener("click", async () => {
   if (!editingId || !confirm("Видалити безповоротно?")) return;
+  if (!(await requireAuth())) return;
+  const d = rows.find(x => x.id === editingId);
+  if (!d) return;
   try {
-    const rm = await sb.storage.from(BUCKET).remove([editingId + "/full.webp"]);
-    if (rm.error) console.warn("storage remove:", rm.error.message || rm.error);
-    const { error } = await sb.from("items").delete().eq("id", editingId);
-    if (error) throw error;
-    toast("Видалено" + (rm.error ? " (фото не стерлося: " + (rm.error.message || "помилка") + ")" : ""));
+    await deleteItem(d);
     closeEditor();
     await load();
   } catch (e) { toast("Помилка: " + e.message); }
@@ -538,7 +781,7 @@ $$("#tabs .tab").forEach(t => t.addEventListener("click", () => {
   $$("#tabs .tab").forEach(x => x.classList.remove("active"));
   t.classList.add("active");
   cat = t.dataset.cat;
-  $("#addBtn").textContent = cat === "halls" ? "Додати залу" : "Додати";
+  $("#addBtn").textContent = cat === "halls" ? "Додати залу" : cat === "projects" ? "Додати фото" : "Додати";
   render();
 }));
 
