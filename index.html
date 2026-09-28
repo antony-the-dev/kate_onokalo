@@ -695,7 +695,7 @@
   <sc-if value="{{ roomOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; z-index: 100; background: {{ roomWallColor }}; overflow: hidden; animation: floatIn .35s ease-out both; font-family: 'Commissioner', system-ui, sans-serif;">
       <sc-if value="{{ roomOwn }}">
-        <img src="{{ roomBg }}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; max-width: none;">
+        <img src="{{ roomBg }}" alt="" loading="lazy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; max-width: none;">
       </sc-if>
       <sc-if value="{{ roomPreset }}">
         <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 35%, rgba(255,255,255,.16), rgba(0,0,0,.08));"></div>
@@ -712,7 +712,7 @@
         </svg>
       </sc-if>
       <div class="dc-room-art" ref="{{ roomArtRef }}" onPointerDown="{{ roomDragStart }}" style="left: {{ artX }}px; top: {{ artY }}px; width: {{ artW }}px; height: {{ artH }}px;">
-        <img src="{{ roomImg }}" alt="{{ aTitle }}" style="left: {{ imgX }}px; top: {{ imgY }}px; width: {{ imgW }}px; height: {{ imgH }}px;">
+        <img src="{{ roomImg }}" alt="{{ aTitle }}" loading="lazy" style="left: {{ imgX }}px; top: {{ imgY }}px; width: {{ imgW }}px; height: {{ imgH }}px;">
       </div>
       <div style="position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 18px clamp(14px, 3vw, 32px) 40px; background: linear-gradient(rgba(10,28,59,.55), rgba(10,28,59,0)); color: #F3EFE8;">
         <div style="min-width: 0;">
