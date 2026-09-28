@@ -7,6 +7,7 @@
 <title>Адмін · Катерина Онокало</title>
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
 <script src="./supabase-config.js"></script>
+<script src="./wall.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,6 +105,7 @@
       <img id="edPrev" class="thumb" style="width:88px; height:88px; display:none;" alt="">
       <span class="muted" id="edImgNote">Оберіть фото з телефону чи комп'ютера — стиснеться автоматично.</span>
     </div>
+    <p class="muted" id="edWallNote" style="margin:-4px 0 14px;"></p>
     <label>Розділ<select id="edCat">
       <option value="paintings">Картини</option>
       <option value="postcards">Листівки і закладинки</option>
@@ -453,6 +455,7 @@ function renderList(data) {
         <div class="t">${esc(title)}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}</div>
         ${sub ? `<div class="s">${esc(sub)}</div>` : ""}
         ${price ? `<div class="price">${esc(price)}</div>` : ""}
+        ${cat === "paintings" && d.img ? `<div class="s" data-wall="${esc(d.id)}"></div>` : ""}
       </div>
       <div class="ops">
         <button data-act="up" data-id="${esc(d.id)}">↑</button>
@@ -464,6 +467,81 @@ function renderList(data) {
     </div>`;
   }).join("");
   bindOps(el);
+  if (cat === "paintings") checkWalls(list);
+}
+
+// ---------- «Приміряти на стіні» hints (same check as the site, wall.js) ----------
+
+const WALL_TEXT = {
+  ok: "✓ є «Приміряти на стіні»",
+  size: "без примірки — розмір не двома числами",
+  photo: "без примірки — фото не на рівному фоні",
+  ratio: "без примірки — пропорції фото не як у розмірі"
+};
+const WALL_HINT = {
+  ok: "✓ На сайті буде кнопка «Приміряти на стіні» — картина в реальному розмірі над диваном.",
+  size: "«Приміряти на стіні» не буде: вкажіть розмір двома числами, наприклад 60 × 80.",
+  photo: "«Приміряти на стіні» не буде: фото не на рівному фоні (інтер'єр, упаковка). Для примірки потрібне фото полотна на однотонному фоні.",
+  ratio: "«Приміряти на стіні» не буде: пропорції полотна на фото не збігаються з розміром — перевірте розмір."
+};
+const wallCache = {};
+
+function dimsOf(url) {
+  const m = String(url || "").match(/-(\d{2,5})x(\d{2,5})-(?:full|thumb)\./);
+  return m ? { w: Number(m[1]), h: Number(m[2]) } : null;
+}
+
+function loadCors(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function paintWall(el, key, texts) {
+  el.textContent = texts[key];
+  el.style.color = key === "ok" ? "#4F6B4A" : "#9A6B3D";
+}
+
+async function checkWalls(list) {
+  if (!window.KoWall) return;
+  for (const d of list) {
+    const k = d.img + "|" + (d.size || "");
+    if (!(k in wallCache)) {
+      const size = KoWall.parseSize(d.size), dims = dimsOf(d.img);
+      if (!size) wallCache[k] = "size";
+      else if (!dims) wallCache[k] = null;
+      else {
+        try { const r = KoWall.check(await loadCors(thumbOf(d.img)), dims, size); wallCache[k] = r.ok ? "ok" : r.reason; }
+        catch (e) { wallCache[k] = null; }
+      }
+    }
+    const el = document.querySelector('[data-wall="' + d.id + '"]');
+    if (el && wallCache[k]) paintWall(el, wallCache[k], WALL_TEXT);
+  }
+}
+
+let wallHintSeq = 0;
+async function updateWallHint() {
+  const el = $("#edWallNote");
+  const seq = ++wallHintSeq;
+  el.textContent = "";
+  if ($("#edCat").value !== "paintings" || !window.KoWall) return;
+  const file = $("#edImg").files[0], cur = $("#edPrev").dataset.current || "";
+  if (!file && !cur) return;
+  const size = KoWall.parseSize($("#edSize").value);
+  if (!size) { paintWall(el, "size", WALL_HINT); return; }
+  try {
+    let img, dims;
+    if (file) { img = await loadImage(file); dims = { w: img.naturalWidth, h: img.naturalHeight }; }
+    else { dims = dimsOf(cur); if (!dims) return; img = await loadCors(thumbOf(cur)); }
+    if (seq !== wallHintSeq) return;
+    const r = KoWall.check(img, dims, size);
+    paintWall(el, r.ok ? "ok" : r.reason, WALL_HINT);
+  } catch (e) { /* no hint */ }
 }
 
 function bindOps(el) {
@@ -536,10 +614,12 @@ function openEditor(id) {
     if (d.img) { prev.src = thumbOf(d.img); prev.style.display = ""; prev.setAttribute("data-current", d.img); $("#edImgNote").style.display = "none"; }
   }
   $("#editor").style.display = "flex";
+  updateWallHint();
 }
 function closeEditor() { $("#editor").style.display = "none"; editingId = null; }
 
-$("#edCat").addEventListener("change", () => applyCatFields($("#edCat").value));
+$("#edCat").addEventListener("change", () => { applyCatFields($("#edCat").value); updateWallHint(); });
+$("#edSize").addEventListener("input", () => { clearTimeout(updateWallHint._t); updateWallHint._t = setTimeout(updateWallHint, 400); });
 
 $("#edImg").addEventListener("change", () => {
   const f = $("#edImg").files[0];
@@ -547,6 +627,7 @@ $("#edImg").addEventListener("change", () => {
   $("#edPrev").src = URL.createObjectURL(f);
   $("#edPrev").style.display = "";
   $("#edImgNote").style.display = "none";
+  updateWallHint();
 });
 
 // ---------- Data ----------

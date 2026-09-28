@@ -19,6 +19,7 @@ Content is managed by the artist herself through a Supabase-backed admin panel �
 | `index.html` | Public site: hero, halls (overview cards ↔ single-hall view), postcards, boxes, completed projects, about, interior, order, collab, contact, cart, work modal, project lightbox. Reads Supabase via REST. |
 | `admin.html` | Admin panel (standalone, plain JS): login, tabs (Картини / Листівки / Бокси / Реалізовані проєкти / Зали / Налаштування), CRUD, section («Розділ») select to move items between categories, photo pipeline (see below), order/hide/delete, settings (projects intro, Etsy URL), one-off legacy photo re-compression. |
 | `supabase-config.js` | Supabase url + anonKey. |
+| `wall.js` | Shared «Приміряти на стіні» check (`window.KoWall`: `parseSize`, `detectBox`, `check`), loaded by both pages. |
 | `support.js` | DC runtime (generated — don't edit). |
 | `img/` | WebP assets, favicons, `og-1200.jpg` (link-preview image). |
 | `ДОКУМЕНТАЦІЯ.md`, `ІНСТРУКЦІЯ-ДЛЯ-КАТЕРИНИ.md` | Handover docs (UA). |
@@ -48,8 +49,9 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - Cart SKUs: `w<id>` painting, `p<id>` postcard, `b<id>` box; persisted in `localStorage.ko_cart`; hidden/deleted/price-0 items drop out of the cart. Price 0 → «Ціна за запитом» + «Запитати» (Telegram) instead of «В кошик». Checkout/ask/order → `t.me/@kate_art_tort?text=<encoded>` (never clipboard).
 - Body scroll is locked in `componentDidUpdate` whenever the menu, cart, work modal or project lightbox or room view is open.
 - Open work is mirrored in the URL as `#work-<id>` via `replaceState` (no history spam); deep links open the modal inside its hall. «Поділитися» uses `navigator.share` or copies the link.
-- «Приміряти на стіні» (room view): `detectBox()` finds the canvas inside a studio shot (plain backdrop, border-ring colour + row/column thresholds on the 800px thumb, needs CORS — Supabase sends `ACAO: *`); `ensureRoomInfo()` accepts it only if the box aspect matches the «Розмір» field (±25%, picks orientation) and the image name carries dimensions. Busy/interior photos → no button. `roomGeom()` lays out a preset room at true scale (sofa 210 cm, painting bottom ~20 cm above it) or the visitor's own wall photo (object URL, never uploaded; drag + size slider).
-- Hero «жива фарба»: raw WebGL1 shader over the hero image (`initLivePaint`), slow noise drift + pointer smear; paused off-screen/hidden tab, skipped for reduced motion or no WebGL (the `<img>` stays underneath).
+- «Приміряти на стіні» (room view): `KoWall.detectBox()` (wall.js) finds the canvas inside a studio shot (plain backdrop, border-ring colour + row/column thresholds on the 800px thumb, needs CORS — Supabase sends `ACAO: *`); `KoWall.check()` accepts it only if the box aspect matches the «Розмір» field (±25%, picks orientation). Interior/packaging photos or a size that isn't two numbers → no button; the admin shows the same verdict per painting and in the editor. `roomGeom()` lays out a preset room at true scale (sofa 210 cm, painting bottom ~20 cm above it) or the visitor's own wall photo (object URL, never uploaded; drag + size slider).
+- Hero «жива фарба»: raw WebGL1 shader over the hero image (`initLivePaint`): very slow noise drift + drop ripples (ring buffer of 6 drops) on tap/click, along the mouse trail, and automatically every 4.5–7.5 s when idle. Paused off-screen/hidden tab, skipped for reduced motion or no WebGL, hidden on context loss (the `<img>` stays underneath). `st.raf` stays set while a frame runs so drops added inside a frame can't start a second loop.
+- Modal/lightbox images sit in a fixed-ratio box (`.dc-fit`/`.dc-lbfit`, `--r` from the file-name dimensions) with the cached thumb underneath — no layout jump while the full image loads.
 - Modal image sheen/tilt (`.dc-sheen`, mouse only) and scroll reveal (`.dc-reveal`, CSS `animation-timeline: view()` — progressive, no JS).
 
 ## Contacts / config

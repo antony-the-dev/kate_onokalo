@@ -23,6 +23,7 @@
 <script>try{if(localStorage.getItem('ko_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name="theme-color"]').setAttribute('content','#0A1C3B');}}catch(e){}</script>
 <script src="./support.js"></script>
 <script src="./supabase-config.js"></script>
+<script src="./wall.js"></script>
 </head>
 <body>
 <x-dc>
@@ -124,14 +125,16 @@
   .dc-proj figure { break-inside: avoid; margin: 0 0 clamp(10px, 1.6vw, 22px); cursor: zoom-in; overflow: hidden; background: var(--cream2); }
   .dc-proj img { display: block; width: 100%; height: auto; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
   .dc-proj figure:hover img { transform: scale(1.03); }
-  .dc-lb-img { display: block; max-width: 100%; max-height: calc(100vh - 200px); max-height: calc(100svh - 200px); object-fit: contain; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
+  .dc-fit { position: relative; width: min(100%, calc(74vh * var(--r, 1))); aspect-ratio: var(--r, 1); box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
+  .dc-lbfit { position: relative; flex: none; width: min(100%, calc((100vh - 200px) * var(--r, 1))); width: min(100%, calc((100svh - 200px) * var(--r, 1))); aspect-ratio: var(--r, 1); box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
+  .dc-fit > img, .dc-lbfit > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; object-fit: contain; }
   .dc-skel { background: var(--cream3); animation: pulse 1.6s ease-in-out infinite; }
   @keyframes floatIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   @keyframes breathe { 0%,100% { transform: translateY(10px); } 50% { transform: translateY(-12px); } }
   @keyframes menuDrop { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
   @keyframes pulse { 0%,100% { opacity: .45; } 50% { opacity: .9; } }
   .dc-live { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; }
-  .dc-sheen { position: relative; display: inline-block; max-width: 100%; transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .dc-sheen { position: relative; display: block; max-width: 100%; transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
   .dc-sheen::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--so, 0); transition: opacity .5s ease; mix-blend-mode: screen; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.2), rgba(255,255,255,.05) 28%, rgba(255,255,255,0) 55%); }
   .dc-linkbtn { background: none; border: none; color: inherit; font: inherit; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; padding: 8px 0; display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid transparent; }
   .dc-linkbtn:hover { color: #E4DED4; border-bottom-color: var(--lnav-b); }
@@ -644,9 +647,10 @@
   <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
     <div class="dc-modal" onClick="{{ closeWork }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
       <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; margin: auto 0; color: var(--ltext);">
-        <div style="display: flex; justify-content: center;">
-          <div class="dc-sheen" onPointerMove="{{ sheenMove }}" onPointerLeave="{{ sheenLeave }}">
-            <img src="{{ aImg }}" alt="{{ aTitle }}" width="{{ aW }}" height="{{ aH }}" loading="lazy" decoding="async" style="display: block; width: auto; height: auto; max-height: 74vh; max-width: 100%; box-shadow: 0 50px 90px -30px rgba(0,0,0,.7);">
+        <div style="display: flex; justify-content: center; min-width: 0;">
+          <div class="dc-sheen dc-fit" style="--r: {{ aRatio }};" onPointerMove="{{ sheenMove }}" onPointerLeave="{{ sheenLeave }}">
+            <img src="{{ aThumb }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <img src="{{ aImg }}" alt="{{ aTitle }}" loading="lazy" decoding="async">
           </div>
         </div>
         <div style="max-width: 460px;">
@@ -738,7 +742,10 @@
 
   <sc-if value="{{ projOpen }}" hint-placeholder-val="{{ false }}">
     <div class="dc-modal" onClick="{{ closeProj }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeProj }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 76px clamp(14px, 3vw, 44px) 26px; animation: floatIn .35s ease-out both;">
-      <img class="dc-lb-img" src="{{ pImg }}" alt="{{ pAlt }}" width="{{ pW }}" height="{{ pH }}" loading="lazy" decoding="async" onClick="{{ stop }}">
+      <div class="dc-lbfit" style="--r: {{ pRatio }};" onClick="{{ stop }}">
+        <img src="{{ pThumb }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+        <img src="{{ pImg }}" alt="{{ pAlt }}" loading="lazy" decoding="async">
+      </div>
       <div onClick="{{ stop }}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; color: var(--ltext);">
         <button onClick="{{ projPrev }}" aria-label="Попереднє фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #E4DED4;">⟵</button>
         <span style="min-width: 64px; text-align: center; font-size: 11px; letter-spacing: .22em; color: var(--lmut);">{{ pCounter }}</span>
@@ -989,64 +996,22 @@ class Component extends DCLogic {
     return t;
   }
 
-  // Two numbers in cm ("40x40", "100 × 60 см"); anything else (diptychs, free text) → null.
-  parseSize(s) {
-    const nums = String(s || '').replace(/,/g, '.').match(/\d+(?:\.\d+)?/g);
-    if (!nums || nums.length !== 2) return null;
-    const a = Number(nums[0]), b = Number(nums[1]);
-    return (a >= 5 && b >= 5 && a <= 400 && b <= 400) ? [a, b] : null;
-  }
-
-  // Finds the canvas inside a studio shot on a plain backdrop: the border ring gives the backdrop colour,
-  // rows/columns that mostly differ from it are the painting. Busy backgrounds (interiors) → null.
-  detectBox(img) {
-    const S = 200, sc = S / Math.max(img.naturalWidth, img.naturalHeight);
-    const w = Math.max(8, Math.round(img.naturalWidth * sc)), h = Math.max(8, Math.round(img.naturalHeight * sc));
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    const x = c.getContext('2d', { willReadFrequently: true });
-    x.drawImage(img, 0, 0, w, h);
-    const d = x.getImageData(0, 0, w, h).data;
-    const m = Math.max(2, Math.round(Math.min(w, h) * 0.03));
-    const ring = [];
-    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
-      if (i < m || j < m || i >= w - m || j >= h - m) { const k = (j * w + i) * 4; ring.push([d[k], d[k + 1], d[k + 2]]); }
-    }
-    const med = [0, 1, 2].map(ch => { const v = ring.map(p => p[ch]).sort((a, b) => a - b); return v[v.length >> 1]; });
-    const spread = Math.sqrt(ring.reduce((s, p) => s + (p[0] - med[0]) ** 2 + (p[1] - med[1]) ** 2 + (p[2] - med[2]) ** 2, 0) / ring.length);
-    if (spread > 35) return null;
-    const T = Math.max(38, spread * 2.2);
-    const rows = new Array(h).fill(0), cols = new Array(w).fill(0);
-    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
-      const k = (j * w + i) * 4;
-      if (Math.hypot(d[k] - med[0], d[k + 1] - med[1], d[k + 2] - med[2]) > T) { rows[j]++; cols[i]++; }
-    }
-    const on = (v, n) => v / n > 0.35;
-    const t = rows.findIndex(v => on(v, w)), b = h - 1 - [...rows].reverse().findIndex(v => on(v, w));
-    const l = cols.findIndex(v => on(v, h)), r = w - 1 - [...cols].reverse().findIndex(v => on(v, h));
-    if (t < 0 || l < 0 || (b - t + 1) / h < 0.2 || (r - l + 1) / w < 0.2) return null;
-    return [l / w, t / h, (r + 1) / w, (b + 1) / h];
-  }
-
-  // Async per image: is the "on a wall" preview possible, and at what size/orientation.
+  // Async per image: is the "on a wall" preview possible, and at what size/orientation (wall.js).
   ensureRoomInfo(wk) {
-    if (!wk || !wk.img || this._rooms[wk.img]) return;
+    const K = window.KoWall;
+    if (!K || !wk || !wk.img || this._rooms[wk.img]) return;
     const key = wk.img;
     const dm = this.dims(key);
-    const size = this.parseSize(wk.ua && wk.ua.size);
+    const size = K.parseSize(wk.ua && wk.ua.size);
     this._rooms[key] = { ok: false };
     if (!dm.w || !size) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       try {
-        const box = this.detectBox(img);
-        if (!box) return;
-        const ar = ((box[2] - box[0]) * dm.w) / ((box[3] - box[1]) * dm.h);
-        const opts = size[0] === size[1] ? [size] : [size, [size[1], size[0]]];
-        const best = opts.map(o => ({ o, err: Math.abs(Math.log(ar / (o[0] / o[1]))) })).sort((p, q) => p.err - q.err)[0];
-        if (best.err > Math.log(1.25)) return;
-        this._rooms[key] = { ok: true, box, nw: dm.w, nh: dm.h, wCm: best.o[0], hCm: best.o[1] };
+        const res = K.check(img, dm, size);
+        if (!res.ok) return;
+        this._rooms[key] = Object.assign({ nw: dm.w, nh: dm.h }, res);
         this.setState({ roomTick: this.state.roomTick + 1 });
       } catch (e) { /* unreadable pixels → no preview */ }
     };
@@ -1089,7 +1054,8 @@ class Component extends DCLogic {
     return { roomOpen: false, roomBg: '', roomPos: null };
   }
 
-  // Hero "live paint": the painting drifts slowly and smears under the pointer like wet paint (WebGL).
+  // Hero "live paint": the painting drifts very slowly, and drops ripple across it like across wet paint —
+  // on tap/click, along the mouse trail, and on their own every few seconds when nobody touches it (WebGL).
   initLivePaint() {
     const cv = this.heroCanvasRef.current, wrap = this.heroRef.current;
     if (!cv || !wrap || !window.IntersectionObserver) return;
@@ -1097,20 +1063,29 @@ class Component extends DCLogic {
     let gl = null;
     try { gl = cv.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' }); } catch (e) {}
     if (!gl) return;
+    const DROPS = 6;
     const VS = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
     const FS = [
       'precision mediump float;',
-      'uniform sampler2D u_tex;uniform float u_time,u_force,u_aspect;uniform vec2 u_mouse,u_vel;varying vec2 v;',
+      'uniform sampler2D u_tex;uniform float u_time,u_aspect;uniform vec4 u_drops[' + DROPS + '];varying vec2 v;',
       'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
       'float n(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),u.x),u.y);}',
       'void main(){',
       '  vec2 uv=v;float t=u_time*.05;',
-      '  vec2 fl=vec2(n(uv*2.3+vec2(t,t*.7)),n(uv*2.3+vec2(-t*.6,t)+7.3))-.5;',
-      '  uv+=fl*.008;',
-      '  vec2 d=(uv-u_mouse)*vec2(u_aspect,1.);',
-      '  float k=exp(-dot(d,d)*26.)*u_force;',
-      '  uv-=u_vel*k*1.4;uv+=vec2(-d.y,d.x)*k*.02;',
-      '  gl_FragColor=vec4(texture2D(u_tex,clamp(uv,.001,.999)).rgb,1.);',
+      '  uv+=(vec2(n(v*2.3+vec2(t,t*.7)),n(v*2.3+vec2(-t*.6,t)+7.3))-.5)*.004;',
+      '  float shade=0.;',
+      '  for(int i=0;i<' + DROPS + ';i++){',
+      '    vec4 dr=u_drops[i];float age=u_time-dr.z;',
+      '    if(dr.w<=0.||age<0.||age>3.5)continue;',
+      '    vec2 dv=(v-dr.xy)*vec2(u_aspect,1.);float dist=length(dv);',
+      '    float x=dist-age*.3;',
+      '    float env=exp(-x*x*45.)*exp(-age*1.25)*dr.w;',
+      '    float w=sin(x*90.);',
+      '    uv+=dv/max(dist,1e-4)/vec2(u_aspect,1.)*w*env*.016;',
+      '    shade+=w*env;',
+      '  }',
+      '  vec3 c=texture2D(u_tex,clamp(uv,.001,.999)).rgb+shade*.07;',
+      '  gl_FragColor=vec4(c,1.);',
       '}'
     ].join('\n');
     let prog;
@@ -1128,9 +1103,14 @@ class Component extends DCLogic {
     const loc = gl.getAttribLocation(prog, 'p');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uT = gl.getUniformLocation(prog, 'u_time'), uM = gl.getUniformLocation(prog, 'u_mouse'), uV = gl.getUniformLocation(prog, 'u_vel');
-    const uF = gl.getUniformLocation(prog, 'u_force'), uA = gl.getUniformLocation(prog, 'u_aspect');
-    const st = { mx: .5, my: .5, vx: 0, vy: 0, f: 0, lx: null, ly: null, raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now() };
+    const uT = gl.getUniformLocation(prog, 'u_time'), uA = gl.getUniformLocation(prog, 'u_aspect'), uD = gl.getUniformLocation(prog, 'u_drops');
+    const st = { raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now(), drops: new Float32Array(DROPS * 4), di: 0, last: null, touched: 0, nextAuto: 1.4 };
+    const now = () => (performance.now() - st.t0) / 1000;
+    const drop = (x, y, amp) => {
+      const k = (st.di++ % DROPS) * 4;
+      st.drops[k] = x; st.drops[k + 1] = y; st.drops[k + 2] = now(); st.drops[k + 3] = amp;
+      start();
+    };
     const fit = () => {
       const r = wrap.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -1138,17 +1118,22 @@ class Component extends DCLogic {
       if (cv.width !== w || cv.height !== hh) { cv.width = w; cv.height = hh; gl.viewport(0, 0, w, hh); }
       gl.uniform1f(uA, r.width / Math.max(1, r.height));
     };
-    const frame = (now) => {
-      st.raf = 0;
-      if (!st.on || document.hidden) return;
-      st.f *= 0.955; st.vx *= 0.9; st.vy *= 0.9;
+    // st.raf stays set while a frame runs, so drop() → start() inside it can't spawn a second loop.
+    const frame = () => {
+      if (!st.on || document.hidden || !st.ready) { st.raf = 0; return; }
+      const t = now();
+      // a drop falls on its own when nobody has touched the painting for a while
+      if (t > st.nextAuto && t - st.touched > 3.5) {
+        drop(0.2 + Math.random() * 0.6, 0.2 + Math.random() * 0.6, 0.85);
+        st.nextAuto = t + 4.5 + Math.random() * 3;
+      }
+      let busy = false;
+      for (let i = 0; i < DROPS; i++) if (st.drops[i * 4 + 3] > 0 && t - st.drops[i * 4 + 2] < 3.5) busy = true;
       st.n++;
-      if (st.f > 0.01 || st.n % 2 === 0) {
+      if (busy || st.n % 2 === 0) {
         fit();
-        gl.uniform1f(uT, (now - st.t0) / 1000);
-        gl.uniform2f(uM, st.mx, st.my);
-        gl.uniform2f(uV, st.vx, st.vy);
-        gl.uniform1f(uF, st.f);
+        gl.uniform1f(uT, t);
+        gl.uniform4fv(uD, st.drops);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         if (!st.shown) { st.shown = true; cv.style.opacity = '1'; }
       }
@@ -1165,6 +1150,7 @@ class Component extends DCLogic {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
       st.ready = true;
+      st.nextAuto = now() + 1.4;
       start();
     };
     img.src = 'img/hero-1600.webp';
@@ -1177,26 +1163,22 @@ class Component extends DCLogic {
     });
     const io = new IntersectionObserver((en) => { st.on = en[0].isIntersecting; start(); });
     io.observe(wrap);
+    const at = (e) => { const r = wrap.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
+    const onDown = (e) => { const [x, y] = at(e); st.touched = now(); st.last = [x, y, st.touched]; drop(x, y, 1); };
     const onMove = (e) => {
-      const r = wrap.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      if (st.lx !== null) {
-        st.vx = Math.max(-0.08, Math.min(0.08, st.vx + x - st.lx));
-        st.vy = Math.max(-0.08, Math.min(0.08, st.vy + y - st.ly));
-      }
-      st.lx = x; st.ly = y; st.mx = x; st.my = y;
-      st.f = Math.min(1, st.f + 0.25);
-      start();
+      if (e.pointerType !== 'mouse') return;
+      const [x, y] = at(e), t = now();
+      st.touched = t;
+      if (!st.last || Math.hypot(x - st.last[0], y - st.last[1]) > 0.09 || t - st.last[2] > 0.35) { st.last = [x, y, t]; drop(x, y, 0.4); }
     };
-    const onLeave = () => { st.lx = null; st.ly = null; };
+    wrap.addEventListener('pointerdown', onDown);
     wrap.addEventListener('pointermove', onMove);
-    wrap.addEventListener('pointerleave', onLeave);
     document.addEventListener('visibilitychange', start);
     this._liveStop = () => {
       cancelAnimationFrame(st.raf);
       io.disconnect();
+      wrap.removeEventListener('pointerdown', onDown);
       wrap.removeEventListener('pointermove', onMove);
-      wrap.removeEventListener('pointerleave', onLeave);
       document.removeEventListener('visibilitychange', start);
     };
   }
@@ -1694,7 +1676,8 @@ class Component extends DCLogic {
       projNext: () => this.stepProj(1),
       projOpen: !!pa,
       pImg: pa ? pa.img : '',
-      pW: paDims.w, pH: paDims.h,
+      pThumb: pa ? (pa.thumb || pa.img) : '',
+      pRatio: (paDims.w && paDims.h) ? (paDims.w / paDims.h).toFixed(4) : '1',
       pAlt: pa ? (this.loc(pa, l).t || L.projAlt) : '',
       pCounter: pa ? (pi + 1) + ' / ' + projs.length : '',
       askProj: () => { if (pa) this.openTg(L.similarMsg + '\n' + pa.img); },
@@ -1711,7 +1694,8 @@ class Component extends DCLogic {
       nextWork: () => this.step(1),
       active: !!a,
       aImg: a ? a.img : '',
-      aW: aDims.w, aH: aDims.h,
+      aThumb: a ? (a.thumb || a.img) : '',
+      aRatio: (aDims.w && aDims.h) ? (aDims.w / aDims.h).toFixed(4) : '1',
       aTitle: av ? av.t : '',
       aHall: aGroup ? this.hallText(aGroup, l).t : '',
       aDesc: av ? av.d : '',
