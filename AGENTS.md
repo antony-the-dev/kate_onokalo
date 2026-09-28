@@ -34,7 +34,7 @@ Table **`settings`** (`key` text PK, `value` text): `projects_intro`, `projects_
 
 `projects` items are photo-only (title/price unused on the site).
 
-Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-<w>x<h>-full.<webp|jpg>` plus a sibling `-thumb` (800px). A new name per upload (no overwrite/caching issues), uploaded via signed upload URL with `Cache-Control: max-age=31536000`; the old files are removed afterwards. The site derives the thumb URL and the image dimensions (for `width`/`height`) from the name. Legacy `<itemId>/full.webp` PNGs were re-compressed on 2026-09-28; the Налаштування card only appears if a non-optimized image exists. Uploads go through `uploadToSignedUrl` (multipart — the only way `cacheControl` is stored; a raw PUT ignores the header and falls back to `no-cache`), with a raw PUT as fallback. Deleting files needs storage RLS select+delete policies for `authenticated` (SQL №3 in `ДОКУМЕНТАЦІЯ.md`) — without them `remove()` silently deletes nothing. `admin.html?tools` shows an orphan-file cleanup. Safari can't encode WebP in `canvas.toBlob` → admin falls back to JPEG.
+Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-<w>x<h>-full.<webp|jpg>` plus a sibling `-thumb` (800px). A new name per upload (no overwrite/caching issues), uploaded via signed upload URL with `Cache-Control: max-age=31536000`; the old files are removed afterwards. The site derives the thumb URL and the image dimensions (for `width`/`height`) from the name. Legacy `<itemId>/full.webp` PNGs were re-compressed on 2026-09-28; the Налаштування card only appears if a non-optimized image exists. Uploads are a raw PUT to the signed upload URL with `Cache-Control: max-age=31536000` (verified: GET returns `public, max-age=31536000`; note Supabase answers HEAD with `no-cache` regardless, so check caching with GET). Deleting files needs storage RLS select+delete policies for `authenticated` (SQL №3 in `ДОКУМЕНТАЦІЯ.md`) — without them `remove()` silently deletes nothing. `admin.html?tools` shows an orphan-file cleanup. Safari can't encode WebP in `canvas.toBlob` → admin falls back to JPEG.
 
 **RLS:** read public (`using (true)`), write only `to authenticated`.
 
@@ -46,7 +46,11 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - Image frames (`.dc-frame`): fixed 4:5 box, image `max-width/max-height: 100%`, bottom-aligned — never cropped or stretched (Kateryna's complaint about the old wall/catalog).
 - `loc(it, lang)` — UA/EN with EN fallback to UA.
 - Cart SKUs: `w<id>` painting, `p<id>` postcard, `b<id>` box; persisted in `localStorage.ko_cart`; hidden/deleted/price-0 items drop out of the cart. Price 0 → «Ціна за запитом» + «Запитати» (Telegram) instead of «В кошик». Checkout/ask/order → `t.me/@kate_art_tort?text=<encoded>` (never clipboard).
-- Body scroll is locked in `componentDidUpdate` whenever the menu, cart, work modal or project lightbox is open.
+- Body scroll is locked in `componentDidUpdate` whenever the menu, cart, work modal or project lightbox or room view is open.
+- Open work is mirrored in the URL as `#work-<id>` via `replaceState` (no history spam); deep links open the modal inside its hall. «Поділитися» uses `navigator.share` or copies the link.
+- «Приміряти на стіні» (room view): `detectBox()` finds the canvas inside a studio shot (plain backdrop, border-ring colour + row/column thresholds on the 800px thumb, needs CORS — Supabase sends `ACAO: *`); `ensureRoomInfo()` accepts it only if the box aspect matches the «Розмір» field (±25%, picks orientation) and the image name carries dimensions. Busy/interior photos → no button. `roomGeom()` lays out a preset room at true scale (sofa 210 cm, painting bottom ~20 cm above it) or the visitor's own wall photo (object URL, never uploaded; drag + size slider).
+- Hero «жива фарба»: raw WebGL1 shader over the hero image (`initLivePaint`), slow noise drift + pointer smear; paused off-screen/hidden tab, skipped for reduced motion or no WebGL (the `<img>` stays underneath).
+- Modal image sheen/tilt (`.dc-sheen`, mouse only) and scroll reveal (`.dc-reveal`, CSS `animation-timeline: view()` — progressive, no JS).
 
 ## Contacts / config
 

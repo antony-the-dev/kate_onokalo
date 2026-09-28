@@ -259,13 +259,9 @@ async function encodeImage(img, max) {
 async function putFile(path, enc) {
   const signed = await sb.storage.from(BUCKET).createSignedUploadUrl(path);
   if (signed.error) throw new Error("Створення посилання для фото: " + (signed.error.message || signed.error));
-  // The SDK sends multipart with a cacheControl field — the only way the long cache header is stored.
-  const up = await sb.storage.from(BUCKET).uploadToSignedUrl(path, signed.data.token, enc.blob, { cacheControl: "31536000", contentType: enc.type });
-  if (!up.error) return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
-  console.warn("uploadToSignedUrl failed, retrying with a plain PUT:", up.error.message || up.error);
   const res = await fetch(signed.data.signedUrl, {
     method: "PUT",
-    headers: { "Content-Type": enc.type },
+    headers: { "Content-Type": enc.type, "Cache-Control": "max-age=31536000" },
     body: enc.blob
   });
   if (!res.ok) {
@@ -580,8 +576,18 @@ function render() {
 
 const SETTINGS_NOTE = '<p class="note">Це поле запрацює після разового налаштування бази — попросіть Антона (SQL у файлі ДОКУМЕНТАЦІЯ.md, розділ 8).</p>';
 
+// Re-rendering the tab (token refresh, reload after saving an item) must not wipe text being typed.
 function renderExtra() {
   const el = $("#extra");
+  const typed = {};
+  if (el.dataset.tab === cat && !el.dataset.saved) el.querySelectorAll("textarea[id], input[id]:not([type=password])").forEach((i) => { typed[i.id] = i.value; });
+  delete el.dataset.saved;
+  el.dataset.tab = cat;
+  fillExtra(el);
+  Object.keys(typed).forEach((id) => { const i = document.getElementById(id); if (i) i.value = typed[id]; });
+}
+
+function fillExtra(el) {
   if (cat === "projects") {
     el.innerHTML = `<div class="card">
       <h2>Текст над реалізованими проєктами</h2>
@@ -651,6 +657,7 @@ async function saveSettings(obj) {
   const payload = Object.keys(obj).map((k) => ({ key: k, value: obj[k] }));
   const { error } = await sb.from("settings").upsert(payload, { onConflict: "key" });
   if (error) { toast("Помилка: " + error.message); return; }
+  $("#extra").dataset.saved = "1";
   toast("Збережено");
   await load();
 }
