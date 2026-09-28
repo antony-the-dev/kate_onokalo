@@ -79,6 +79,7 @@
       <button class="tab" data-cat="boxes">Подарункові бокси</button>
       <button class="tab" data-cat="projects">Реалізовані проєкти</button>
       <button class="tab" data-cat="halls">Зали</button>
+      <button class="tab" data-cat="page">Сторінка</button>
       <button class="tab" data-cat="settings">Налаштування</button>
     </div>
 
@@ -303,6 +304,7 @@ async function cleanupStorage() {
   try {
     const keep = new Set();
     rows.forEach((r) => urlPaths(r.img).forEach((p) => keep.add(p)));
+    Object.values(settings).forEach((v) => urlPaths(v).forEach((p) => keep.add(p)));
     const top = await sb.storage.from(BUCKET).list("", { limit: 1000 });
     if (top.error) throw top.error;
     const folders = (top.data || []).filter((o) => !o.id).map((o) => o.name);
@@ -648,10 +650,10 @@ async function load() {
 }
 
 function render() {
-  $("#listBar").style.display = cat === "settings" ? "none" : "";
+  $("#listBar").style.display = (cat === "settings" || cat === "page") ? "none" : "";
   renderExtra();
   if (cat === "halls") renderHalls();
-  else if (cat === "settings") $("#list").innerHTML = "";
+  else if (cat === "settings" || cat === "page") $("#list").innerHTML = "";
   else renderList(rows);
 }
 
@@ -668,7 +670,129 @@ function renderExtra() {
   Object.keys(typed).forEach((id) => { const i = document.getElementById(id); if (i) i.value = typed[id]; });
 }
 
+// ---------- «Сторінка»: photos and texts of the page (stored in settings) ----------
+
+const PAGE_PHOTOS = [
+  { key: "about_img1", label: "«Про мене» — велике фото", def: "img/kate-01.webp" },
+  { key: "about_img2", label: "«Про мене» — мале фото", def: "img/kate-02.webp" },
+  { key: "interior_img1", label: "«Як це живе на справжній стіні» — фото 1", def: "img/paint-06-w1100.webp" },
+  { key: "interior_img2", label: "«Як це живе на справжній стіні» — фото 2", def: "img/paint-03-w1100.webp" }
+];
+
+function textEdits() {
+  try { return settings.texts ? JSON.parse(settings.texts) : {}; } catch (e) { return {}; }
+}
+
+function fillPage(el) {
+  el.innerHTML = `<div class="card">
+      <h2>Фото на сторінці</h2>
+      <p class="muted" style="margin-bottom:6px;">Оберіть нове фото — стиснеться саме й одразу з'явиться на сайті.</p>
+      ${settingsOk ? "" : SETTINGS_NOTE}
+      ${PAGE_PHOTOS.map((p) => `<div class="row" style="margin-top:14px; align-items:center; flex-wrap:wrap;">
+        <img class="thumb" src="${esc(thumbOf(settings[p.key]) || p.def)}" alt="" style="width:72px; height:72px; object-fit:cover; border-radius:8px;">
+        <div style="flex:1; min-width:200px;">
+          <div style="font-size:14.5px; margin-bottom:4px;">${esc(p.label)}</div>
+          <input type="file" accept="image/*" data-photo="${p.key}" ${settingsOk ? "" : "disabled"} style="margin-top:0;">
+        </div>
+        ${settings[p.key] ? `<button class="btn btn-line" data-photo-reset="${p.key}">Повернути як було</button>` : ""}
+      </div>`).join("")}
+    </div>
+    <div class="card">
+      <h2>Тексти сайту</h2>
+      <p class="muted" style="margin-bottom:12px;">Знайдіть текст і впишіть свій варіант. Порожнє поле — лишається як зараз. Англійську можна не чіпати.</p>
+      <input id="txtFind" type="search" placeholder="Пошук: наприклад «п’ятнадцять»">
+      <div id="txtList" style="margin-top:14px;"><p class="muted">Завантажую тексти…</p></div>
+    </div>`;
+  el.querySelectorAll("[data-photo]").forEach((i) => i.addEventListener("change", () => uploadPagePhoto(i.dataset.photo, i.files[0])));
+  el.querySelectorAll("[data-photo-reset]").forEach((b) => b.addEventListener("click", () => resetPagePhoto(b.dataset.photoReset)));
+  loadTexts();
+}
+
+// The list of texts is read from the live index.html (every element with data-en), so it never goes stale.
+async function loadTexts() {
+  const box = $("#txtList");
+  let html;
+  try { html = await (await fetch("index.html", { cache: "no-store" })).text(); } catch (e) { box.innerHTML = '<p class="muted">Не вдалося завантажити тексти.</p>'; return; }
+  if (!$("#txtList")) return;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const seen = new Set(), items = [];
+  doc.querySelectorAll("[data-en]").forEach((n) => {
+    const ua = n.textContent;
+    if (!ua.trim() || seen.has(ua)) return;
+    seen.add(ua);
+    items.push({ ua, en: n.getAttribute("data-en") || "" });
+  });
+  const edits = textEdits();
+  box.innerHTML = items.map((it, i) => {
+    const e = edits[it.ua] || {};
+    return `<div class="txt" data-i="${i}" style="border-top:1px solid rgba(27,26,22,.12); padding:14px 0;">
+      <div class="grid2">
+        <label>Українською<textarea rows="2" data-ua placeholder="${esc(it.ua)}">${esc(e.ua || "")}</textarea></label>
+        <label>English<textarea rows="2" data-en placeholder="${esc(it.en)}">${esc(e.en || "")}</textarea></label>
+      </div>
+      <button class="btn btn-line" data-save="${i}">Зберегти</button>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-save]").forEach((b) => b.addEventListener("click", () => {
+    const row = b.closest(".txt"), it = items[Number(b.dataset.save)];
+    saveText(it.ua, row.querySelector("[data-ua]").value.trim(), row.querySelector("[data-en]").value.trim());
+  }));
+  const find = $("#txtFind");
+  const filter = () => {
+    const q = find.value.trim().toLowerCase();
+    box.querySelectorAll(".txt").forEach((row) => {
+      const it = items[Number(row.dataset.i)];
+      const hay = (it.ua + " " + it.en + " " + row.querySelector("[data-ua]").value + " " + row.querySelector("[data-en]").value).toLowerCase();
+      row.style.display = !q || hay.includes(q) ? "" : "none";
+    });
+  };
+  find.addEventListener("input", filter);
+  filter();
+}
+
+async function saveText(ua, newUa, newEn) {
+  if (!(await requireAuth())) return;
+  const edits = textEdits();
+  if (newUa || newEn) edits[ua] = { ua: newUa, en: newEn }; else delete edits[ua];
+  const value = JSON.stringify(edits);
+  const { error } = await sb.from("settings").upsert([{ key: "texts", value }], { onConflict: "key" });
+  if (error) { toast("Помилка: " + error.message); return; }
+  settings.texts = value;
+  toast(newUa || newEn ? "Текст збережено" : "Повернуто як було");
+}
+
+async function uploadPagePhoto(key, file) {
+  if (busy || !file) return;
+  if (!(await requireAuth())) return;
+  busy = true;
+  const old = settings[key];
+  try {
+    toast("Стискаю і завантажую фото…", true);
+    const url = await uploadPhoto("page", file);
+    const { error } = await sb.from("settings").upsert([{ key, value: url }], { onConflict: "key" });
+    if (error) { await removeFiles(urlPaths(url)); throw error; }
+    if (old) await removeFiles(urlPaths(old));
+    toast("Фото замінено");
+  } catch (e) {
+    toast("Помилка: " + (e && e.message ? e.message : e));
+  }
+  busy = false;
+  await load();
+}
+
+async function resetPagePhoto(key) {
+  if (!confirm("Повернути фото, яке було спочатку?")) return;
+  if (!(await requireAuth())) return;
+  const old = settings[key];
+  const { error } = await sb.from("settings").upsert([{ key, value: "" }], { onConflict: "key" });
+  if (error) { toast("Помилка: " + error.message); return; }
+  if (old) await removeFiles(urlPaths(old));
+  toast("Повернуто");
+  await load();
+}
+
 function fillExtra(el) {
+  if (cat === "page") { fillPage(el); return; }
   if (cat === "projects") {
     el.innerHTML = `<div class="card">
       <h2>Текст над реалізованими проєктами</h2>

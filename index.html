@@ -476,8 +476,8 @@
   <section id="about" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <img src="img/kate-01.webp" alt="Катерина у студії" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
-        <img src="img/kate-02.webp" alt="Катерина Онокало" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ aboutImg1 }}" alt="Катерина у студії" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
+        <img src="{{ aboutImg2 }}" alt="Катерина Онокало" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <div style="border: 1px solid var(--lnav-b); padding: 18px; display: flex; flex-direction: column; justify-content: flex-end;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .3em; color: #D9662A;">2011</div>
           <div style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--lmut); margin-top: 8px;" data-en="first canvas">перше полотно</div>
@@ -506,11 +506,11 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
-        <img src="img/paint-06-w1100.webp" alt="Картина у вітальні" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ interiorImg1 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
       </figure>
       <figure style="margin: 0;">
-        <img src="img/paint-03-w1100.webp" alt="Диптих у їдальні" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ interiorImg2 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
       </figure>
     </div>
@@ -1466,14 +1466,27 @@ class Component extends DCLogic {
     if (c !== this._savedCart) { this._savedCart = c; try { localStorage.setItem('ko_cart', c); } catch (e) {} }
   }
 
+  // Static texts: data-ua keeps the original Ukrainian text, which is also the key of Kateryna's edits
+  // made in the admin («Сторінка» → settings.texts = {"<original UA>": {ua, en}}).
+  textEdits() {
+    const raw = this.setting('texts');
+    if (raw !== this._editsRaw) {
+      this._editsRaw = raw;
+      try { this._edits = raw ? JSON.parse(raw) : {}; } catch (e) { this._edits = {}; }
+    }
+    return this._edits || {};
+  }
+
   applyLang() {
     const r = this.rootRef.current;
     if (!r) return;
     const en = this.state.lang === 'en';
+    const edits = this.textEdits();
     document.documentElement.lang = en ? 'en' : 'uk';
     r.querySelectorAll('[data-en]').forEach(el => {
       if (!el.hasAttribute('data-ua')) el.setAttribute('data-ua', el.textContent);
-      const t = en ? el.getAttribute('data-en') : el.getAttribute('data-ua');
+      const ua = el.getAttribute('data-ua'), o = edits[ua] || {};
+      const t = en ? (o.en || el.getAttribute('data-en')) : (o.ua || ua);
       if (el.textContent !== t) el.textContent = t;
     });
   }
@@ -1591,6 +1604,10 @@ class Component extends DCLogic {
     const r1 = (v) => (rg ? Math.round(v * 10) / 10 : 0);
     return {
       rootRef: this.rootRef,
+      aboutImg1: this.setting('about_img1') || 'img/kate-01.webp',
+      aboutImg2: this.setting('about_img2') || 'img/kate-02.webp',
+      interiorImg1: this.setting('interior_img1') || 'img/paint-06-w1100.webp',
+      interiorImg2: this.setting('interior_img2') || 'img/paint-03-w1100.webp',
       heroRef: this.heroRef,
       heroCanvasRef: this.heroCanvasRef,
       roomArtRef: this.roomArtRef,

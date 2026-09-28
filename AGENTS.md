@@ -31,7 +31,7 @@ Table **`items`** (id uuid PK; app generates UUIDs via `crypto.randomUUID()`):
 
 Table **`halls`**: `num` (label like "I"), `name` (UA, grouping key — items reference it by this string; admin cascades renames into `items.hall`/`hall_en`), `name_en`, `note`, `note_en`, `sort_order`.
 
-Table **`settings`** (`key` text PK, `value` text): `projects_intro`, `projects_intro_en`, `etsy_url`. Created by the SQL in `ДОКУМЕНТАЦІЯ.md` §8; the site works without it (defaults, Etsy hidden).
+Table **`settings`** (`key` text PK, `value` text): `projects_intro`, `projects_intro_en`, `etsy_url`, page photos `about_img1|2`, `interior_img1|2` (storage URLs under `page/`, fallback to `img/…`), and `texts` — JSON `{"<original UA text>": {ua, en}}` edited in admin «Сторінка»; `applyLang()` applies it to every `[data-en]` element (key = original UA `textContent`, so changing a text in `index.html` orphans its edit). The admin reads the text list from the live `index.html`. Created by the SQL in `ДОКУМЕНТАЦІЯ.md` §8; the site works without it (defaults, Etsy hidden).
 
 `projects` items are photo-only (title/price unused on the site).
 
