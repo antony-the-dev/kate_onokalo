@@ -1,11 +1,12 @@
-# Builds w/<id>.html + w/<id>.jpg link-preview pages for every visible painting (see .github/scripts/work-previews.mjs)
-# and commits them to main, which redeploys GitHub Pages. Nothing is committed when nothing changed.
+# Builds the work pages w/<id>.html + w/<id>.jpg, the catalogue snapshot and «Усі роботи» inside index.html and
+# sitemap.xml (see .github/scripts/work-previews.mjs) and commits them to main, which redeploys GitHub Pages.
+# Nothing is committed when nothing changed.
 # GitHub runs the schedule as the user who last changed the cron line — commit changes to it from the owner account.
 name: Work previews
 
 on:
   schedule:
-    - cron: '3,33 * * * *' # every 30 min: new/edited works get their preview within about half an hour
+    - cron: '3,33 * * * *' # every 30 min: new/edited works get their page within about half an hour
   workflow_dispatch: # Actions → Work previews → Run workflow (instant update)
   repository_dispatch: # optional: a Supabase webhook can call this on every items change
     types: [items-changed]
@@ -36,14 +37,14 @@ jobs:
           node-version: 20
       - name: Install sharp
         run: npm install --no-save --no-package-lock --no-audit --no-fund sharp@0.33.5
-      - name: Build previews
+      - name: Build pages
         run: node .github/scripts/work-previews.mjs
       - name: Commit and push
         run: |
-          git add -A w
+          git add -A w sitemap.xml index.html
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "Work previews: update link pages"
+            commit -q -m "Work pages: update catalogue"
           for i in 1 2 3; do
             git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0
             sleep 5
