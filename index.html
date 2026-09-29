@@ -76,6 +76,8 @@
 <script src="vendor/react-dom.production.min.js"></script>
 <script src="./support.js"></script>
 <script src="./supabase-config.js"></script>
+<!-- Catalogue snapshot, written by .github/scripts/work-previews.mjs: shown at once, then refreshed from Supabase. -->
+<!-- ko:snapshot --><!-- /ko:snapshot -->
 </head>
 <body>
 <x-dc>
@@ -181,6 +183,16 @@
     -webkit-mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 140px), transparent);
     mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 140px), transparent);
   }
+  .dc-catalog { margin-top: clamp(40px, 6vw, 72px); padding-top: 18px; border-top: 1px solid var(--lnav-b); font-size: 13px; line-height: 1.8; color: var(--lmut); }
+  .dc-catalog summary { cursor: pointer; list-style: none; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut); min-height: 44px; display: flex; align-items: center; gap: 10px; }
+  .dc-catalog summary span + span { opacity: .6; }
+  .dc-catalog summary::-webkit-details-marker { display: none; }
+  .dc-catalog summary::after { content: "▾"; font-size: 9px; letter-spacing: 0; opacity: .7; }
+  .dc-catalog[open] summary::after { content: "▴"; }
+  .dc-catalog p { margin: 10px 0 0; max-width: 110ch; }
+  .dc-catalog b { font-weight: 400; color: var(--ltext2); margin-right: 8px; }
+  .dc-catalog a { color: var(--ltext2); }
+  .dc-catalog a:hover { color: #C7A17A; }
   .dc-dabs { display: inline-flex; align-items: center; gap: 6px; }
   .dc-dab { display: block; width: 15px; height: 12px; border-radius: 55% 45% 52% 48% / 62% 50% 50% 38%; box-shadow: 0 0 0 1px rgba(27,26,22,.08), inset 0 -2px 3px rgba(0,0,0,.2), inset 0 1px 2px rgba(255,255,255,.35); animation: dabIn .6s cubic-bezier(.2,.7,.2,1) both; }
   .dc-dab:nth-child(2) { border-radius: 45% 55% 40% 60% / 50% 60% 40% 50%; animation-delay: .07s; }
@@ -804,6 +816,8 @@
           </a>
         </div>
       </div>
+      <!-- «Усі роботи»: every work linked to its page, written by .github/scripts/work-previews.mjs (readable without JS). -->
+      <!-- ko:catalog --><!-- /ko:catalog -->
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: clamp(40px, 6vw, 80px); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ldim);">
         <span>© 2026 Kateryna Onokalo</span>
         <span data-en="Nizhyn · Ukraine">Ніжин · Україна</span>
@@ -1519,9 +1533,26 @@ class Component extends DCLogic {
     return r.json();
   }
 
+  // Catalogue snapshot the preview bot writes into this page (#ko-snapshot JSON, ≤ 30 min old): the halls
+  // appear at once instead of after the Supabase round trip, and stay if Supabase is unreachable.
+  snapshot() {
+    try { const el = document.getElementById('ko-snapshot'); const d = el ? JSON.parse(el.textContent) : null; return d && Array.isArray(d.items) ? d : null; } catch (e) { return null; }
+  }
+
+  applySettings(rows) {
+    const st = {};
+    (rows || []).forEach((s) => { st[s.key] = s.value || ''; });
+    return st;
+  }
+
   loadSupabase() {
     const cfg = window.SUPABASE_CONFIG;
     if (!cfg || !cfg.url || !cfg.anonKey) return;
+    const snap = this.snapshot();
+    if (snap) {
+      this.applyRows(snap.items);
+      this.setState({ halls: (snap.halls && snap.halls.length) ? snap.halls : null, settings: this.applySettings(snap.settings), dataMode: 'live' }, () => this.flushHash());
+    }
     const load = async () => {
       try {
         const [items, halls, settings] = await Promise.all([
@@ -1530,9 +1561,7 @@ class Component extends DCLogic {
           this.rest('settings?select=*').catch(() => null)
         ]);
         this.applyRows(items || []);
-        const st = {};
-        (settings || []).forEach((s) => { st[s.key] = s.value || ''; });
-        this.setState({ halls: (halls && halls.length) ? halls : null, settings: st, dataMode: 'live' }, () => this.flushHash());
+        this.setState({ halls: (halls && halls.length) ? halls : null, settings: settings ? this.applySettings(settings) : this.state.settings, dataMode: 'live' }, () => this.flushHash());
       } catch (e) {
         console.warn('Supabase items:', e);
         if (this.state.dataMode !== 'live') this.setState({ dataMode: 'error' });
