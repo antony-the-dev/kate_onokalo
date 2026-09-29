@@ -139,8 +139,6 @@
   .dc-dabs-sm { gap: 4px; }
   .dc-dabs-sm .dc-dab { width: 9px; height: 8px; }
   @keyframes dabIn { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
-  /* Paint poured when entering a hall: above the page, under the sticky header. */
-  .dc-pour { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 38; pointer-events: none; }
   .dc-proj { column-width: 250px; column-gap: clamp(10px, 1.6vw, 22px); }
   .dc-proj figure { break-inside: avoid; margin: 0 0 clamp(10px, 1.6vw, 22px); cursor: zoom-in; overflow: hidden; background: var(--cream2); }
   .dc-proj img { display: block; width: 100%; height: auto; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
@@ -1421,7 +1419,7 @@ class Component extends DCLogic {
   // «Живі зали»: every hall takes its colours from its own paintings. Thumbnails are read on a tiny canvas,
   // median-cut into boxes, and the most characterful distinct colours kept (cached in localStorage.ko_pal).
   // A hall's palette comes from its cover first (already loaded on the overview), then from up to 6 works
-  // once the hall is open. It tints the hall's wall, draws the paint dabs and is poured when entering.
+  // once the hall is open. It tints the hall's wall and draws the paint dabs.
   palKey(g, full) {
     const urls = (full ? g.works.slice(0, 6) : g.works.slice(0, 1)).map(w => w.thumb || w.img).filter(Boolean);
     const s = urls.join('|');
@@ -1551,88 +1549,6 @@ class Component extends DCLogic {
     return out.map(c => '#' + c.map(v => v.toString(16).padStart(2, '0')).join(''));
   }
 
-  // Entering a hall: its colours are poured from where you clicked, ring inside ring like an acrylic
-  // "puddle pour". The paint runs outward as a band — the new hall opens from the middle behind it —
-  // and slows down as it spreads, like real paint; the hall's wall keeps a faint tint of it afterwards.
-  pour(slug, x, y) {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const g = this.hallGroups().find(h => h.slug === slug);
-    if (!g) return;
-    const pal = this.palOf(g) || ['#B4501C', '#C7A17A', '#0A1C3B', '#8E9AAB'];
-    if (this._pourStop) this._pourStop();
-    const cv = document.createElement('canvas');
-    cv.className = 'dc-pour';
-    cv.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(cv);
-    const cx = cv.getContext('2d');
-    if (!cx) { cv.remove(); return; }
-    const W = cv.clientWidth || window.innerWidth, H = cv.clientHeight || window.innerHeight;
-    const k = Math.min(window.devicePixelRatio || 1, 2) * 0.5; // soft edges are fine — half resolution
-    cv.width = Math.max(1, Math.round(W * k));
-    cv.height = Math.max(1, Math.round(H * k));
-    cx.scale(k, k);
-    const ox = x == null ? W / 2 : x, oy = y == null ? H * 0.45 : y;
-    const R = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy)) * 1.25;
-    const lift = (hex, m) => { const n = parseInt(hex.slice(1), 16) || 0; return 'rgb(' + [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (255 - v) * m)).join(',') + ')'; };
-    const N = 6, D = 50, GROW = 900;
-    // later pours push the earlier ones outward; repeats of a colour come a little lighter (thinned paint)
-    const rings = Array.from({ length: N }, (_, i) => {
-      const a = Math.random() * Math.PI * 2;
-      return { c: i < pal.length ? pal[i] : lift(pal[i % pal.length], 0.28), d: i * D, dx: Math.cos(a) * i * 6, dy: Math.sin(a) * i * 6,
-        ph: [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], amp: 0.05 + Math.random() * 0.04 };
-    });
-    const hole = { d: N * D + 60, dx: 0, dy: 0, ph: [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], amp: 0.07 };
-    const t0 = performance.now();
-    let raf = 0;
-    const stop = () => { cancelAnimationFrame(raf); cv.remove(); if (this._pourStop === stop) this._pourStop = null; };
-    const shape = (r, t) => {
-      const p = Math.min(1, Math.max(0, (t - r.d) / GROW));
-      const rad = R * (1 - Math.pow(1 - p, 3));
-      cx.beginPath();
-      for (let s = 0; s <= 72; s++) {
-        const th = (s / 72) * Math.PI * 2;
-        const w = 1 + r.amp * (0.55 * Math.sin(3 * th + r.ph[0] + t * 0.0013) + 0.3 * Math.sin(5 * th + r.ph[1] - t * 0.0019) + 0.15 * Math.sin(9 * th + r.ph[2]));
-        const px = ox + r.dx * p + Math.cos(th) * rad * w, py = oy + r.dy * p + Math.sin(th) * rad * w;
-        if (s) cx.lineTo(px, py); else cx.moveTo(px, py);
-      }
-      cx.closePath();
-      return rad;
-    };
-    const frame = (now) => {
-      const t = now - t0;
-      cx.clearRect(0, 0, W, H);
-      cx.globalCompositeOperation = 'source-over';
-      rings.forEach((r) => {
-        if (t <= r.d) return;
-        shape(r, t);
-        cx.fillStyle = r.c;
-        cx.fill();
-        cx.lineWidth = 1.6;
-        cx.strokeStyle = 'rgba(255,255,255,.34)';
-        cx.stroke();
-      });
-      // wet sheen on the paint only
-      cx.globalCompositeOperation = 'source-atop';
-      const sh = cx.createRadialGradient(ox - R * 0.18, oy - R * 0.22, 0, ox, oy, R * 0.9);
-      sh.addColorStop(0, 'rgba(255,255,255,.22)');
-      sh.addColorStop(0.5, 'rgba(255,255,255,.06)');
-      sh.addColorStop(1, 'rgba(0,0,0,.08)');
-      cx.fillStyle = sh;
-      cx.fillRect(0, 0, W, H);
-      // the hall opens from the middle behind the last pour
-      let open = 0;
-      if (t > hole.d) {
-        cx.globalCompositeOperation = 'destination-out';
-        open = shape(hole, t);
-        cx.fillStyle = '#000';
-        cx.fill();
-      }
-      if (open < R / 1.25 * 1.12 && t < hole.d + GROW) raf = requestAnimationFrame(frame); else stop();
-    };
-    this._pourStop = stop;
-    raf = requestAnimationFrame(frame);
-  }
-
   groupOf(id, groups) {
     const s = String(id);
     return (groups || this.hallGroups()).find(g => g.works.some(w => String(w.id) === s)) || null;
@@ -1709,10 +1625,6 @@ class Component extends DCLogic {
       if (id === 'halls' || id.indexOf('hall-') === 0) {
         e.preventDefault();
         if (a.blur) a.blur();
-        if (id !== 'halls' && id !== this.state.hall) {
-          const r = a.getBoundingClientRect();
-          this.pour(id, e.clientX || r.left + r.width / 2, e.clientY || r.top + r.height / 2);
-        }
         this.setState({ hall: id === 'halls' ? null : id, menuOpen: false });
         this.scrollToId('halls');
         if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
@@ -1732,9 +1644,7 @@ class Component extends DCLogic {
         return;
       }
       this._hashWork = null;
-      const hall = h.indexOf('hall-') === 0 ? h : null;
-      if (hall && hall !== this.state.hall) this.pour(hall);
-      this.setState({ hall, activeId: null });
+      this.setState({ hall: h.indexOf('hall-') === 0 ? h : null, activeId: null });
     };
     window.addEventListener('popstate', this.onPop);
     this._pendingHash = location.hash ? location.hash.slice(1) : null;
@@ -1773,7 +1683,6 @@ class Component extends DCLogic {
     window.removeEventListener('beforeprint', this.onPrint);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
     this._dead = true;
-    if (this._pourStop) this._pourStop();
     document.body.style.overflow = '';
   }
 
