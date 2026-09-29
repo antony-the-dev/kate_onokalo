@@ -151,6 +151,18 @@
       .dc-reveal { animation: floatIn linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
     }
   }
+  /* Paper grain behind the content: shows on the cream page only — photos and coloured blocks cover it. */
+  .dc-grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: var(--grain, none); opacity: .5; }
+  /* Window light on the "wall": behind the content, so paintings and photos keep their true colours.
+     Pane-shaped patches drift slowly with scroll; the tint follows the visitor's time of day. */
+  .dc-light { position: fixed; left: -12vw; top: -14vh; width: 124vw; height: 128vh; z-index: -1; pointer-events: none; background: var(--light, none) center / cover no-repeat; opacity: var(--light-o, 1); will-change: transform; }
+  [data-theme="dark"] .dc-light { display: none; }
+  /* Brush-stroke scroll progress under the header: three "bristles" drawn with the page. */
+  .dc-stroke { position: absolute; left: 0; bottom: -4px; width: 100%; height: 8px; overflow: visible; pointer-events: none; color: var(--terracotta); opacity: 0; transition: opacity .4s ease; }
+  .dc-stroke path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-dasharray: 1000 1000; stroke-dashoffset: 1000; }
+  /* Section titles come into focus once, like on alisachenko.com. */
+  .dc-h { opacity: 0; filter: blur(10px); transform: translateY(14px); transition: opacity .9s ease, filter .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .dc-h.on { opacity: 1; filter: none; transform: none; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   @media (max-width: 1180px) {
     .dc-nav { display: none !important; }
@@ -174,7 +186,9 @@
 </style>
 </helmet>
 
-<div ref="{{ rootRef }}" class="dc-root" style="background: var(--bg);">
+<div ref="{{ rootRef }}" class="dc-root">
+  <div class="dc-grain" aria-hidden="true"></div>
+  <div class="dc-light" aria-hidden="true"></div>
 
   <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
     <div style="background: var(--navy-bg); color: var(--cream-text); padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
@@ -219,6 +233,11 @@
         </button>
       </div>
     </div>
+    <svg class="dc-stroke" viewBox="0 0 1000 8" preserveAspectRatio="none" aria-hidden="true">
+      <path pathLength="1000" stroke-width="2.6" d="M3 4.2C150 3.2 300 5 480 4S820 3.4 997 4.4"/>
+      <path pathLength="1000" stroke-width="1.1" opacity=".55" d="M3 5.6C170 4.8 320 6.3 500 5.4S830 5 996 5.9"/>
+      <path pathLength="1000" stroke-width=".8" opacity=".45" d="M5 2.8C160 2.2 330 3.5 520 2.7S840 2.4 994 3"/>
+    </svg>
   </header>
 
   <sc-if value="{{ menuOpen }}">
@@ -286,7 +305,7 @@
     </div>
   </section>
 
-  <section id="halls" data-recede="1" style="position: relative; z-index: 1; background: var(--bg); max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
+  <section id="halls" data-recede="1" style="position: relative; z-index: 1; max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
 
     <sc-if value="{{ hallOverview }}">
       <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
@@ -1183,12 +1202,19 @@ class Component extends DCLogic {
     };
   }
 
-  // Sections fold away once scrolled past: the hero recedes into depth (shrinks, sinks, fades — as on
-  // alisachenko.com), later sections shrink toward their bottom edge and dim like a card being put aside.
-  // Desktop only for sections; phones get just a light fade of the hero (cheap, no flicker).
-  initRecede() {
+  // Scroll effects, one rAF-throttled handler:
+  //  · sections fold away once scrolled past — the hero recedes into depth (shrinks, sinks, fades — as on
+  //    alisachenko.com), later sections shrink toward their bottom edge and dim like a card put aside;
+  //  · window light drifts slowly; · brush stroke under the header draws with page progress;
+  //  · paintings in the grids shift a few px at different speeds (depth).
+  // Sections/depth are desktop-only; phones get the hero fade, light and stroke (cheap, no flicker).
+  initScrollFx() {
     const root = this.rootRef.current;
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const light = root.querySelector('.dc-light');
+    const stroke = root.querySelector('.dc-stroke');
+    const bristles = stroke ? [...stroke.querySelectorAll('path')] : [];
+    const speeds = [0.7, 1.15, 0.9, 1.3];
     let ticking = false;
     const ease = (p) => 1 - (1 - p) * (1 - p);
     const clamp = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -1197,11 +1223,14 @@ class Component extends DCLogic {
       ticking = false;
       const vh = window.innerHeight || 1;
       const desktop = window.innerWidth > 900;
+      const y = window.scrollY;
+      const page = clamp(y / Math.max(1, document.documentElement.scrollHeight - vh));
+
       root.querySelectorAll('[data-recede]').forEach((el) => {
         const hero = el.id === 'top';
         if (!hero && !desktop) { reset(el); return; }
         const r = el.getBoundingClientRect();
-        const e = ease(hero ? clamp(window.scrollY / (vh * 1.25)) : clamp((vh - r.bottom) / (vh * 0.85)));
+        const e = ease(hero ? clamp(y / (vh * 1.25)) : clamp((vh - r.bottom) / (vh * 0.85)));
         if (e <= 0.001) { reset(el); return; }
         if (hero) {
           el.style.transformOrigin = '50% 35%';
@@ -1214,11 +1243,96 @@ class Component extends DCLogic {
           el.style.borderRadius = (18 * e).toFixed(1) + 'px';
         }
       });
+
+      if (light) light.style.transform = 'translate3d(' + (-3 * page).toFixed(2) + 'vw,' + (8 - 16 * page).toFixed(2) + 'vh,0)';
+
+      if (stroke) {
+        stroke.style.opacity = page > 0.004 ? '1' : '0';
+        // thinner bristles trail a little but still finish together at the end of the page
+        bristles.forEach((b, i) => { b.style.strokeDashoffset = (1000 * (1 - clamp((page - i * 0.03) / (1 - i * 0.03)))).toFixed(1); });
+      }
+
+      // depth: read every frame's position first, then write (no layout thrash); undo our own shift when measuring
+      const frames = desktop ? [...root.querySelectorAll('#halls .dc-frame, #paper .dc-frame, #boxes .dc-frame')] : [];
+      const shifts = frames.map((f, i) => {
+        const r = f.getBoundingClientRect();
+        if (r.bottom < -100 || r.top > vh + 100) return null;
+        const mid = r.top + r.height / 2 - (f._dy || 0);
+        return -((mid - vh / 2) / vh) * 14 * speeds[i % speeds.length];
+      });
+      frames.forEach((f, i) => {
+        const dy = shifts[i];
+        if (dy === null) return;
+        f._dy = dy;
+        f.style.transform = 'translateY(' + dy.toFixed(1) + 'px)';
+      });
+      if (!desktop) root.querySelectorAll('.dc-frame').forEach((f) => { if (f._dy) { f._dy = 0; f.style.transform = ''; } });
     };
-    this.onRecede = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-    window.addEventListener('scroll', this.onRecede, { passive: true });
-    window.addEventListener('resize', this.onRecede);
+    this.onScrollFx = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    window.addEventListener('scroll', this.onScrollFx, { passive: true });
+    window.addEventListener('resize', this.onScrollFx);
     update();
+  }
+
+  // Grain tile and window-light image are drawn once on a canvas and used as CSS backgrounds.
+  initAmbient() {
+    const root = document.documentElement;
+    try {
+      const n = 140, c = document.createElement('canvas');
+      c.width = c.height = n;
+      const x = c.getContext('2d'), d = x.createImageData(n, n);
+      for (let i = 0; i < d.data.length; i += 4) {
+        const v = Math.random() < 0.5 ? 25 : 255;
+        d.data[i] = d.data[i + 1] = d.data[i + 2] = v;
+        d.data[i + 3] = Math.random() * 26;
+      }
+      x.putImageData(d, 0, 0);
+      root.style.setProperty('--grain', 'url(' + c.toDataURL('image/png') + ')');
+    } catch (e) {}
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    try {
+      const hr = new Date().getHours();
+      // [shade rgb, shade alpha, patch tint rgba or null, layer opacity] — morning cool, day neutral,
+      // evening golden patches, night barely there. The room is a touch shaded, window patches stay bright.
+      const tone = hr >= 6 && hr < 11 ? [[95, 105, 125], 0.09, null, 1]
+        : hr >= 11 && hr < 16 ? [[110, 100, 90], 0.08, null, 1]
+        : hr >= 16 && hr < 21 ? [[110, 88, 70], 0.1, 'rgba(255,200,125,0.38)', 1]
+        : [[60, 70, 100], 0.06, null, 0.8];
+      const c = document.createElement('canvas');
+      c.width = 450; c.height = 350;
+      const x = c.getContext('2d');
+      x.fillStyle = 'rgba(' + tone[0].join(',') + ',' + tone[1] + ')';
+      x.fillRect(0, 0, c.width, c.height);
+      const panes = [[262, 70, 46, 64], [320, 70, 46, 64], [262, 146, 46, 64], [320, 146, 46, 64]]; // 2×2 window, mullions between
+      const blurred = (op, color) => {
+        x.save();
+        x.globalCompositeOperation = op;
+        x.shadowColor = color; x.shadowBlur = 11; x.shadowOffsetX = 3000;
+        x.setTransform(1, 0, -0.42, 1, 0, 0); // light falls at an angle; horizontal skew only, so the shadow offset stays exact
+        panes.forEach(([px, py, w, hh]) => x.fillRect(px - 3000, py, w, hh));
+        x.restore();
+      };
+      blurred('destination-out', 'rgba(0,0,0,1)'); // cut soft window patches out of the shade
+      if (tone[2]) blurred('source-over', tone[2]); // evening: golden patches
+      root.style.setProperty('--light', 'url(' + c.toDataURL('image/png') + ')');
+      root.style.setProperty('--light-o', String(tone[3]));
+    } catch (e) {}
+  }
+
+  // Section titles blur into focus once when they first come into view (also titles mounted later, e.g. a hall).
+  observeHeads() {
+    const root = this.rootRef.current;
+    if (!root || !window.IntersectionObserver || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!this._headIO) {
+      this._headIO = new IntersectionObserver((entries) => entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add('on'); this._headIO.unobserve(en.target); }
+      }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    }
+    root.querySelectorAll('section h2:not([data-h])').forEach((h2) => {
+      h2.setAttribute('data-h', '1');
+      h2.classList.add('dc-h');
+      this._headIO.observe(h2);
+    });
   }
 
   money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
@@ -1458,7 +1572,12 @@ class Component extends DCLogic {
     };
     window.addEventListener('resize', this.onResize);
     this.initLivePaint();
-    this.initRecede();
+    this.initAmbient();
+    this.initScrollFx();
+    this.observeHeads();
+    // titles must never stay hidden (print, odd capture contexts)
+    this.onPrint = () => this.rootRef.current && this.rootRef.current.querySelectorAll('.dc-h').forEach((el) => el.classList.add('on'));
+    window.addEventListener('beforeprint', this.onPrint);
     this.loadSupabase();
   }
 
@@ -1471,7 +1590,9 @@ class Component extends DCLogic {
     clearTimeout(this._rtTimer);
     window.removeEventListener('resize', this.onResize);
     if (this._liveStop) this._liveStop();
-    if (this.onRecede) { window.removeEventListener('scroll', this.onRecede); window.removeEventListener('resize', this.onRecede); }
+    if (this.onScrollFx) { window.removeEventListener('scroll', this.onScrollFx); window.removeEventListener('resize', this.onScrollFx); }
+    if (this._headIO) this._headIO.disconnect();
+    window.removeEventListener('beforeprint', this.onPrint);
     if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
     document.body.style.overflow = '';
@@ -1479,6 +1600,8 @@ class Component extends DCLogic {
 
   componentDidUpdate() {
     this.applyLang();
+    this.observeHeads();
+    if (this.onScrollFx) this.onScrollFx();
     if (this.state.hall !== this._chipHall) {
       this._chipHall = this.state.hall;
       const chip = this.rootRef.current && this.rootRef.current.querySelector('.dc-chips [data-active="true"]');
