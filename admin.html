@@ -689,7 +689,9 @@ async function loadTexts() {
   let lastPlace = "";
   box.innerHTML = items.map((it, i) => {
     const e = edits[it.key] || {};
-    const head = it.place !== lastPlace ? `<h3 class="txt-place" style="font-family:Georgia,serif; font-weight:400; font-size:17px; margin:22px 0 2px;">${esc(it.place)}</h3>` : "";
+    const tabNote = { "Майстер-класи": "«Майстер-класи»", "Реалізовані проєкти": "«Реалізовані проєкти»" }[it.place];
+    const head = it.place !== lastPlace ? `<h3 class="txt-place" style="font-family:Georgia,serif; font-weight:400; font-size:17px; margin:22px 0 2px;">${esc(it.place)}</h3>` +
+      (tabNote ? `<p class="muted" style="margin:0 0 6px;">Основний текст цього розділу змінюється у вкладці ${tabNote} (зверху, «Текст…»).</p>` : "") : "";
     lastPlace = it.place;
     const where = it.role + (it.count > 1 ? (it.role === "пункт меню" ? " · у меню на комп'ютері й на телефоні" : " · стоїть у " + it.count + " місцях, зміниться всюди") : "");
     return `${head}<div class="txt" data-i="${i}" style="border-top:1px solid rgba(27,26,22,.12); padding:12px 0 14px;">
@@ -787,7 +789,7 @@ function fillExtra(el) {
       <h2>Текст про майстер-класи</h2>
       <p class="muted" style="margin-bottom:14px;">Показується на сайті в розділі «Майстер-класи» над фото, поруч із кнопкою «Замовити майстер-клас». Порожнє поле — стандартний текст («Проводжу виїзні майстер-класи з живопису…»). Фото додавайте кнопкою «Додати фото» нижче — можна кілька одразу.</p>
       ${settingsOk ? "" : SETTINGS_NOTE}
-      <label style="margin-top:12px;">Українською<textarea id="stWs" rows="4" placeholder="Проводжу виїзні майстер-класи з живопису — приїжджаю до вас: додому, в офіс, кафе чи на свято…">${esc(settings.workshops_intro)}</textarea></label>
+      <label style="margin-top:12px;">Українською<textarea id="stWs" rows="4" placeholder="Проводжу виїзні майстер-класи з живопису — приїжджаю до вас в офіс, кафе чи на свято…">${esc(settings.workshops_intro)}</textarea></label>
       <label>Англійською (необов.)<textarea id="stWsEn" rows="3">${esc(settings.workshops_intro_en)}</textarea></label>
       <button class="btn btn-dark" id="stWsSave" ${settingsOk ? "" : "disabled"}>Зберегти текст</button>
     </div>`;
