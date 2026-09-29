@@ -25,6 +25,7 @@ Content is managed by the artist herself through a Supabase-backed admin panel �
 | `support.js` | DC runtime (generated — don't edit). |
 | `img/` | WebP assets, favicons, `og-1200.jpg` (link-preview image). |
 | `fonts/` | Self-hosted Cormorant Garamond + Commissioner (variable woff2, Cyrillic/Latin/Latin-ext only) + `fonts.css` + OFL licences. No Google Fonts requests. `index.html` preloads the two Cyrillic files; `admin.html` links `fonts.css` too. |
+| `vendor/` | Self-hosted JS: React 18.3.1 UMD (`react`, `react-dom` — byte-identical to support.js's SRI hashes; loaded in `<head>` before `support.js`, which then skips its unpkg download because `window.React`/`ReactDOM` exist) and `@supabase/supabase-js` UMD (`supabase.js`, `window.supabase`; realtime on the site, whole admin) + MIT licences. The site makes no requests to public CDNs (only Supabase itself). Regenerate/upgrade: `node .github/scripts/fetch-vendor.mjs [supabase-js version]` (checks the React hashes against support.js). |
 | `sitemap.xml`, `robots.txt` | Sitemap with the one indexable URL (submit in Search Console); robots.txt only matters once there is a custom domain. |
 | `ДОКУМЕНТАЦІЯ.md`, `ІНСТРУКЦІЯ-ДЛЯ-КАТЕРИНИ.md` | Handover docs (UA). |
 
@@ -75,7 +76,7 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 ## Design tokens
 
 - Cream `#E9E4DC` (bg), deep navy **`#0A1C3B`** (dark sections/buttons — was `#111C2E`), terracotta `#B4501C`, gold `#C7A17A`, muted `#857F74`.
-- Fonts: Cormorant Garamond (display) + Commissioner (body), loaded via Google Fonts in `<helmet>`.
+- Fonts: Cormorant Garamond (display) + Commissioner (body), self-hosted in `fonts/` (see Key files).
 
 ## Gotchas / conventions
 
