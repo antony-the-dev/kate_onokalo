@@ -208,8 +208,17 @@
   @keyframes dcStrokeOn { 0% { opacity: 0; } 0.4%, 100% { opacity: 1; } }
   @keyframes dcBristle { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
   /* Section titles come into focus once, like on alisachenko.com. */
-  .dc-h { opacity: 0; filter: blur(10px); transform: translateY(14px); transition: opacity .9s ease, filter .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  /* Tied to the scroll where supported: a title is sharp as soon as it is fully on screen, before the
+     text under it scrolls in (a 0.9 s timer used to leave it blurred while the body text was already there). */
+  .dc-h { opacity: 0; filter: blur(6px); transform: translateY(12px); transition: opacity .45s ease-out, filter .45s ease-out, transform .45s cubic-bezier(.2,.7,.2,1); }
   .dc-h.on { opacity: 1; filter: none; transform: none; }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .dc-h, .dc-h.on { opacity: 1; filter: none; transform: none; transition: none; animation: dcHeadIn cubic-bezier(.2,.7,.2,1) both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
+    }
+  }
+  @keyframes dcHeadIn { from { opacity: 0; filter: blur(6px); transform: translateY(12px); } }
+  @media print { .dc-h, .dc-reveal { animation: none !important; opacity: 1 !important; filter: none !important; transform: none !important; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   @media (max-width: 1270px) {
     .dc-nav { display: none !important; }
@@ -1183,7 +1192,7 @@ class Component extends DCLogic {
     gl.useProgram(progs.show.pr); gl.uniform1i(progs.show.u.u_s, 0); gl.uniform1i(progs.show.u.u_img, 1);
     gl.uniform2f(progs.show.u.u_px, 1 / SW, 1 / SH); gl.uniform2f(progs.show.u.u_sz, SW, SH);
 
-    const st = { raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now(), last: 0, touched: -9, nextAuto: 1.2, queue: [], pt: null };
+    const st = { raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now(), last: 0, touched: -9, scrolled: -9, nextAuto: 1.2, queue: [], pt: null, tap: null };
     const now = () => (performance.now() - st.t0) / 1000;
     // x, y from the top left in 0..1; radius in canvas widths
     const drop = (x, y, r, k) => { if (st.queue.length < 16) st.queue.push([x, 1 - y, r, k]); start(); };
@@ -1207,6 +1216,8 @@ class Component extends DCLogic {
       const t = now();
       const touched = t - st.touched < 2;
       st.n++;
+      // while the page scrolls the surface just waits — the frame budget goes to the scroll
+      if (!touched && t - st.scrolled < 0.25) { st.last = 0; st.raf = requestAnimationFrame(frame); return; }
       if (touched || st.n % 2 === 0) {
         if (t > st.nextAuto && t - st.touched > 3) {
           const x = 0.15 + Math.random() * 0.7, y = 0.15 + Math.random() * 0.7;
@@ -1259,11 +1270,19 @@ class Component extends DCLogic {
     const io = new IntersectionObserver((en) => { st.on = en[0].isIntersecting; start(); });
     io.observe(wrap);
     const at = (e) => { const r = wrap.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
-    const onDown = (e) => { const [x, y] = at(e); st.touched = now(); st.pt = [x, y]; drop(x, y, 0.045, 0.075); };
+    // mouse: a drop on press; touch: only on a tap (a finger that starts a scroll on the painting doesn't splash)
+    const onDown = (e) => {
+      const [x, y] = at(e);
+      st.pt = [x, y];
+      if (e.pointerType === 'touch') { st.tap = [x, y, now()]; return; }
+      st.touched = now();
+      drop(x, y, 0.045, 0.075);
+    };
     // a wake: small drops along the path since the last point
     const onMove = (e) => {
       const [x, y] = at(e);
       if (x < 0 || x > 1 || y < 0 || y > 1) return;
+      if (st.tap && Math.hypot(x - st.tap[0], y - st.tap[1]) > 0.03) st.tap = null;
       st.touched = now();
       const lp = st.pt;
       st.pt = [x, y];
@@ -1274,21 +1293,29 @@ class Component extends DCLogic {
       const m = Math.min(6, Math.ceil(d / 0.015));
       for (let i = 1; i <= m; i++) drop(lp[0] + (x - lp[0]) * i / m, lp[1] + (y - lp[1]) * i / m, 0.022, k);
     };
-    const onUp = () => { st.pt = null; };
+    const onUp = () => {
+      const tp = st.tap;
+      if (tp && now() - tp[2] < 0.5) { st.touched = now(); drop(tp[0], tp[1], 0.045, 0.075); }
+      st.pt = st.tap = null;
+    };
+    const onCancel = () => { st.pt = st.tap = null; };
+    const onScroll = () => { st.scrolled = now(); };
     wrap.addEventListener('pointerdown', onDown);
     wrap.addEventListener('pointermove', onMove);
-    wrap.addEventListener('pointerleave', onUp);
+    wrap.addEventListener('pointerleave', onCancel);
     wrap.addEventListener('pointerup', onUp);
-    wrap.addEventListener('pointercancel', onUp);
+    wrap.addEventListener('pointercancel', onCancel);
+    window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', start);
     this._liveStop = () => {
       cancelAnimationFrame(st.raf);
       io.disconnect();
       wrap.removeEventListener('pointerdown', onDown);
       wrap.removeEventListener('pointermove', onMove);
-      wrap.removeEventListener('pointerleave', onUp);
+      wrap.removeEventListener('pointerleave', onCancel);
       wrap.removeEventListener('pointerup', onUp);
-      wrap.removeEventListener('pointercancel', onUp);
+      wrap.removeEventListener('pointercancel', onCancel);
+      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', start);
     };
   }
@@ -1401,19 +1428,22 @@ class Component extends DCLogic {
     } catch (e) {}
   }
 
-  // Section titles blur into focus once when they first come into view (also titles mounted later, e.g. a hall).
+  // Section titles blur into focus as they come into view (also titles mounted later, e.g. a hall). With
+  // scroll-driven animations it is pure CSS (.dc-h + view()); otherwise a short transition that starts just
+  // before the title scrolls in, so it is done by the time it's read.
   observeHeads() {
     const root = this.rootRef.current;
     if (!root || !window.IntersectionObserver || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (!this._headIO) {
+    const css = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
+    if (!css && !this._headIO) {
       this._headIO = new IntersectionObserver((entries) => entries.forEach((en) => {
         if (en.isIntersecting) { en.target.classList.add('on'); this._headIO.unobserve(en.target); }
-      }), { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+      }), { threshold: 0, rootMargin: '0px 0px 15% 0px' });
     }
     root.querySelectorAll('section h2:not([data-h])').forEach((h2) => {
       h2.setAttribute('data-h', '1');
       h2.classList.add('dc-h');
-      this._headIO.observe(h2);
+      if (!css) this._headIO.observe(h2);
     });
   }
 
