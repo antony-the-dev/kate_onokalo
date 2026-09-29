@@ -1,0 +1,50 @@
+# Builds w/<id>.html + w/<id>.jpg link-preview pages for every visible painting (see .github/scripts/work-previews.mjs)
+# and commits them to main, which redeploys GitHub Pages. Nothing is committed when nothing changed.
+name: Work previews
+
+on:
+  schedule:
+    - cron: '7,37 * * * *' # every 30 min: new/edited works get their preview within about half an hour
+  workflow_dispatch: # Actions → Work previews → Run workflow (instant update)
+  repository_dispatch: # optional: a Supabase webhook can call this on every items change
+    types: [items-changed]
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - .github/scripts/work-previews.mjs
+      - .github/workflows/work-previews.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: work-previews
+  cancel-in-progress: false
+
+jobs:
+  previews:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install sharp
+        run: npm install --no-save --no-package-lock --no-audit --no-fund sharp@0.33.5
+      - name: Build previews
+        run: node .github/scripts/work-previews.mjs
+      - name: Commit and push
+        run: |
+          git add -A w
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Work previews: update link pages"
+          for i in 1 2 3; do
+            git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1

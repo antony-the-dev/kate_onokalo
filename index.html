@@ -120,6 +120,27 @@
   .dc-chip { flex: none; display: inline-flex; align-items: center; min-height: 40px; white-space: nowrap; border: 1px solid var(--border); border-radius: 999px; padding: 0 18px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink3); }
   .dc-chip:hover { border-color: var(--navy-bg); color: var(--ink); }
   .dc-chip[data-active="true"] { background: var(--navy-bg); border-color: var(--navy-bg); color: var(--cream-text); }
+  /* «Живі зали»: the open hall's wall takes a faint tint of its own paintings (--hc1..3 set from the palette). */
+  @property --hc1 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+  @property --hc2 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+  @property --hc3 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+  #halls { transition: --hc1 1.6s ease, --hc2 1.6s ease, --hc3 1.6s ease; }
+  #halls::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); z-index: -1; pointer-events: none;
+    background: radial-gradient(55% 42% at 14% 16%, var(--hc1, transparent), transparent 72%), radial-gradient(50% 48% at 88% 40%, var(--hc2, transparent), transparent 72%), radial-gradient(65% 40% at 42% 90%, var(--hc3, transparent), transparent 74%);
+    -webkit-mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 140px), transparent);
+    mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 140px), transparent);
+  }
+  .dc-dabs { display: inline-flex; align-items: center; gap: 6px; }
+  .dc-dab { display: block; width: 15px; height: 12px; border-radius: 55% 45% 52% 48% / 62% 50% 50% 38%; box-shadow: 0 0 0 1px rgba(27,26,22,.08), inset 0 -2px 3px rgba(0,0,0,.2), inset 0 1px 2px rgba(255,255,255,.35); animation: dabIn .6s cubic-bezier(.2,.7,.2,1) both; }
+  .dc-dab:nth-child(2) { border-radius: 45% 55% 40% 60% / 50% 60% 40% 50%; animation-delay: .07s; }
+  .dc-dab:nth-child(3) { border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%; animation-delay: .14s; }
+  .dc-dab:nth-child(4) { border-radius: 50% 50% 38% 62% / 58% 42% 58% 42%; animation-delay: .21s; }
+  .dc-dabs-sm { gap: 4px; }
+  .dc-dabs-sm .dc-dab { width: 9px; height: 8px; }
+  @keyframes dabIn { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
+  /* Paint poured when entering a hall: above the page, under the sticky header. */
+  .dc-pour { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 38; pointer-events: none; }
   .dc-proj { column-width: 250px; column-gap: clamp(10px, 1.6vw, 22px); }
   .dc-proj figure { break-inside: avoid; margin: 0 0 clamp(10px, 1.6vw, 22px); cursor: zoom-in; overflow: hidden; background: var(--cream2); }
   .dc-proj img { display: block; width: 100%; height: auto; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
@@ -296,7 +317,7 @@
     </div>
   </section>
 
-  <section id="halls" data-recede="1" style="position: relative; z-index: 1; max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
+  <section id="halls" data-recede="1" style="position: relative; z-index: 1; max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border); --hc1: {{ hc1 }}; --hc2: {{ hc2 }}; --hc3: {{ hc3 }};">
 
     <sc-if value="{{ hallOverview }}">
       <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
@@ -332,7 +353,7 @@
               <span style="font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2.1vw, 30px); line-height: 1.12;">{{ h.title }}</span>
             </div>
             <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);">
-              <span>{{ h.count }}</span>
+              <span style="display: inline-flex; align-items: center; gap: 12px;">{{ h.count }}<span class="dc-dabs dc-dabs-sm" aria-hidden="true"><sc-for list="{{ h.dabs }}" as="d"><span class="dc-dab" style="background: {{ d.c }};"></span></sc-for></span></span>
               <span class="dc-hallgo" data-en="Enter ⟶">Увійти ⟶</span>
             </div>
           </a>
@@ -355,7 +376,10 @@
             <p style="font-size: 15px; line-height: 1.7; color: var(--ink4); margin: 16px 0 0; text-wrap: pretty;">{{ hNote }}</p>
           </sc-if>
         </div>
-        <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); white-space: nowrap;">{{ hCount }}</div>
+        <div style="display: flex; align-items: center; gap: 16px; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); white-space: nowrap;">
+          <span class="dc-dabs" aria-hidden="true"><sc-for list="{{ hallDabs }}" as="d"><span class="dc-dab" style="background: {{ d.c }};"></span></sc-for></span>
+          <span>{{ hCount }}</span>
+        </div>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 240px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
         <sc-for list="{{ hallWorks }}" as="it">
@@ -371,7 +395,7 @@
                 <button class="dc-add" data-sku="{{ it.sku }}" onClick="{{ addSku }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAddShort }}</button>
               </sc-if>
               <sc-if value="{{ it.onRequest }}">
-                <button class="dc-add" data-title="{{ it.title }}" onClick="{{ askWork }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAskShort }}</button>
+                <button class="dc-add" data-title="{{ it.title }}" data-work="{{ it.id }}" onClick="{{ askWork }}" style="background: none; border: 1px solid var(--border); padding: 11px 20px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; color: var(--ink); min-height: 44px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">{{ lAskShort }}</button>
               </sc-if>
             </div>
           </div>
@@ -786,7 +810,7 @@ class Component extends DCLogic {
     paints: null, postcards: null, boxes: null, projects: null, halls: null, settings: {},
     dataMode: (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) ? 'loading' : 'demo',
     hall: /^#hall-/.test(location.hash) ? location.hash.slice(1) : null,
-    theme: 'light', showTop: false
+    theme: 'light', showTop: false, palTick: 0
   };
 
   // Demo content — shown only when Supabase is not configured (local preview).
@@ -1209,6 +1233,15 @@ class Component extends DCLogic {
   money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
   priceText(n) { return n > 0 ? this.money(n) : this.L.onRequest; }
 
+  // Link to a painting: its preview page w/<id>.html (built by .github/workflows/work-previews.yml) shows the
+  // painting, title and price when pasted in Telegram etc. and forwards to #work-<id>; 404.html covers works
+  // added since the last build. Local previews have no such pages — they link to the hash directly.
+  workLink(id) {
+    const here = location.href.split('#')[0].split('?')[0];
+    if (location.protocol === 'file:' || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname)) return here + '#work-' + id;
+    return here.replace(/[^/]*$/, '') + 'w/' + encodeURIComponent(id) + '.html';
+  }
+
   tgSend(msg) { return this.tgUrl + '?text=' + encodeURIComponent(msg); }
   openTg(msg) { window.open(this.tgSend(msg), '_blank', 'noopener'); }
 
@@ -1327,6 +1360,221 @@ class Component extends DCLogic {
     return { t: (en && g.en.t) || g.ua.t, n: (en && g.en.n) || g.ua.n };
   }
 
+  // «Живі зали»: every hall takes its colours from its own paintings. Thumbnails are read on a tiny canvas,
+  // median-cut into boxes, and the most characterful distinct colours kept (cached in localStorage.ko_pal).
+  // A hall's palette comes from its cover first (already loaded on the overview), then from up to 6 works
+  // once the hall is open. It tints the hall's wall, draws the paint dabs and is poured when entering.
+  palKey(g, full) {
+    const urls = (full ? g.works.slice(0, 6) : g.works.slice(0, 1)).map(w => w.thumb || w.img).filter(Boolean);
+    const s = urls.join('|');
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+    return { k: (h >>> 0).toString(36) + '.' + urls.length, urls };
+  }
+
+  palStore() {
+    if (!this._pals) {
+      try { this._pals = JSON.parse(localStorage.getItem('ko_pal') || '{}'); } catch (e) {}
+      if (!this._pals || typeof this._pals !== 'object') this._pals = {};
+    }
+    return this._pals;
+  }
+
+  palSave(k, cols) {
+    const st = this.palStore();
+    st[k] = cols.join(',');
+    const keys = Object.keys(st);
+    if (keys.length > 60) keys.slice(0, keys.length - 60).forEach((x) => delete st[x]);
+    try { localStorage.setItem('ko_pal', JSON.stringify(st)); } catch (e) {}
+  }
+
+  // Best known palette of a hall (all its first works, else its cover); null until computed.
+  palOf(g) {
+    const st = this.palStore();
+    const v = st[this.palKey(g, true).k] || st[this.palKey(g, false).k];
+    return v ? v.split(',') : null;
+  }
+
+  rgba(hex, a) {
+    const n = parseInt(String(hex).slice(1), 16) || 0;
+    return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  schedulePalettes() {
+    const mode = this.state.dataMode;
+    if (mode !== 'live' && mode !== 'demo') return;
+    const groups = this.hallGroups();
+    const sig = groups.map(g => this.palKey(g, true).k).join(',') + '|' + (this.state.hall || '');
+    if (sig === this._palSig) return;
+    this._palSig = sig;
+    const st = this.palStore(), fail = this._palFail || (this._palFail = {});
+    const todo = (g, full) => { const p = this.palKey(g, full); return (p.urls.length && !st[p.k] && !fail[p.k]) ? p : null; };
+    const q = [];
+    const cur = groups.find(g => g.slug === this.state.hall);
+    if (cur) { const p = todo(cur, true); if (p) q.push(p); }
+    groups.forEach((g) => { if (!st[this.palKey(g, true).k]) { const p = todo(g, false); if (p) q.push(p); } });
+    this._palQ = q;
+    if (!this._palBusy && q.length) this.runPalettes(cur ? 0 : 1200);
+  }
+
+  async runPalettes(delay) {
+    this._palBusy = true;
+    if (delay) await new Promise(r => setTimeout(r, delay));
+    while (this._palQ && this._palQ.length && !this._dead) {
+      const p = this._palQ.shift();
+      if (this.palStore()[p.k] || this._palFail[p.k]) continue;
+      const cols = await this.extractPalette(p.urls);
+      if (cols) this.palSave(p.k, cols); else this._palFail[p.k] = 1;
+      if (cols && !this._dead) this.setState(s => ({ palTick: s.palTick + 1 }));
+    }
+    this._palBusy = false;
+  }
+
+  // Pixels of an image scaled to 40×40. A copy cached without CORS headers taints the canvas —
+  // then the image is fetched once more under a distinct URL; null if it still can't be read.
+  palPixels(src) {
+    return new Promise((done) => {
+      const S = 40;
+      const load = (u, retry) => {
+        const im = new Image();
+        const again = () => (retry ? load(u + (u.indexOf('?') < 0 ? '?' : '&') + 'pal', false) : done(null));
+        im.crossOrigin = 'anonymous';
+        im.onload = () => {
+          try {
+            const c = document.createElement('canvas');
+            c.width = c.height = S;
+            const x = c.getContext('2d', { willReadFrequently: true });
+            x.drawImage(im, 0, 0, S, S);
+            done(x.getImageData(0, 0, S, S).data);
+          } catch (e) { again(); }
+        };
+        im.onerror = again;
+        im.src = u;
+      };
+      load(src, !/^(data|blob):/.test(src));
+    });
+  }
+
+  async extractPalette(urls) {
+    const datas = await Promise.all(urls.map(u => this.palPixels(u)));
+    const px = [];
+    datas.forEach((d) => { if (d) for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200) px.push([d[i], d[i + 1], d[i + 2]]); });
+    if (px.length < 64) return null;
+    // median cut: keep splitting the box with the widest (range × √count) channel at its median
+    const boxes = [px];
+    while (boxes.length < 10) {
+      let bi = -1, bc = 0, best = 0;
+      boxes.forEach((b, i) => {
+        if (b.length < 8) return;
+        for (let c = 0; c < 3; c++) {
+          let lo = 255, hi = 0;
+          b.forEach((p) => { if (p[c] < lo) lo = p[c]; if (p[c] > hi) hi = p[c]; });
+          const s = (hi - lo) * Math.sqrt(b.length);
+          if (s > best) { best = s; bi = i; bc = c; }
+        }
+      });
+      if (bi < 0) break;
+      const b = boxes[bi].sort((p, q) => p[bc] - q[bc]);
+      boxes.splice(bi, 1, b.slice(0, b.length >> 1), b.slice(b.length >> 1));
+    }
+    // weight = area × chroma; colours close to the cream wall (unpainted ground, would be invisible as a tint)
+    // and near-black (shadows) count less
+    const far = (a, z) => Math.hypot(a[0] - z[0], a[1] - z[1], a[2] - z[2]) > 58;
+    const info = boxes.map((b) => {
+      const m = [0, 0, 0];
+      b.forEach((p) => { m[0] += p[0]; m[1] += p[1]; m[2] += p[2]; });
+      const c = m.map(v => Math.round(v / b.length));
+      const mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]);
+      return { c, w: b.length * (0.1 + (mx - mn) / 255) * (far(c, [233, 228, 220]) ? 1 : 0.3) * (mx < 28 ? 0.4 : 1) };
+    }).sort((a, z) => z.w - a.w);
+    const out = [];
+    info.forEach((it) => { if (out.length < 4 && out.every(o => far(o, it.c))) out.push(it.c); });
+    info.forEach((it) => { if (out.length < 3 && out.indexOf(it.c) < 0) out.push(it.c); });
+    return out.map(c => '#' + c.map(v => v.toString(16).padStart(2, '0')).join(''));
+  }
+
+  // Entering a hall: its colours are poured from where you clicked, ring inside ring like an acrylic
+  // "puddle pour". The paint runs outward as a band — the new hall opens from the middle behind it —
+  // and slows down as it spreads, like real paint; the hall's wall keeps a faint tint of it afterwards.
+  pour(slug, x, y) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const g = this.hallGroups().find(h => h.slug === slug);
+    if (!g) return;
+    const pal = this.palOf(g) || ['#B4501C', '#C7A17A', '#0A1C3B', '#8E9AAB'];
+    if (this._pourStop) this._pourStop();
+    const cv = document.createElement('canvas');
+    cv.className = 'dc-pour';
+    cv.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cv);
+    const cx = cv.getContext('2d');
+    if (!cx) { cv.remove(); return; }
+    const W = cv.clientWidth || window.innerWidth, H = cv.clientHeight || window.innerHeight;
+    const k = Math.min(window.devicePixelRatio || 1, 2) * 0.5; // soft edges are fine — half resolution
+    cv.width = Math.max(1, Math.round(W * k));
+    cv.height = Math.max(1, Math.round(H * k));
+    cx.scale(k, k);
+    const ox = x == null ? W / 2 : x, oy = y == null ? H * 0.45 : y;
+    const R = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy)) * 1.25;
+    const lift = (hex, m) => { const n = parseInt(hex.slice(1), 16) || 0; return 'rgb(' + [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (255 - v) * m)).join(',') + ')'; };
+    const N = 6, D = 50, GROW = 900;
+    // later pours push the earlier ones outward; repeats of a colour come a little lighter (thinned paint)
+    const rings = Array.from({ length: N }, (_, i) => {
+      const a = Math.random() * Math.PI * 2;
+      return { c: i < pal.length ? pal[i] : lift(pal[i % pal.length], 0.28), d: i * D, dx: Math.cos(a) * i * 6, dy: Math.sin(a) * i * 6,
+        ph: [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], amp: 0.05 + Math.random() * 0.04 };
+    });
+    const hole = { d: N * D + 60, dx: 0, dy: 0, ph: [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], amp: 0.07 };
+    const t0 = performance.now();
+    let raf = 0;
+    const stop = () => { cancelAnimationFrame(raf); cv.remove(); if (this._pourStop === stop) this._pourStop = null; };
+    const shape = (r, t) => {
+      const p = Math.min(1, Math.max(0, (t - r.d) / GROW));
+      const rad = R * (1 - Math.pow(1 - p, 3));
+      cx.beginPath();
+      for (let s = 0; s <= 72; s++) {
+        const th = (s / 72) * Math.PI * 2;
+        const w = 1 + r.amp * (0.55 * Math.sin(3 * th + r.ph[0] + t * 0.0013) + 0.3 * Math.sin(5 * th + r.ph[1] - t * 0.0019) + 0.15 * Math.sin(9 * th + r.ph[2]));
+        const px = ox + r.dx * p + Math.cos(th) * rad * w, py = oy + r.dy * p + Math.sin(th) * rad * w;
+        if (s) cx.lineTo(px, py); else cx.moveTo(px, py);
+      }
+      cx.closePath();
+      return rad;
+    };
+    const frame = (now) => {
+      const t = now - t0;
+      cx.clearRect(0, 0, W, H);
+      cx.globalCompositeOperation = 'source-over';
+      rings.forEach((r) => {
+        if (t <= r.d) return;
+        shape(r, t);
+        cx.fillStyle = r.c;
+        cx.fill();
+        cx.lineWidth = 1.6;
+        cx.strokeStyle = 'rgba(255,255,255,.34)';
+        cx.stroke();
+      });
+      // wet sheen on the paint only
+      cx.globalCompositeOperation = 'source-atop';
+      const sh = cx.createRadialGradient(ox - R * 0.18, oy - R * 0.22, 0, ox, oy, R * 0.9);
+      sh.addColorStop(0, 'rgba(255,255,255,.22)');
+      sh.addColorStop(0.5, 'rgba(255,255,255,.06)');
+      sh.addColorStop(1, 'rgba(0,0,0,.08)');
+      cx.fillStyle = sh;
+      cx.fillRect(0, 0, W, H);
+      // the hall opens from the middle behind the last pour
+      let open = 0;
+      if (t > hole.d) {
+        cx.globalCompositeOperation = 'destination-out';
+        open = shape(hole, t);
+        cx.fillStyle = '#000';
+        cx.fill();
+      }
+      if (open < R / 1.25 * 1.12 && t < hole.d + GROW) raf = requestAnimationFrame(frame); else stop();
+    };
+    this._pourStop = stop;
+    raf = requestAnimationFrame(frame);
+  }
+
   groupOf(id, groups) {
     const s = String(id);
     return (groups || this.hallGroups()).find(g => g.works.some(w => String(w.id) === s)) || null;
@@ -1401,6 +1649,10 @@ class Component extends DCLogic {
       if (id === 'halls' || id.indexOf('hall-') === 0) {
         e.preventDefault();
         if (a.blur) a.blur();
+        if (id !== 'halls' && id !== this.state.hall) {
+          const r = a.getBoundingClientRect();
+          this.pour(id, e.clientX || r.left + r.width / 2, e.clientY || r.top + r.height / 2);
+        }
         this.setState({ hall: id === 'halls' ? null : id, menuOpen: false });
         this.scrollToId('halls');
         if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
@@ -1420,7 +1672,9 @@ class Component extends DCLogic {
         return;
       }
       this._hashWork = null;
-      this.setState({ hall: h.indexOf('hall-') === 0 ? h : null, activeId: null });
+      const hall = h.indexOf('hall-') === 0 ? h : null;
+      if (hall && hall !== this.state.hall) this.pour(hall);
+      this.setState({ hall, activeId: null });
     };
     window.addEventListener('popstate', this.onPop);
     this._pendingHash = location.hash ? location.hash.slice(1) : null;
@@ -1442,6 +1696,7 @@ class Component extends DCLogic {
     this.onPrint = () => this.rootRef.current && this.rootRef.current.querySelectorAll('.dc-h').forEach((el) => el.classList.add('on'));
     window.addEventListener('beforeprint', this.onPrint);
     this.loadSupabase();
+    this.schedulePalettes();
   }
 
   componentWillUnmount() {
@@ -1457,12 +1712,15 @@ class Component extends DCLogic {
     if (this._headIO) this._headIO.disconnect();
     window.removeEventListener('beforeprint', this.onPrint);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
+    this._dead = true;
+    if (this._pourStop) this._pourStop();
     document.body.style.overflow = '';
   }
 
   componentDidUpdate() {
     this.applyLang();
     this.observeHeads();
+    this.schedulePalettes();
     if (this.onScrollFx) this.onScrollFx();
     if (this.state.hall !== this._chipHall) {
       this._chipHall = this.state.hall;
@@ -1606,6 +1864,8 @@ class Component extends DCLogic {
     const realHalls = groups.filter(g => !g.other).length;
     const cur = this.state.hall ? (groups.find(g => g.slug === this.state.hall) || null) : null;
     const curText = cur ? this.hallText(cur, l) : null;
+    const pal = cur ? this.palOf(cur) : null;
+    const tint = (i, al) => (pal ? this.rgba(pal[i % pal.length], this.state.theme === 'dark' ? al * 1.5 : al) : 'transparent');
     const a = this.state.activeId ? this.find(this.state.activeId) : null;
     const av = a ? this.loc(a, l) : null;
     const aGroup = a ? this.groupOf(a.id, groups) : null;
@@ -1685,9 +1945,14 @@ class Component extends DCLogic {
         return {
           href: '#' + g.slug, num: g.num, title: this.hallText(g, l).t,
           cover: c.thumb || c.img, w: d.w, h: d.h,
-          count: g.works.length + ' ' + this.plural(g.works.length, L.works)
+          count: g.works.length + ' ' + this.plural(g.works.length, L.works),
+          dabs: (this.palOf(g) || []).map(col => ({ c: col }))
         };
       }),
+      hc1: tint(0, 0.16),
+      hc2: tint(1, 0.13),
+      hc3: tint(2, 0.12),
+      hallDabs: pal ? pal.map(col => ({ c: col })) : [],
       hallChips: groups.map(g => ({ href: '#' + g.slug, title: this.hallText(g, l).t, active: !!cur && g.slug === cur.slug })),
       hEyebrow: cur ? (cur.other ? L.other : L.hall + (cur.num ? ' ' + cur.num : '')) : '',
       hTitle: curText ? curText.t : '',
@@ -1740,7 +2005,7 @@ class Component extends DCLogic {
       lShare: L.share,
       shareWork: async () => {
         if (!a) return;
-        const url = location.href.split('#')[0] + '#work-' + a.id;
+        const url = this.workLink(a.id);
         if (navigator.share) { try { await navigator.share({ title: av ? av.t : document.title, url }); } catch (e) {} return; }
         try { await navigator.clipboard.writeText(url); this.flash(L.linkCopied); } catch (e) { window.prompt(L.share, url); }
       },
@@ -1762,9 +2027,13 @@ class Component extends DCLogic {
       },
 
       addToCart: () => this.addToCartSku('w' + this.state.activeId),
-      askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»'); },
+      askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»\n' + this.workLink(a.id)); },
       addSku: (e) => { e.stopPropagation(); this.addToCartSku(e.currentTarget.dataset.sku); },
-      askWork: (e) => { e.stopPropagation(); this.openTg(L.askMsg + '«' + e.currentTarget.dataset.title + '»'); },
+      askWork: (e) => {
+        e.stopPropagation();
+        const d = e.currentTarget.dataset;
+        this.openTg(L.askMsg + '«' + d.title + '»' + (d.work ? '\n' + this.workLink(d.work) : ''));
+      },
       lAddShort: L.addShort,
       lAskShort: L.askShort,
 
