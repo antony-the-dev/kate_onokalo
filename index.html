@@ -185,14 +185,13 @@
      that repaints (border-radius, filters) would bring the jank back. */
   @supports (animation-timeline: scroll()) {
     @media (prefers-reduced-motion: no-preference) {
-      #top[data-recede] { transform-origin: 50% 35%; animation: dcHeroM cubic-bezier(.5,1,.89,1) both; animation-timeline: scroll(root); animation-range: 0px 125vh; }
       .dc-light { animation: dcLight linear both; animation-timeline: scroll(root); }
       .dc-stroke { transition: none; animation: dcStrokeOn linear both; animation-timeline: scroll(root); }
       .dc-stroke path { animation: dcBristle linear both; animation-timeline: scroll(root); }
       .dc-stroke path:nth-child(2) { animation-range: 3% 100%; }
       .dc-stroke path:nth-child(3) { animation-range: 6% 100%; }
       @media (min-width: 901px) {
-        #top[data-recede] { animation-name: dcHero; }
+        #top[data-recede] { transform-origin: 50% 35%; animation: dcHero cubic-bezier(.5,1,.89,1) both; animation-timeline: scroll(root); animation-range: 0px 125vh; }
         [data-recede]:not(#top) { transform-origin: 50% 100%; animation: dcRecede cubic-bezier(.5,1,.89,1) both; animation-timeline: view(); animation-range: exit 0% exit 85%; }
         #halls .dc-frame, #paper .dc-frame, #boxes .dc-frame { animation: dcDepth linear both; animation-timeline: view(); animation-range: cover; }
         :nth-child(4n+1) > .dc-frame { --dk: .7; }
@@ -203,7 +202,6 @@
     }
   }
   @keyframes dcHero { to { transform: translateY(120px) scale(.8); opacity: 0; } }
-  @keyframes dcHeroM { to { transform: scale(.95); opacity: 0; } }
   @keyframes dcRecede { to { transform: scale(.95); opacity: .7; } }
   @keyframes dcDepth { from { transform: translate3d(0, calc(-10px * var(--dk, 1)), 0); } to { transform: translate3d(0, calc(10px * var(--dk, 1)), 0); } }
   @keyframes dcLight { from { transform: translate3d(0, 8vh, 0); } to { transform: translate3d(-3vw, -8vh, 0); } }
@@ -229,6 +227,7 @@
     .dc-header-inner { gap: 8px !important; }
     .dc-logo-sub { letter-spacing: .2em !important; }
     .dc-cart-label { display: none; }
+    .dc-ribbon { font-size: 10px !important; letter-spacing: .1em !important; padding: 8px 16px !important; gap: 10px !important; }
     .dc-cart-ico { display: block; }
     .dc-proj { column-count: 2; column-width: auto; }
   }
@@ -580,7 +579,7 @@
   </section>
 
   <section id="interior" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 52px);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px 24px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 52px);">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="At home">В інтер’єрі</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="How it lives on a real wall">Як це живе на справжній стіні</h2>
@@ -1297,7 +1296,7 @@ class Component extends DCLogic {
   // Scroll effects: sections fold away once scrolled past — the hero recedes into depth (shrinks, sinks,
   // fades — as on alisachenko.com), later sections shrink toward their bottom edge and dim like a card put
   // aside; the window light drifts; the brush stroke under the header draws with page progress; paintings in
-  // the grids shift a few px at different speeds (depth). Sections/depth are desktop-only.
+  // the grids shift a few px at different speeds (depth). Sections (the hero too) and depth are desktop-only.
   // Where animation-timeline is supported all of it is CSS (see "scroll-driven animations" in the styles) —
   // this handler is only the fallback (Firefox, older Safari). All positions are read before anything is
   // written, from layout offsets (not getBoundingClientRect), so our own transforms never force a relayout.
@@ -1325,12 +1324,12 @@ class Component extends DCLogic {
       // write
       secs.forEach(({ el, top, h }) => {
         const hero = el.id === 'top';
-        if (!hero && !desktop) { reset(el); return; }
+        if (!desktop) { reset(el); return; } // phones: the painting just scrolls away, no fade
         const e = ease(hero ? clamp(y / (vh * 1.25)) : clamp((vh - (top + h - y)) / (vh * 0.85)));
         if (e <= 0.001) { reset(el); return; }
         if (hero) {
           el.style.transformOrigin = '50% 35%';
-          el.style.transform = desktop ? 'translateY(' + (120 * e).toFixed(1) + 'px) scale(' + (1 - 0.2 * e).toFixed(4) + ')' : 'scale(' + (1 - 0.05 * e).toFixed(4) + ')';
+          el.style.transform = 'translateY(' + (120 * e).toFixed(1) + 'px) scale(' + (1 - 0.2 * e).toFixed(4) + ')';
           el.style.opacity = (1 - e).toFixed(3);
         } else {
           el.style.transformOrigin = '50% 100%';
