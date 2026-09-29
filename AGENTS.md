@@ -85,6 +85,7 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - Keep HTML balanced for `sc-if`/`sc-for`/`style`/`helmet` (past edits have broken `</style>` accidentally).
 - **No absolute paths** (GitHub Pages subpath). Always relative: `img/...`, `./support.js`. (Exception: `404.html`, served at any depth — its home link is computed in JS; `w/*.html` use `../`.)
 - The Work previews bot pushes to `main` — `git pull` before pushing.
+- The Work previews **schedule runs as the user who last changed the cron line**. A cron edit committed as "Claude <noreply@anthropic.com>" (a cloud session's git identity) silently stopped the schedule for hours — edit `work-previews.yml`'s cron only from the owner's account (GitHub web UI / API, or a local commit as antony-the-dev).
 - python SSL cert fails on this Mac (`CERTIFICATE_VERIFY_FAILED`) — use **node fetch** or `curl` for API calls.
 - `image-slot.js` was removed; no longer used. The horizontal «Стіна» (wall) carousel was removed too (replaced by halls).
 - The root wrapper uses `.dc-root { overflow-x: clip }` — `overflow-x: hidden` there breaks the sticky header.
