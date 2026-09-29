@@ -249,7 +249,7 @@
     </div>
   </sc-if>
 
-  <section id="top" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
+  <section id="top" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
     <div style="animation: floatIn .9s ease-out both;">
       <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 26px;" data-en="Abstraction · Oil · Acrylic">Абстракція · Олія · Акрил</div>
       <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(46px, 7.4vw, 108px); line-height: .95; letter-spacing: -.02em; margin: 0 0 28px;">
@@ -286,7 +286,7 @@
     </div>
   </section>
 
-  <section id="halls" style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
+  <section id="halls" data-recede="1" style="position: relative; z-index: 1; background: var(--bg); max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px) clamp(56px, 8vw, 110px); border-top: 1px solid var(--border);">
 
     <sc-if value="{{ hallOverview }}">
       <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px 40px; padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
@@ -378,7 +378,7 @@
   </section>
 
   <sc-if value="{{ hasPaper }}">
-    <section id="paper" style="background: var(--cream2); border-top: 1px solid var(--border);">
+    <section id="paper" data-recede="1" style="background: var(--cream2); border-top: 1px solid var(--border);">
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
         <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Paper">Папір</div>
@@ -415,7 +415,7 @@
   </sc-if>
 
   <sc-if value="{{ hasBoxes }}">
-    <section id="boxes" style="border-top: 1px solid var(--border);">
+    <section id="boxes" data-recede="1" style="border-top: 1px solid var(--border);">
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
         <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Gifts">Подарунки</div>
@@ -452,7 +452,7 @@
   </sc-if>
 
   <sc-if value="{{ hasProjects }}">
-    <section id="projects" style="border-top: 1px solid var(--border);">
+    <section id="projects" data-recede="1" style="border-top: 1px solid var(--border);">
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px 40px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
           <div style="max-width: 62ch;">
@@ -473,7 +473,7 @@
     </section>
   </sc-if>
 
-  <section id="about" style="background: var(--navy-bg); color: var(--ltext);">
+  <section id="about" data-recede="1" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <img src="{{ aboutImg1 }}" alt="Катерина у студії" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
@@ -496,7 +496,7 @@
     </div>
   </section>
 
-  <section id="interior" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+  <section id="interior" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
     <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 52px);">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="At home">В інтер’єрі</div>
@@ -516,7 +516,7 @@
     </div>
   </section>
 
-  <section id="order" style="background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <section id="order" data-recede="1" style="background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 76px);">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Commission">На замовлення</div>
@@ -571,7 +571,7 @@
     </div>
   </section>
 
-  <section id="collab" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+  <section id="collab" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
     <div style="max-width: 76ch;">
       <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
       <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.8vw, 52px); line-height: 1.1; margin: 0 0 26px;" data-en="The paintings can live beyond the canvas">Картини можуть жити далі за полотно</h2>
@@ -1183,6 +1183,44 @@ class Component extends DCLogic {
     };
   }
 
+  // Sections fold away once scrolled past: the hero recedes into depth (shrinks, sinks, fades — as on
+  // alisachenko.com), later sections shrink toward their bottom edge and dim like a card being put aside.
+  // Desktop only for sections; phones get just a light fade of the hero (cheap, no flicker).
+  initRecede() {
+    const root = this.rootRef.current;
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let ticking = false;
+    const ease = (p) => 1 - (1 - p) * (1 - p);
+    const clamp = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+    const reset = (el) => { if (el.style.transform || el.style.opacity) { el.style.transform = ''; el.style.opacity = ''; el.style.borderRadius = ''; } };
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight || 1;
+      const desktop = window.innerWidth > 900;
+      root.querySelectorAll('[data-recede]').forEach((el) => {
+        const hero = el.id === 'top';
+        if (!hero && !desktop) { reset(el); return; }
+        const r = el.getBoundingClientRect();
+        const e = ease(hero ? clamp(window.scrollY / (vh * 1.25)) : clamp((vh - r.bottom) / (vh * 0.85)));
+        if (e <= 0.001) { reset(el); return; }
+        if (hero) {
+          el.style.transformOrigin = '50% 35%';
+          el.style.transform = desktop ? 'translateY(' + (120 * e).toFixed(1) + 'px) scale(' + (1 - 0.2 * e).toFixed(4) + ')' : 'scale(' + (1 - 0.05 * e).toFixed(4) + ')';
+          el.style.opacity = (1 - e).toFixed(3);
+        } else {
+          el.style.transformOrigin = '50% 100%';
+          el.style.transform = 'scale(' + (1 - 0.05 * e).toFixed(4) + ')';
+          el.style.opacity = (1 - 0.3 * e).toFixed(3); // light: a navy block faded further turns grey on the cream page
+          el.style.borderRadius = (18 * e).toFixed(1) + 'px';
+        }
+      });
+    };
+    this.onRecede = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+    window.addEventListener('scroll', this.onRecede, { passive: true });
+    window.addEventListener('resize', this.onRecede);
+    update();
+  }
+
   money(n) { return n.toLocaleString('uk-UA').replace(/,/g, ' ') + ' ₴'; }
   priceText(n) { return n > 0 ? this.money(n) : this.L.onRequest; }
 
@@ -1420,6 +1458,7 @@ class Component extends DCLogic {
     };
     window.addEventListener('resize', this.onResize);
     this.initLivePaint();
+    this.initRecede();
     this.loadSupabase();
   }
 
@@ -1432,6 +1471,7 @@ class Component extends DCLogic {
     clearTimeout(this._rtTimer);
     window.removeEventListener('resize', this.onResize);
     if (this._liveStop) this._liveStop();
+    if (this.onRecede) { window.removeEventListener('scroll', this.onRecede); window.removeEventListener('resize', this.onRecede); }
     if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
     document.body.style.overflow = '';

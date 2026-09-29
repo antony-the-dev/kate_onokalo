@@ -53,6 +53,7 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - Hero «жива фарба»: raw WebGL1 shader over the hero image (`initLivePaint`): very slow noise drift + drop ripples (ring buffer of 6 drops) on tap/click, along the mouse trail, and automatically every 4.5–7.5 s when idle. Paused off-screen/hidden tab, skipped for reduced motion or no WebGL, hidden on context loss (the `<img>` stays underneath). `st.raf` stays set while a frame runs so drops added inside a frame can't start a second loop.
 - Modal/lightbox images sit in a fixed-ratio box (`.dc-fit`/`.dc-lbfit`, `--r` from the file-name dimensions) with the cached thumb underneath — no layout jump while the full image loads.
 - Modal image sheen/tilt (`.dc-sheen`, mouse only) and scroll reveal (`.dc-reveal`, CSS `animation-timeline: view()` — progressive, no JS).
+- Receding sections (`initRecede`, sections with `data-recede`): the hero shrinks/sinks/fades over 1.25 viewports of scroll (as on alisachenko.com); other sections scale to 0.95 toward their bottom edge, get rounded corners and a light fade (≥0.7 — a navy block faded further turns grey) as their bottom rises through the viewport. Desktop (>900px) only for sections; phones fade the hero only. `#halls` is `position: relative; z-index: 1` with a background so it covers the sinking hero. Never put `position: fixed` elements inside a receding section (transform breaks fixed).
 
 ## Contacts / config
 
