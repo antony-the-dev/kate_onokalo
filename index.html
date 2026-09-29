@@ -171,7 +171,7 @@
     }
   }
   /* Paper grain behind the content: shows on the cream page only — photos and coloured blocks cover it. */
-  .dc-grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: var(--grain, none); opacity: .5; }
+  .dc-grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: var(--grain, none); opacity: .5; will-change: transform; }
   /* Window light on the "wall": behind the content, so paintings and photos keep their true colours.
      Pane-shaped patches drift slowly with scroll; the tint follows the visitor's time of day. */
   .dc-light { position: fixed; left: -12vw; top: -14vh; width: 124vw; height: 128vh; z-index: -1; pointer-events: none; background: var(--light, none) center / cover no-repeat; opacity: var(--light-o, 1); will-change: transform; }
@@ -179,6 +179,36 @@
   /* Brush-stroke scroll progress under the header: three "bristles" drawn with the page. */
   .dc-stroke { position: absolute; left: 0; bottom: -4px; width: 100%; height: 8px; overflow: visible; pointer-events: none; color: var(--terracotta); opacity: 0; transition: opacity .4s ease; }
   .dc-stroke path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-dasharray: 1000 1000; stroke-dashoffset: 1000; }
+  /* Scroll effects as scroll-driven animations: the browser runs them in step with the scroll itself
+     (transform/opacity on the compositor), so nothing lags or jitters behind the page. Browsers without
+     animation-timeline get the JS fallback in initScrollFx(). Only transform/opacity here — anything
+     that repaints (border-radius, filters) would bring the jank back. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      #top[data-recede] { transform-origin: 50% 35%; animation: dcHeroM cubic-bezier(.5,1,.89,1) both; animation-timeline: scroll(root); animation-range: 0px 125vh; }
+      .dc-light { animation: dcLight linear both; animation-timeline: scroll(root); }
+      .dc-stroke { transition: none; animation: dcStrokeOn linear both; animation-timeline: scroll(root); }
+      .dc-stroke path { animation: dcBristle linear both; animation-timeline: scroll(root); }
+      .dc-stroke path:nth-child(2) { animation-range: 3% 100%; }
+      .dc-stroke path:nth-child(3) { animation-range: 6% 100%; }
+      @media (min-width: 901px) {
+        #top[data-recede] { animation-name: dcHero; }
+        [data-recede]:not(#top) { transform-origin: 50% 100%; animation: dcRecede cubic-bezier(.5,1,.89,1) both; animation-timeline: view(); animation-range: exit 0% exit 85%; }
+        #halls .dc-frame, #paper .dc-frame, #boxes .dc-frame { animation: dcDepth linear both; animation-timeline: view(); animation-range: cover; }
+        :nth-child(4n+1) > .dc-frame { --dk: .7; }
+        :nth-child(4n+2) > .dc-frame { --dk: 1.15; }
+        :nth-child(4n+3) > .dc-frame { --dk: .9; }
+        :nth-child(4n+4) > .dc-frame { --dk: 1.3; }
+      }
+    }
+  }
+  @keyframes dcHero { to { transform: translateY(120px) scale(.8); opacity: 0; } }
+  @keyframes dcHeroM { to { transform: scale(.95); opacity: 0; } }
+  @keyframes dcRecede { to { transform: scale(.95); opacity: .7; } }
+  @keyframes dcDepth { from { transform: translate3d(0, calc(-10px * var(--dk, 1)), 0); } to { transform: translate3d(0, calc(10px * var(--dk, 1)), 0); } }
+  @keyframes dcLight { from { transform: translate3d(0, 8vh, 0); } to { transform: translate3d(-3vw, -8vh, 0); } }
+  @keyframes dcStrokeOn { 0% { opacity: 0; } 0.4%, 100% { opacity: 1; } }
+  @keyframes dcBristle { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
   /* Section titles come into focus once, like on alisachenko.com. */
   .dc-h { opacity: 0; filter: blur(10px); transform: translateY(14px); transition: opacity .9s ease, filter .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
   .dc-h.on { opacity: 1; filter: none; transform: none; }
@@ -738,17 +768,25 @@
           <sc-if value="{{ aDesc }}">
             <p style="font-size: 15.5px; line-height: 1.7; color: var(--ltext2); margin: 0 0 28px; text-wrap: pretty;">{{ aDesc }}</p>
           </sc-if>
-          <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 30px;">
-            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lSize }}</span><span style="text-align: right;">{{ aSize }}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lTech }}</span><span style="text-align: right;">{{ aTech }}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); border-bottom: 1px solid var(--lnav-b); font-size: 13.5px;">
-              <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lYear }}</span><span style="text-align: right;">{{ aYear }}</span>
-            </div>
+          <sc-if value="{{ aHasMeta }}">
+          <div style="display: flex; flex-direction: column; gap: 0; margin-bottom: 30px; border-bottom: 1px solid var(--lnav-b);">
+            <sc-if value="{{ aSize }}">
+              <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
+                <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lSize }}</span><span style="text-align: right;">{{ aSize }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ aTech }}">
+              <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
+                <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lTech }}</span><span style="text-align: right;">{{ aTech }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ aYear }}">
+              <div style="display: flex; justify-content: space-between; gap: 20px; padding: 13px 0; border-top: 1px solid var(--lnav-b); font-size: 13.5px;">
+                <span style="color: var(--lmut); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;">{{ lYear }}</span><span style="text-align: right;">{{ aYear }}</span>
+              </div>
+            </sc-if>
           </div>
+          </sc-if>
           <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 24px;">
             <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3vw, 38px);">{{ aPrice }}</div>
             <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldim);">{{ lOne }}</div>
@@ -1023,103 +1061,192 @@ class Component extends DCLogic {
     return t;
   }
 
-  // Hero "live paint": the painting drifts very slowly, and drops ripple across it like across wet paint —
-  // on tap/click, along the mouse trail, and on their own every few seconds when nobody touches it (WebGL).
+  // Hero «жива вода»: a real wave simulation on the GPU over the painting. A height field (two float
+  // textures, ping-pong) is stepped with the wave equation, so ripples spread, run into each other and bounce
+  // off the edges of the canvas; the painting is refracted through the surface (colours split a little, like
+  // in a prism) and the wet surface catches the window light from the top left, like the light on the page.
+  // Drops: a tap/click drops a big one, the mouse or a finger drawn across leaves a wake, and when nobody
+  // touches it a drop falls every few seconds. Runs only while the hero is on screen and the tab is visible:
+  // ~30 fps when idle, full rate while touched. Skipped for reduced motion and without WebGL / float render
+  // targets (the <img> underneath stays), hidden on context loss.
   initLivePaint() {
     const cv = this.heroCanvasRef.current, wrap = this.heroRef.current;
     if (!cv || !wrap || !window.IntersectionObserver) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let gl = null;
-    try { gl = cv.getContext('webgl', { alpha: false, antialias: false, powerPreference: 'low-power' }); } catch (e) {}
+    try { gl = cv.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' }); } catch (e) {}
     if (!gl) return;
-    const DROPS = 6;
-    const VS = 'attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
-    const FS = [
-      'precision mediump float;',
-      'uniform sampler2D u_tex;uniform float u_time,u_aspect;uniform vec4 u_drops[' + DROPS + '];varying vec2 v;',
-      'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
-      'float n(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),u.x),u.y);}',
+    const TEX = gl.TEXTURE_2D, FB = gl.FRAMEBUFFER;
+    const hf = gl.getExtension('OES_texture_half_float'), ff = gl.getExtension('OES_texture_float');
+    gl.getExtension('EXT_color_buffer_half_float');
+    gl.getExtension('WEBGL_color_buffer_float');
+    const SW = 256, SH = Math.max(96, Math.min(512, Math.round(256 * (wrap.offsetHeight || 1) / (wrap.offsetWidth || 1))));
+    // two render targets of the first float type the device can render into
+    const target = (type, lin) => {
+      const t = gl.createTexture();
+      gl.bindTexture(TEX, t);
+      gl.texParameteri(TEX, gl.TEXTURE_MIN_FILTER, lin ? gl.LINEAR : gl.NEAREST);
+      gl.texParameteri(TEX, gl.TEXTURE_MAG_FILTER, lin ? gl.LINEAR : gl.NEAREST);
+      gl.texParameteri(TEX, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(TEX, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(TEX, 0, gl.RGBA, SW, SH, 0, gl.RGBA, type, null);
+      const f = gl.createFramebuffer();
+      gl.bindFramebuffer(FB, f);
+      gl.framebufferTexture2D(FB, gl.COLOR_ATTACHMENT0, TEX, t, 0);
+      const ok = gl.checkFramebufferStatus(FB) === gl.FRAMEBUFFER_COMPLETE;
+      if (ok) { gl.viewport(0, 0, SW, SH); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); }
+      gl.bindFramebuffer(FB, null);
+      return ok ? { t, f } : null;
+    };
+    let A = null, B = null, lin = false;
+    const kinds = [[hf && hf.HALF_FLOAT_OES, 'OES_texture_half_float_linear'], [ff && gl.FLOAT, 'OES_texture_float_linear']];
+    for (const [type, linExt] of kinds) {
+      if (!type) continue;
+      lin = !!gl.getExtension(linExt);
+      A = target(type, lin);
+      B = A && target(type, lin);
+      if (A && B) break;
+      A = B = null;
+    }
+    if (!A) return;
+    const HP = '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n';
+    const VS = 'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
+    // one step of the wave equation (x = height, y = velocity); clamped edges reflect the waves
+    const FS_STEP = HP + [
+      'uniform sampler2D u_s;uniform vec2 u_px;varying vec2 v;',
       'void main(){',
-      '  vec2 uv=v;float t=u_time*.05;',
-      '  uv+=(vec2(n(v*2.3+vec2(t,t*.7)),n(v*2.3+vec2(-t*.6,t)+7.3))-.5)*.004;',
-      '  float shade=0.;',
-      '  for(int i=0;i<' + DROPS + ';i++){',
-      '    vec4 dr=u_drops[i];float age=u_time-dr.z;',
-      '    if(dr.w<=0.||age<0.||age>3.5)continue;',
-      '    vec2 dv=(v-dr.xy)*vec2(u_aspect,1.);float dist=length(dv);',
-      '    float x=dist-age*.3;',
-      '    float env=exp(-x*x*45.)*exp(-age*1.25)*dr.w;',
-      '    float w=sin(x*90.);',
-      '    uv+=dv/max(dist,1e-4)/vec2(u_aspect,1.)*w*env*.016;',
-      '    shade+=w*env;',
-      '  }',
-      '  vec3 c=texture2D(u_tex,clamp(uv,.001,.999)).rgb+shade*.07;',
-      '  gl_FragColor=vec4(c,1.);',
+      '  vec4 c=texture2D(u_s,v);',
+      '  float avg=(texture2D(u_s,v-vec2(u_px.x,0.)).r+texture2D(u_s,v+vec2(u_px.x,0.)).r+texture2D(u_s,v-vec2(0.,u_px.y)).r+texture2D(u_s,v+vec2(0.,u_px.y)).r)*.25;',
+      '  c.g+=(avg-c.r)*2.;c.g*=.994;c.r+=c.g;c.r*=.9993;',
+      '  gl_FragColor=c;',
       '}'
     ].join('\n');
-    let prog;
+    const FS_DROP = HP + [
+      'uniform sampler2D u_s;uniform vec4 u_d;uniform vec2 u_as;varying vec2 v;', // u_d: x, y, radius, strength
+      'void main(){',
+      '  vec4 c=texture2D(u_s,v);',
+      '  float d=max(0.,1.-length((v-u_d.xy)*u_as)/u_d.z);',
+      '  c.r+=(.5-cos(d*3.14159)*.5)*u_d.w;',
+      '  gl_FragColor=c;',
+      '}'
+    ].join('\n');
+    const FS_SHOW = HP + (lin ? '#define LIN\n' : '') + [
+      'uniform sampler2D u_img,u_s;uniform vec2 u_px,u_sz;uniform float u_t;varying vec2 v;',
+      'float H(vec2 p){',
+      '#ifdef LIN',
+      '  return texture2D(u_s,p).r;',
+      '#else',
+      '  vec2 q=p*u_sz-.5,i=floor(q),f=q-i,b=(i+.5)/u_sz;',
+      '  return mix(mix(texture2D(u_s,b).r,texture2D(u_s,b+vec2(u_px.x,0.)).r,f.x),mix(texture2D(u_s,b+vec2(0.,u_px.y)).r,texture2D(u_s,b+u_px).r,f.x),f.y);',
+      '#endif',
+      '}',
+      'float hs(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
+      'float ns(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(hs(i),hs(i+vec2(1.,0.)),u.x),mix(hs(i+vec2(0.,1.)),hs(i+vec2(1.,1.)),u.x),u.y);}',
+      'void main(){',
+      '  float h=H(v);',
+      '  vec2 g=vec2(H(v+vec2(u_px.x,0.))-h,H(v+vec2(0.,u_px.y))-h);',
+      '  vec3 n=normalize(vec3(-g*150.,1.));',
+      '  float t=u_t*.05;',
+      '  vec2 uv=vec2(v.x,1.-v.y)+(vec2(ns(v*2.3+vec2(t,t*.7)),ns(v*2.3+vec2(-t*.6,t)+7.3))-.5)*.004;',
+      '  vec2 o=vec2(n.x,-n.y)*.05;', // refraction; y flipped: the painting is stored top row first
+      '  vec3 col=vec3(texture2D(u_img,clamp(uv+o*.85,.001,.999)).r,texture2D(u_img,clamp(uv+o,.001,.999)).g,texture2D(u_img,clamp(uv+o*1.15,.001,.999)).b);',
+      '  vec3 L=normalize(vec3(-.4,.5,1.));', // window light from the top left
+      '  col*=1.+(dot(n,L)-L.z)*1.1;',
+      '  col+=pow(max(reflect(-L,n).z,0.),40.)*vec3(1.,.96,.88)*.75;',
+      '  gl_FragColor=vec4(col,1.);',
+      '}'
+    ].join('\n');
+    const progs = {};
     try {
       const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
-      prog = gl.createProgram();
-      gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
-      gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
-      gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
-    } catch (e) { console.warn('live paint:', e); return; }
-    gl.useProgram(prog);
+      const vs = sh(gl.VERTEX_SHADER, VS);
+      const mk = (fs, names) => {
+        const pr = gl.createProgram();
+        gl.attachShader(pr, vs);
+        gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+        gl.bindAttribLocation(pr, 0, 'p');
+        gl.linkProgram(pr);
+        if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+        const u = {};
+        names.forEach((nm) => { u[nm] = gl.getUniformLocation(pr, nm); });
+        return { pr, u };
+      };
+      progs.step = mk(FS_STEP, ['u_s', 'u_px']);
+      progs.drop = mk(FS_DROP, ['u_s', 'u_d', 'u_as']);
+      progs.show = mk(FS_SHOW, ['u_img', 'u_s', 'u_px', 'u_sz', 'u_t']);
+    } catch (e) { console.warn('live water:', e); return; }
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'p');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uT = gl.getUniformLocation(prog, 'u_time'), uA = gl.getUniformLocation(prog, 'u_aspect'), uD = gl.getUniformLocation(prog, 'u_drops');
-    const st = { raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now(), drops: new Float32Array(DROPS * 4), di: 0, last: null, touched: 0, nextAuto: 1.4 };
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    gl.useProgram(progs.step.pr); gl.uniform1i(progs.step.u.u_s, 0); gl.uniform2f(progs.step.u.u_px, 1 / SW, 1 / SH);
+    gl.useProgram(progs.drop.pr); gl.uniform1i(progs.drop.u.u_s, 0); gl.uniform2f(progs.drop.u.u_as, 1, SH / SW);
+    gl.useProgram(progs.show.pr); gl.uniform1i(progs.show.u.u_s, 0); gl.uniform1i(progs.show.u.u_img, 1);
+    gl.uniform2f(progs.show.u.u_px, 1 / SW, 1 / SH); gl.uniform2f(progs.show.u.u_sz, SW, SH);
+
+    const st = { raf: 0, on: false, ready: false, shown: false, n: 0, t0: performance.now(), last: 0, touched: -9, nextAuto: 1.2, queue: [], pt: null };
     const now = () => (performance.now() - st.t0) / 1000;
-    const drop = (x, y, amp) => {
-      const k = (st.di++ % DROPS) * 4;
-      st.drops[k] = x; st.drops[k + 1] = y; st.drops[k + 2] = now(); st.drops[k + 3] = amp;
-      start();
+    // x, y from the top left in 0..1; radius in canvas widths
+    const drop = (x, y, r, k) => { if (st.queue.length < 16) st.queue.push([x, 1 - y, r, k]); start(); };
+    const pass = (prog) => {
+      gl.useProgram(prog.pr);
+      gl.bindFramebuffer(FB, B.f);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(TEX, A.t);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      const x = A; A = B; B = x;
     };
     const fit = () => {
-      const r = wrap.getBoundingClientRect();
+      // layout size, not getBoundingClientRect: the hero is scaled while it recedes and must not resize the canvas
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = Math.max(1, Math.round(r.width * dpr)), hh = Math.max(1, Math.round(r.height * dpr));
-      if (cv.width !== w || cv.height !== hh) { cv.width = w; cv.height = hh; gl.viewport(0, 0, w, hh); }
-      gl.uniform1f(uA, r.width / Math.max(1, r.height));
+      const w = Math.max(1, Math.round(wrap.offsetWidth * dpr)), h = Math.max(1, Math.round(wrap.offsetHeight * dpr));
+      if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
     };
     // st.raf stays set while a frame runs, so drop() → start() inside it can't spawn a second loop.
     const frame = () => {
       if (!st.on || document.hidden || !st.ready) { st.raf = 0; return; }
       const t = now();
-      // a drop falls on its own when nobody has touched the painting for a while
-      if (t > st.nextAuto && t - st.touched > 3.5) {
-        drop(0.2 + Math.random() * 0.6, 0.2 + Math.random() * 0.6, 0.85);
-        st.nextAuto = t + 4.5 + Math.random() * 3;
-      }
-      let busy = false;
-      for (let i = 0; i < DROPS; i++) if (st.drops[i * 4 + 3] > 0 && t - st.drops[i * 4 + 2] < 3.5) busy = true;
+      const touched = t - st.touched < 2;
       st.n++;
-      if (busy || st.n % 2 === 0) {
+      if (touched || st.n % 2 === 0) {
+        if (t > st.nextAuto && t - st.touched > 3) {
+          const x = 0.15 + Math.random() * 0.7, y = 0.15 + Math.random() * 0.7;
+          drop(x, y, 0.03 + Math.random() * 0.015, 0.05);
+          if (Math.random() < 0.35) drop(x + (Math.random() - 0.5) * 0.2, y + (Math.random() - 0.5) * 0.2, 0.018, 0.03);
+          st.nextAuto = t + 3.5 + Math.random() * 3;
+        }
+        gl.viewport(0, 0, SW, SH);
+        st.queue.splice(0).forEach((d) => { gl.useProgram(progs.drop.pr); gl.uniform4f(progs.drop.u.u_d, d[0], d[1], d[2], d[3]); pass(progs.drop); });
+        // same wave speed at any frame rate: ~120 steps per second
+        const steps = Math.max(1, Math.min(6, Math.round((t - (st.last || t - 1 / 60)) * 120)));
+        st.last = t;
+        for (let i = 0; i < steps; i++) pass(progs.step);
         fit();
-        gl.uniform1f(uT, t);
-        gl.uniform4fv(uD, st.drops);
+        gl.bindFramebuffer(FB, null);
+        gl.viewport(0, 0, cv.width, cv.height);
+        gl.useProgram(progs.show.pr);
+        gl.uniform1f(progs.show.u.u_t, t);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(TEX, A.t);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         if (!st.shown) { st.shown = true; cv.style.opacity = '1'; }
       }
       st.raf = requestAnimationFrame(frame);
     };
-    const start = () => { if (st.ready && st.on && !st.raf && !document.hidden) st.raf = requestAnimationFrame(frame); };
+    const start = () => { if (st.ready && st.on && !st.raf && !document.hidden) { st.last = 0; st.raf = requestAnimationFrame(frame); } };
     const img = new Image();
     img.onload = () => {
       const tex = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(TEX, tex);
+      gl.texParameteri(TEX, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(TEX, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(TEX, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(TEX, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texImage2D(TEX, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      gl.activeTexture(gl.TEXTURE0);
       st.ready = true;
-      st.nextAuto = now() + 1.4;
+      st.nextAuto = now() + 1.2;
       start();
     };
     img.src = 'img/hero-1600.webp';
@@ -1133,34 +1260,51 @@ class Component extends DCLogic {
     const io = new IntersectionObserver((en) => { st.on = en[0].isIntersecting; start(); });
     io.observe(wrap);
     const at = (e) => { const r = wrap.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
-    const onDown = (e) => { const [x, y] = at(e); st.touched = now(); st.last = [x, y, st.touched]; drop(x, y, 1); };
+    const onDown = (e) => { const [x, y] = at(e); st.touched = now(); st.pt = [x, y]; drop(x, y, 0.045, 0.075); };
+    // a wake: small drops along the path since the last point
     const onMove = (e) => {
-      if (e.pointerType !== 'mouse') return;
-      const [x, y] = at(e), t = now();
-      st.touched = t;
-      if (!st.last || Math.hypot(x - st.last[0], y - st.last[1]) > 0.09 || t - st.last[2] > 0.35) { st.last = [x, y, t]; drop(x, y, 0.4); }
+      const [x, y] = at(e);
+      if (x < 0 || x > 1 || y < 0 || y > 1) return;
+      st.touched = now();
+      const lp = st.pt;
+      st.pt = [x, y];
+      if (!lp) return;
+      const d = Math.hypot(x - lp[0], y - lp[1]);
+      if (d < 0.004 || d > 0.35) return;
+      const k = e.pointerType === 'mouse' ? 0.01 : 0.016;
+      const m = Math.min(6, Math.ceil(d / 0.015));
+      for (let i = 1; i <= m; i++) drop(lp[0] + (x - lp[0]) * i / m, lp[1] + (y - lp[1]) * i / m, 0.022, k);
     };
+    const onUp = () => { st.pt = null; };
     wrap.addEventListener('pointerdown', onDown);
     wrap.addEventListener('pointermove', onMove);
+    wrap.addEventListener('pointerleave', onUp);
+    wrap.addEventListener('pointerup', onUp);
+    wrap.addEventListener('pointercancel', onUp);
     document.addEventListener('visibilitychange', start);
     this._liveStop = () => {
       cancelAnimationFrame(st.raf);
       io.disconnect();
       wrap.removeEventListener('pointerdown', onDown);
       wrap.removeEventListener('pointermove', onMove);
+      wrap.removeEventListener('pointerleave', onUp);
+      wrap.removeEventListener('pointerup', onUp);
+      wrap.removeEventListener('pointercancel', onUp);
       document.removeEventListener('visibilitychange', start);
     };
   }
 
-  // Scroll effects, one rAF-throttled handler:
-  //  · sections fold away once scrolled past — the hero recedes into depth (shrinks, sinks, fades — as on
-  //    alisachenko.com), later sections shrink toward their bottom edge and dim like a card put aside;
-  //  · window light drifts slowly; · brush stroke under the header draws with page progress;
-  //  · paintings in the grids shift a few px at different speeds (depth).
-  // Sections/depth are desktop-only; phones get the hero fade, light and stroke (cheap, no flicker).
+  // Scroll effects: sections fold away once scrolled past — the hero recedes into depth (shrinks, sinks,
+  // fades — as on alisachenko.com), later sections shrink toward their bottom edge and dim like a card put
+  // aside; the window light drifts; the brush stroke under the header draws with page progress; paintings in
+  // the grids shift a few px at different speeds (depth). Sections/depth are desktop-only.
+  // Where animation-timeline is supported all of it is CSS (see "scroll-driven animations" in the styles) —
+  // this handler is only the fallback (Firefox, older Safari). All positions are read before anything is
+  // written, from layout offsets (not getBoundingClientRect), so our own transforms never force a relayout.
   initScrollFx() {
     const root = this.rootRef.current;
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()')) return;
     const light = root.querySelector('.dc-light');
     const stroke = root.querySelector('.dc-stroke');
     const bristles = stroke ? [...stroke.querySelectorAll('path')] : [];
@@ -1168,19 +1312,21 @@ class Component extends DCLogic {
     let ticking = false;
     const ease = (p) => 1 - (1 - p) * (1 - p);
     const clamp = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
-    const reset = (el) => { if (el.style.transform || el.style.opacity) { el.style.transform = ''; el.style.opacity = ''; el.style.borderRadius = ''; } };
+    const reset = (el) => { if (el.style.transform || el.style.opacity) { el.style.transform = ''; el.style.opacity = ''; } };
     const update = () => {
       ticking = false;
       const vh = window.innerHeight || 1;
       const desktop = window.innerWidth > 900;
       const y = window.scrollY;
       const page = clamp(y / Math.max(1, document.documentElement.scrollHeight - vh));
-
-      root.querySelectorAll('[data-recede]').forEach((el) => {
+      // read
+      const secs = [...root.querySelectorAll('[data-recede]')].map(el => ({ el, top: this.docTop(el), h: el.offsetHeight }));
+      const frames = desktop ? [...root.querySelectorAll('#halls .dc-frame, #paper .dc-frame, #boxes .dc-frame')].map(f => ({ f, top: this.docTop(f), h: f.offsetHeight })) : [];
+      // write
+      secs.forEach(({ el, top, h }) => {
         const hero = el.id === 'top';
         if (!hero && !desktop) { reset(el); return; }
-        const r = el.getBoundingClientRect();
-        const e = ease(hero ? clamp(y / (vh * 1.25)) : clamp((vh - r.bottom) / (vh * 0.85)));
+        const e = ease(hero ? clamp(y / (vh * 1.25)) : clamp((vh - (top + h - y)) / (vh * 0.85)));
         if (e <= 0.001) { reset(el); return; }
         if (hero) {
           el.style.transformOrigin = '50% 35%';
@@ -1190,33 +1336,20 @@ class Component extends DCLogic {
           el.style.transformOrigin = '50% 100%';
           el.style.transform = 'scale(' + (1 - 0.05 * e).toFixed(4) + ')';
           el.style.opacity = (1 - 0.3 * e).toFixed(3); // light: a navy block faded further turns grey on the cream page
-          el.style.borderRadius = (18 * e).toFixed(1) + 'px';
         }
       });
-
       if (light) light.style.transform = 'translate3d(' + (-3 * page).toFixed(2) + 'vw,' + (8 - 16 * page).toFixed(2) + 'vh,0)';
-
       if (stroke) {
         stroke.style.opacity = page > 0.004 ? '1' : '0';
         // thinner bristles trail a little but still finish together at the end of the page
         bristles.forEach((b, i) => { b.style.strokeDashoffset = (1000 * (1 - clamp((page - i * 0.03) / (1 - i * 0.03)))).toFixed(1); });
       }
-
-      // depth: read every frame's position first, then write (no layout thrash); undo our own shift when measuring
-      const frames = desktop ? [...root.querySelectorAll('#halls .dc-frame, #paper .dc-frame, #boxes .dc-frame')] : [];
-      const shifts = frames.map((f, i) => {
-        const r = f.getBoundingClientRect();
-        if (r.bottom < -100 || r.top > vh + 100) return null;
-        const mid = r.top + r.height / 2 - (f._dy || 0);
-        return -((mid - vh / 2) / vh) * 14 * speeds[i % speeds.length];
+      frames.forEach(({ f, top, h }, i) => {
+        const mid = top + h / 2 - y;
+        if (mid < -h - 100 || mid > vh + h + 100) return;
+        f.style.transform = 'translate3d(0,' + (-((mid - vh / 2) / vh) * 14 * speeds[i % speeds.length]).toFixed(1) + 'px,0)';
       });
-      frames.forEach((f, i) => {
-        const dy = shifts[i];
-        if (dy === null) return;
-        f._dy = dy;
-        f.style.transform = 'translateY(' + dy.toFixed(1) + 'px)';
-      });
-      if (!desktop) root.querySelectorAll('.dc-frame').forEach((f) => { if (f._dy) { f._dy = 0; f.style.transform = ''; } });
+      if (!desktop) root.querySelectorAll('.dc-frame').forEach((f) => { if (f.style.transform) f.style.transform = ''; });
     };
     this.onScrollFx = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
     window.addEventListener('scroll', this.onScrollFx, { passive: true });
@@ -1572,10 +1705,17 @@ class Component extends DCLogic {
     setTimeout(() => { if (document.getElementById(target)) this.scrollToId(target); }, 60);
   }
 
+  // Page offset of an element from layout (ignores CSS transforms, unlike getBoundingClientRect).
+  docTop(el) {
+    let y = 0;
+    for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
+    return y;
+  }
+
   scrollToId(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 84;
+    const top = this.docTop(el) - 84; // layout position: a receding (scaled) section would report a shifted rect
     const start = window.scrollY;
     const dist = top - start;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(dist) < 4) {
@@ -1640,7 +1780,9 @@ class Component extends DCLogic {
     this.onPop = () => {
       const h = location.hash.slice(1);
       if (h.indexOf('work-') === 0) {
-        if (this.find(h.slice(5))) { this._hashWork = h.slice(5); this.setState({ activeId: h.slice(5) }); }
+        // open the work inside its own hall (history can jump here from another hall)
+        const wid = h.slice(5), g = this.find(wid) && this.groupOf(wid);
+        if (g) { this._hashWork = wid; this._hashBack = '#' + g.slug; this.setState({ hall: g.slug, activeId: wid }); }
         return;
       }
       this._hashWork = null;
@@ -1998,6 +2140,7 @@ class Component extends DCLogic {
       aSize: av ? this.fmtSize(av.size, l) : '',
       aTech: av ? av.tech : '',
       aYear: a ? a.year : '',
+      aHasMeta: !!(av && (av.size || av.tech || a.year)),
       aPrice: a ? this.priceText(a.price) : '',
       aCanBuy: !!a && a.price > 0,
       lShare: L.share,
