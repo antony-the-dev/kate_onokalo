@@ -23,7 +23,6 @@
 <script>try{if(localStorage.getItem('ko_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name="theme-color"]').setAttribute('content','#0A1C3B');}}catch(e){}</script>
 <script src="./support.js"></script>
 <script src="./supabase-config.js"></script>
-<script src="./wall.js"></script>
 </head>
 <body>
 <x-dc>
@@ -138,14 +137,6 @@
   .dc-sheen::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--so, 0); transition: opacity .5s ease; mix-blend-mode: screen; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.2), rgba(255,255,255,.05) 28%, rgba(255,255,255,0) 55%); }
   .dc-linkbtn { background: none; border: none; color: inherit; font: inherit; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; padding: 8px 0; display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid transparent; }
   .dc-linkbtn:hover { color: #E4DED4; border-bottom-color: var(--lnav-b); }
-  .dc-room-art { position: absolute; overflow: hidden; touch-action: none; cursor: grab; box-shadow: 0 18px 30px -12px rgba(0,0,0,.45), 0 2px 5px rgba(0,0,0,.2); }
-  .dc-room-art img { position: absolute; max-width: none; user-select: none; -webkit-user-drag: none; pointer-events: none; }
-  .dc-room-pill { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; background: rgba(10,28,59,.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 999px; color: #E9E4DC; width: max-content; max-width: calc(100% - 24px); }
-  .dc-room-sw { width: 30px; height: 30px; border-radius: 999px; cursor: pointer; border: 2px solid rgba(233,228,220,.35); padding: 0; }
-  .dc-room-sw[data-on="true"] { border-color: #E9E4DC; box-shadow: 0 0 0 2px rgba(10,28,59,.8), 0 0 0 4px #E9E4DC; }
-  .dc-room-own { display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; border: 1px solid rgba(233,228,220,.4); border-radius: 999px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; cursor: pointer; }
-  .dc-room-own:hover { border-color: #E9E4DC; }
-  .dc-room-range { width: 130px; accent-color: #C7A17A; }
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .dc-reveal { animation: floatIn linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
@@ -700,9 +691,6 @@
             <button onClick="{{ askTg }}" style="background: none; color: var(--ltext); border: 1px solid var(--lnav-b); padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="border-color: #E4DED4;">{{ lAsk }}</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 18px; color: var(--lgold);">
-            <sc-if value="{{ aRoomOk }}">
-              <button class="dc-linkbtn" onClick="{{ openRoom }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3.5" width="10" height="8"/><path d="M3 20.5v-4a2 2 0 012-2h14a2 2 0 012 2v4M5 14.5v-1.5a1.5 1.5 0 011.5-1.5h11a1.5 1.5 0 011.5 1.5v1.5"/></svg>{{ lTryWall }}</button>
-            </sc-if>
             <button class="dc-linkbtn" onClick="{{ shareWork }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 13v6.5h14V13"/></svg>{{ lShare }}</button>
           </div>
           <div style="display: flex; gap: 22px; margin-top: 34px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">
@@ -712,50 +700,6 @@
         </div>
       </div>
       <button onClick="{{ closeWork }}" aria-label="Закрити" style="position: fixed; top: 22px; right: 24px; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.1); border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.2);">✕</button>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ roomOpen }}" hint-placeholder-val="{{ false }}">
-    <div style="position: fixed; inset: 0; z-index: 100; background: {{ roomWallColor }}; overflow: hidden; animation: floatIn .35s ease-out both; font-family: 'Commissioner', system-ui, sans-serif;">
-      <sc-if value="{{ roomOwn }}">
-        <img src="{{ roomBg }}" alt="" loading="lazy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; max-width: none;">
-      </sc-if>
-      <sc-if value="{{ roomPreset }}">
-        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 35%, rgba(255,255,255,.16), rgba(0,0,0,.08));"></div>
-        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{ roomFloorH }}px; background: linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.02) 30%, rgba(0,0,0,.12)), #B29A7E;"></div>
-        <div style="position: absolute; left: 0; right: 0; bottom: {{ roomFloorH }}px; height: {{ roomBaseH }}px; background: rgba(255,255,255,.5); box-shadow: 0 -1px 0 rgba(0,0,0,.06);"></div>
-        <svg viewBox="0 0 210 84" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: {{ sofaX }}px; bottom: {{ sofaBottom }}px; width: {{ sofaW }}px; height: {{ sofaH }}px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.22));">
-          <rect x="9" y="8" width="192" height="48" rx="11" fill="#8E867A"/>
-          <rect x="20" y="44" width="170" height="28" rx="8" fill="#9C9488"/>
-          <path d="M105 46v24" stroke="#877F73" stroke-width="1.2"/>
-          <rect x="0" y="30" width="27" height="44" rx="10" fill="#837B6F"/>
-          <rect x="183" y="30" width="27" height="44" rx="10" fill="#837B6F"/>
-          <rect x="14" y="73" width="4" height="11" rx="1" fill="#4E3F31"/>
-          <rect x="192" y="73" width="4" height="11" rx="1" fill="#4E3F31"/>
-        </svg>
-      </sc-if>
-      <div class="dc-room-art" ref="{{ roomArtRef }}" onPointerDown="{{ roomDragStart }}" style="left: {{ artX }}px; top: {{ artY }}px; width: {{ artW }}px; height: {{ artH }}px;">
-        <img src="{{ roomImg }}" alt="{{ aTitle }}" loading="lazy" style="left: {{ imgX }}px; top: {{ imgY }}px; width: {{ imgW }}px; height: {{ imgH }}px;">
-      </div>
-      <div style="position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 18px clamp(14px, 3vw, 32px) 40px; background: linear-gradient(rgba(10,28,59,.55), rgba(10,28,59,0)); color: #F3EFE8;">
-        <div style="min-width: 0;">
-          <div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(22px, 2.4vw, 30px); line-height: 1.1;">{{ aTitle }}</div>
-          <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; margin-top: 8px; opacity: .85; line-height: 1.5;">{{ roomNote }}</div>
-        </div>
-        <button onClick="{{ closeRoom }}" aria-label="Закрити" style="flex: none; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.14); border: 1px solid rgba(233,228,220,.35); color: #F3EFE8; font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.28);">✕</button>
-      </div>
-      <div class="dc-room-pill">
-        <sc-for list="{{ roomSwatches }}" as="s">
-          <button class="dc-room-sw" data-i="{{ s.i }}" data-on="{{ s.on }}" onClick="{{ roomSetWall }}" aria-label="{{ s.label }}" title="{{ s.label }}" style="background: {{ s.color }};"></button>
-        </sc-for>
-        <label class="dc-room-own">
-          <input type="file" accept="image/*" onChange="{{ roomUpload }}" style="display: none;">
-          <span>{{ lOwnWall }}</span>
-        </label>
-        <sc-if value="{{ roomOwn }}">
-          <input class="dc-room-range" type="range" min="6" max="90" value="{{ roomScale }}" onChange="{{ roomScaleInput }}" aria-label="Розмір картини">
-        </sc-if>
-      </div>
     </div>
   </sc-if>
 
@@ -833,7 +777,6 @@ class Component extends DCLogic {
   rootRef = React.createRef();
   heroRef = React.createRef();
   heroCanvasRef = React.createRef();
-  roomArtRef = React.createRef();
   fName = React.createRef();
   fContact = React.createRef();
   fIdea = React.createRef();
@@ -843,18 +786,8 @@ class Component extends DCLogic {
     paints: null, postcards: null, boxes: null, projects: null, halls: null, settings: {},
     dataMode: (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) ? 'loading' : 'demo',
     hall: /^#hall-/.test(location.hash) ? location.hash.slice(1) : null,
-    theme: 'light', showTop: false,
-    roomOpen: false, roomWall: 0, roomBg: '', roomScale: 26, roomPos: null, roomTick: 0
+    theme: 'light', showTop: false
   };
-
-  _rooms = {};
-
-  WALLS = [
-    { c: '#ECE7DF', ua: 'Світла стіна', en: 'Light wall' },
-    { c: '#D3C7B4', ua: 'Бежева стіна', en: 'Beige wall' },
-    { c: '#A9B19C', ua: 'Шавлієва стіна', en: 'Sage wall' },
-    { c: '#2E3D55', ua: 'Синя стіна', en: 'Navy wall' }
-  ];
 
   // Demo content — shown only when Supabase is not configured (local preview).
   works = [
@@ -930,9 +863,7 @@ class Component extends DCLogic {
       projAlt: 'Реалізований проєкт',
       projIntro: 'Ці роботи вже живуть у своїх власників. Будь-яку з них я можу написати для вас ще раз — у вашому розмірі, зі змінами в кольорах чи деталях.',
       etsy: 'Живете за кордоном? Можна замовити й через мій магазин на Etsy ↗',
-      tryWall: 'Приміряти на стіні', share: 'Поділитися', linkCopied: 'Посилання скопійовано',
-      ownWall: 'Своя стіна', sofa: 'диван 210 см', trueScale: 'Реальний масштаб',
-      ownHint: 'Потягніть картину, розмір — повзунком · фото стіни лишається тільки на вашому пристрої',
+      share: 'Поділитися', linkCopied: 'Посилання скопійовано',
       orderHead: 'Вітаю! Хочу замовити:', totalLine: 'Разом: ',
       commHead: 'Вітаю! Хочу замовити картину.', name: 'Ім’я: ', contact: 'Контакт: ', idea: 'Ідея: ', mailSubj: 'Запит на картину на замовлення' },
     en: { size: 'Size', tech: 'Technique', year: 'Year', one: 'One of a kind', add: 'Add to cart', ask: 'Ask in Telegram',
@@ -951,9 +882,7 @@ class Component extends DCLogic {
       projAlt: 'Completed project',
       projIntro: 'These works already live with their owners. I can paint any of them again for you — in your size, with changes to the colours or details.',
       etsy: 'Outside Ukraine? You can also order via my Etsy shop ↗',
-      tryWall: 'See it on a wall', share: 'Share', linkCopied: 'Link copied',
-      ownWall: 'Your wall', sofa: 'sofa 210 cm', trueScale: 'True scale',
-      ownHint: 'Drag the painting, resize with the slider · your photo stays on your device',
+      share: 'Share', linkCopied: 'Link copied',
       orderHead: 'Hello! I would like to order:', totalLine: 'Total: ',
       commHead: 'Hello! I would like to commission a painting.', name: 'Name: ', contact: 'Contact: ', idea: 'Idea: ', mailSubj: 'Commission request' }
   };
@@ -1013,64 +942,6 @@ class Component extends DCLogic {
     if (/^\d+(?:[.,]\d+)?(?: × \d+(?:[.,]\d+)?)+$/.test(t)) t += ' см';
     if (l === 'en') t = t.replace(/ см/g, ' cm');
     return t;
-  }
-
-  // Async per image: is the "on a wall" preview possible, and at what size/orientation (wall.js).
-  ensureRoomInfo(wk) {
-    const K = window.KoWall;
-    if (!K || !wk || !wk.img || this._rooms[wk.img]) return;
-    const key = wk.img;
-    const dm = this.dims(key);
-    const size = K.parseSize(wk.ua && wk.ua.size);
-    this._rooms[key] = { ok: false };
-    if (!dm.w || !size) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        const res = K.check(img, dm, size);
-        if (!res.ok) return;
-        this._rooms[key] = Object.assign({ nw: dm.w, nh: dm.h }, res);
-        this.setState({ roomTick: this.state.roomTick + 1 });
-      } catch (e) { /* unreadable pixels → no preview */ }
-    };
-    img.src = wk.thumb || key;
-  }
-
-  // Pixel layout of the room view: preset room at true scale (sofa 210 cm), or the visitor's own wall photo.
-  roomGeom(info) {
-    const W = window.innerWidth, H = window.innerHeight;
-    const own = !!this.state.roomBg;
-    const pos = this.state.roomPos;
-    const g = { own, floorH: 0, baseH: 0, sofa: { x: 0, b: 0, w: 0, h: 0 } };
-    let cx, cy;
-    if (own) {
-      g.artW = W * this.state.roomScale / 100;
-      g.artH = g.artW * info.hCm / info.wCm;
-      cx = pos ? pos.x : W / 2; cy = pos ? pos.y : H * 0.42;
-    } else {
-      g.floorH = Math.round(H * 0.16);
-      const floorY = H - g.floorH;
-      const px = Math.min(W / (W < 700 ? 250 : 400), (floorY - 96) / 250);
-      g.baseH = Math.max(3, Math.round(8 * px));
-      g.sofa = { x: (W - 210 * px) / 2, b: g.floorH - 2 * px, w: 210 * px, h: 84 * px };
-      g.artW = info.wCm * px; g.artH = info.hCm * px;
-      cx = pos ? pos.x : W / 2;
-      cy = pos ? pos.y : floorY - (84 + 22 + info.hCm / 2) * px; // bottom edge ~20 cm above the sofa back
-    }
-    const [l, t, r, b] = info.box;
-    const bw = (r - l) * info.nw, bh = (b - t) * info.nh;
-    const s = Math.max(g.artW / bw, g.artH / bh);
-    g.artX = cx - g.artW / 2; g.artY = cy - g.artH / 2;
-    g.imgW = info.nw * s; g.imgH = info.nh * s;
-    g.imgX = -l * info.nw * s - (bw * s - g.artW) / 2;
-    g.imgY = -t * info.nh * s - (bh * s - g.artH) / 2;
-    return g;
-  }
-
-  closeRoomState() {
-    if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
-    return { roomOpen: false, roomBg: '', roomPos: null };
   }
 
   // Hero "live paint": the painting drifts very slowly, and drops ripple across it like across wet paint —
@@ -1509,12 +1380,7 @@ class Component extends DCLogic {
     } catch (e) {}
     this.applyLang();
     this.onKey = (e) => {
-      if (e.key === 'Escape') {
-        if (this.state.roomOpen) { this.setState(this.closeRoomState()); return; }
-        this.setState({ activeId: null, projIdx: null, drawer: false, menuOpen: false });
-        return;
-      }
-      if (this.state.roomOpen) return;
+      if (e.key === 'Escape') { this.setState({ activeId: null, projIdx: null, drawer: false, menuOpen: false }); return; }
       if (this.state.projIdx !== null && e.key === 'ArrowRight') this.stepProj(1);
       else if (this.state.projIdx !== null && e.key === 'ArrowLeft') this.stepProj(-1);
       else if (this.state.activeId && e.key === 'ArrowRight') this.step(1);
@@ -1566,10 +1432,7 @@ class Component extends DCLogic {
       if (s !== this.state.showTop) this.setState({ showTop: s });
     };
     window.addEventListener('scroll', this.onWinScroll, { passive: true });
-    this.onResize = () => {
-      if (this.state.menuOpen && window.innerWidth > 1180) this.setState({ menuOpen: false });
-      if (this.state.roomOpen) this.setState({ roomTick: this.state.roomTick + 1 });
-    };
+    this.onResize = () => { if (this.state.menuOpen && window.innerWidth > 1180) this.setState({ menuOpen: false }); };
     window.addEventListener('resize', this.onResize);
     this.initLivePaint();
     this.initAmbient();
@@ -1593,7 +1456,6 @@ class Component extends DCLogic {
     if (this.onScrollFx) { window.removeEventListener('scroll', this.onScrollFx); window.removeEventListener('resize', this.onScrollFx); }
     if (this._headIO) this._headIO.disconnect();
     window.removeEventListener('beforeprint', this.onPrint);
-    if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
     if (this._chan && this._sb) { this._sb.removeChannel(this._chan); this._chan = null; }
     document.body.style.overflow = '';
   }
@@ -1610,11 +1472,9 @@ class Component extends DCLogic {
     const loaded = this.state.dataMode !== 'loading';
     const workOpen = !!(this.state.activeId && this.find(this.state.activeId));
     const projOpen = this.state.projIdx !== null && !!this.visibleProjects()[this.state.projIdx];
-    const roomOpen = this.state.roomOpen && workOpen && !!(this._rooms[this.find(this.state.activeId).img] || {}).ok;
     if (loaded && this.state.activeId && !workOpen) { this.setState({ activeId: null }); return; }
     if (loaded && this.state.projIdx !== null && !projOpen) { this.setState({ projIdx: null }); return; }
-    if (this.state.roomOpen && !roomOpen) { this.setState(this.closeRoomState()); return; }
-    const lock = !!(this.state.menuOpen || this.state.drawer || workOpen || projOpen || roomOpen);
+    const lock = !!(this.state.menuOpen || this.state.drawer || workOpen || projOpen);
     if (lock !== this._locked) { this._locked = lock; document.body.style.overflow = lock ? 'hidden' : ''; }
     const aid = this.state.activeId || null;
     if (aid !== (this._hashWork || null)) {
@@ -1622,9 +1482,7 @@ class Component extends DCLogic {
       if (aid) { if (!this._hashWork) this._hashBack = location.hash; history.replaceState(null, '', '#work-' + aid); }
       else history.replaceState(null, '', this._hashBack || (location.pathname + location.search));
       this._hashWork = aid;
-      if (this.state.roomOpen) this.setState(this.closeRoomState());
     }
-    if (aid) this.ensureRoomInfo(this.find(aid));
     const c = JSON.stringify(this.state.cart);
     if (c !== this._savedCart) { this._savedCart = c; try { localStorage.setItem('ko_cart', c); } catch (e) {} }
   }
@@ -1761,10 +1619,6 @@ class Component extends DCLogic {
     const paper = this.visible(this.posts()).map(g => this.card(g, 'p', l));
     const boxes = this.visible(this.boxes()).map(g => this.card(g, 'b', l));
     const customIntro = l === 'en' ? this.setting('projects_intro_en') : this.setting('projects_intro');
-    const roomInfo = a ? this._rooms[a.img] : null;
-    const roomOk = !!(roomInfo && roomInfo.ok);
-    const rg = (roomOk && this.state.roomOpen) ? this.roomGeom(roomInfo) : null;
-    const r1 = (v) => (rg ? Math.round(v * 10) / 10 : 0);
     return {
       rootRef: this.rootRef,
       aboutImg1: this.setting('about_img1') || 'img/kate-01.webp',
@@ -1773,7 +1627,6 @@ class Component extends DCLogic {
       interiorImg2: this.setting('interior_img2') || 'img/paint-03-w1100.webp',
       heroRef: this.heroRef,
       heroCanvasRef: this.heroCanvasRef,
-      roomArtRef: this.roomArtRef,
       ribbon: this.props.showCollabRibbon ?? true,
       langLabel: l === 'ua' ? 'EN' : 'UA',
       toggleLang: () => {
@@ -1884,8 +1737,6 @@ class Component extends DCLogic {
       aYear: a ? a.year : '',
       aPrice: a ? this.priceText(a.price) : '',
       aCanBuy: !!a && a.price > 0,
-      aRoomOk: roomOk,
-      lTryWall: L.tryWall,
       lShare: L.share,
       shareWork: async () => {
         if (!a) return;
@@ -1910,59 +1761,6 @@ class Component extends DCLogic {
         el.style.setProperty('--so', '0');
       },
 
-      roomOpen: !!rg,
-      roomOwn: !!rg && rg.own,
-      roomPreset: !!rg && !rg.own,
-      roomBg: this.state.roomBg,
-      roomImg: a ? a.img : '',
-      roomWallColor: this.WALLS[this.state.roomWall].c,
-      roomFloorH: rg ? rg.floorH : 0,
-      roomBaseH: rg ? rg.baseH : 0,
-      sofaX: rg ? r1(rg.sofa.x) : 0, sofaBottom: rg ? r1(rg.sofa.b) : 0, sofaW: rg ? r1(rg.sofa.w) : 0, sofaH: rg ? r1(rg.sofa.h) : 0,
-      artX: rg ? r1(rg.artX) : 0, artY: rg ? r1(rg.artY) : 0, artW: rg ? r1(rg.artW) : 0, artH: rg ? r1(rg.artH) : 0,
-      imgX: rg ? r1(rg.imgX) : 0, imgY: rg ? r1(rg.imgY) : 0, imgW: rg ? r1(rg.imgW) : 0, imgH: rg ? r1(rg.imgH) : 0,
-      roomNote: rg ? (rg.own ? L.ownHint : L.trueScale + ' · ' + this.fmtSize(roomInfo.wCm + '×' + roomInfo.hCm, l) + ' · ' + L.sofa) : '',
-      roomSwatches: this.WALLS.map((w, i) => ({ i, color: w.c, label: l === 'en' ? w.en : w.ua, on: !this.state.roomBg && i === this.state.roomWall })),
-      roomScale: this.state.roomScale,
-      lOwnWall: L.ownWall,
-      openRoom: () => this.setState({ roomOpen: true, roomPos: null }),
-      closeRoom: () => this.setState(this.closeRoomState()),
-      roomSetWall: (e) => {
-        if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
-        this.setState({ roomWall: Number(e.currentTarget.dataset.i), roomBg: '', roomPos: null });
-      },
-      roomUpload: (e) => {
-        const f = e.target.files && e.target.files[0];
-        if (!f) return;
-        if (this.state.roomBg) URL.revokeObjectURL(this.state.roomBg);
-        this.setState({ roomBg: URL.createObjectURL(f), roomPos: null, roomScale: 26 });
-        e.target.value = '';
-      },
-      roomScaleInput: (e) => this.setState({ roomScale: Number(e.target.value) }),
-      roomDragStart: (e) => {
-        const el = this.roomArtRef.current;
-        if (!el) return;
-        e.preventDefault();
-        const r = el.getBoundingClientRect();
-        const off = { x: e.clientX - (r.left + r.width / 2), y: e.clientY - (r.top + r.height / 2) };
-        let pos = null;
-        el.style.cursor = 'grabbing';
-        const move = (ev) => {
-          pos = { x: ev.clientX - off.x, y: ev.clientY - off.y };
-          el.style.left = (pos.x - r.width / 2) + 'px';
-          el.style.top = (pos.y - r.height / 2) + 'px';
-        };
-        const up = () => {
-          window.removeEventListener('pointermove', move);
-          window.removeEventListener('pointerup', up);
-          window.removeEventListener('pointercancel', up);
-          el.style.cursor = '';
-          if (pos) this.setState({ roomPos: pos });
-        };
-        window.addEventListener('pointermove', move);
-        window.addEventListener('pointerup', up);
-        window.addEventListener('pointercancel', up);
-      },
       addToCart: () => this.addToCartSku('w' + this.state.activeId),
       askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»'); },
       addSku: (e) => { e.stopPropagation(); this.addToCartSku(e.currentTarget.dataset.sku); },
