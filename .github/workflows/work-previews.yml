@@ -1,10 +1,11 @@
 # Builds w/<id>.html + w/<id>.jpg link-preview pages for every visible painting (see .github/scripts/work-previews.mjs)
 # and commits them to main, which redeploys GitHub Pages. Nothing is committed when nothing changed.
+# GitHub runs the schedule as the user who last changed the cron line — commit changes to it from the owner account.
 name: Work previews
 
 on:
   schedule:
-    - cron: '7,37 * * * *' # every 30 min: new/edited works get their preview within about half an hour
+    - cron: '3,33 * * * *' # every 30 min: new/edited works get their preview within about half an hour
   workflow_dispatch: # Actions → Work previews → Run workflow (instant update)
   repository_dispatch: # optional: a Supabase webhook can call this on every items change
     types: [items-changed]
