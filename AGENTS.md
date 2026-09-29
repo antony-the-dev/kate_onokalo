@@ -24,6 +24,8 @@ Content is managed by the artist herself through a Supabase-backed admin panel �
 | `404.html` | GitHub Pages 404: `w/<id>(.html)` without a built page → `../#work-<id>`; else "not found" + home link (JS-computed base). |
 | `support.js` | DC runtime (generated — don't edit). |
 | `img/` | WebP assets, favicons, `og-1200.jpg` (link-preview image). |
+| `fonts/` | Self-hosted Cormorant Garamond + Commissioner (variable woff2, Cyrillic/Latin/Latin-ext only) + `fonts.css` + OFL licences. No Google Fonts requests. `index.html` preloads the two Cyrillic files; `admin.html` links `fonts.css` too. |
+| `sitemap.xml`, `robots.txt` | Sitemap with the one indexable URL (submit in Search Console); robots.txt only matters once there is a custom domain. |
 | `ДОКУМЕНТАЦІЯ.md`, `ІНСТРУКЦІЯ-ДЛЯ-КАТЕРИНИ.md` | Handover docs (UA). |
 
 ## Supabase data model
@@ -86,6 +88,7 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - `image-slot.js` was removed; no longer used. The horizontal «Стіна» (wall) carousel was removed too (replaced by halls).
 - The root wrapper uses `.dc-root { overflow-x: clip }` — `overflow-x: hidden` there breaks the sticky header.
 - Overlays (`.dc-modal`) re-declare the light-text palette for dark theme via CSS variables; don't reintroduce `#artModal` attribute selectors.
+- SEO in the static `<head>`: `canonical`, hero-image preload (`fetchpriority="high"`), JSON-LD `WebSite` + `Person` (address Ніжин, sameAs Instagram/Telegram/Etsy — the Etsy URL is hardcoded there, keep it in sync with settings `etsy_url`). All of these, plus `sitemap.xml`/`robots.txt`, carry the absolute GitHub Pages URL — update them together with `og:url` on a domain change.
 - Title/description/OG tags live in the static `<head>` (crawlers don't run JS, `<helmet>` is runtime-only); `og:url`/`og:image` are absolute GitHub Pages URLs — update them if a custom domain is added. `<head>` also preconnects to the Supabase host.
 - Nav switches to the burger at ≤1270px (7 items incl. the «Магазин ▾» dropdown = Листівки і закладинки + Брендована продукція, shown when either has items; 8 flat items didn't fit even at 1440). The phone menu stays a flat list.
 - `.gitignore`: `.DS_Store`, `uploads/`, `.image-slots.state.json`, `node_modules/`. `uploads/` was untracked.

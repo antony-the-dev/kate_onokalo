@@ -1,0 +1,5 @@
+# Crawlers read robots.txt only at a domain root — this file takes effect once the site has its own domain.
+User-agent: *
+Allow: /
+
+Sitemap: https://antony-the-dev.github.io/kate_onokalo/sitemap.xml
