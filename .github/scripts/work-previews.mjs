@@ -117,7 +117,8 @@ function page(it, v) {
 }
 
 const items = await loadItems();
-const works = items.filter(it => it && it.id && it.img && !it.hidden && !['postcards', 'boxes', 'projects'].includes(it.cat)
+// same split as index.html → applyRows: every other category is a painting
+const works = items.filter(it => it && it.id && it.img && !it.hidden && !['postcards', 'boxes', 'projects', 'workshops'].includes(it.cat)
   && /^[A-Za-z0-9-]+$/.test(String(it.id)));
 await fs.mkdir(OUT, { recursive: true });
 let manifest = {};

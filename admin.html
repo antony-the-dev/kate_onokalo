@@ -75,8 +75,9 @@
     <div class="tabs" id="tabs">
       <button class="tab active" data-cat="paintings">Картини</button>
       <button class="tab" data-cat="postcards">Листівки і закладинки</button>
-      <button class="tab" data-cat="boxes">Подарункові бокси</button>
+      <button class="tab" data-cat="boxes">Брендована продукція</button>
       <button class="tab" data-cat="projects">Реалізовані проєкти</button>
+      <button class="tab" data-cat="workshops">Майстер-класи</button>
       <button class="tab" data-cat="halls">Зали</button>
       <button class="tab" data-cat="page">Сторінка</button>
       <button class="tab" data-cat="settings">Налаштування</button>
@@ -108,8 +109,9 @@
     <label>Розділ<select id="edCat">
       <option value="paintings">Картини</option>
       <option value="postcards">Листівки і закладинки</option>
-      <option value="boxes">Подарункові бокси</option>
+      <option value="boxes">Брендована продукція</option>
       <option value="projects">Реалізовані проєкти (тільки фото)</option>
+      <option value="workshops">Майстер-класи (тільки фото)</option>
     </select></label>
     <div id="fMain">
       <div class="grid2">
@@ -173,7 +175,10 @@ const CFG = window.SUPABASE_CONFIG || {};
 const CONFIG_OK = CFG.url && CFG.anonKey;
 const BUCKET = "items";
 const TOOLS = /[?&]tools\b/.test(location.search);
-const NEW_TITLE = { paintings: "Нова картина", postcards: "Нова листівка", boxes: "Новий бокс", projects: "Нове фото" };
+const NEW_TITLE = { paintings: "Нова картина", postcards: "Нова листівка", boxes: "Новий товар", projects: "Нове фото", workshops: "Нове фото" };
+// Photo-only sections: no title/price, photos are added several at a time.
+const PHOTO_ONLY = ["projects", "workshops"];
+const photoOnly = (c) => PHOTO_ONLY.includes(c);
 
 // English names of the original built-in halls (used when a hall has no English name in the «Зали» tab).
 const HALLS = {
@@ -359,7 +364,7 @@ async function saveItem() {
   if (!(await requireAuth())) return;
   const id = editingId || newId();
   const icat = $("#edCat").value;
-  const isProj = icat === "projects";
+  const isProj = photoOnly(icat);
   const file = $("#edImg").files[0];
   const titleUa = $("#edTua").value.trim();
   const oldImg = editingId ? ($("#edPrev").dataset.current || "") : "";
@@ -410,19 +415,19 @@ async function deleteItem(d) {
   toast("Видалено" + (err ? " (фото не стерлося: " + (err.message || "помилка") + ")" : ""));
 }
 
-async function addProjectPhotos(files) {
+async function addPhotos(files, c) {
   if (busy || !files.length) return;
   if (!(await requireAuth())) return;
   busy = true;
   $("#addBtn").disabled = true;
   let done = 0, failed = 0;
-  let order = nextOrder("projects");
+  let order = nextOrder(c);
   for (const f of files) {
     toast("Завантажую фото " + (done + failed + 1) + " з " + files.length + "…", true);
     const id = newId();
     try {
       const img = await uploadPhoto(id, f);
-      const { error } = await sb.from("items").upsert(Object.assign(blankRow(id, "projects"), { img, sort_order: order++ }), { onConflict: "id" });
+      const { error } = await sb.from("items").upsert(Object.assign(blankRow(id, c), { img, sort_order: order++ }), { onConflict: "id" });
       if (error) { await removeFiles(storagePaths(id, img)); throw error; }
       done++;
     } catch (e) {
@@ -444,7 +449,7 @@ function renderList(data) {
     el.innerHTML = '<p class="muted">Тут поки порожньо. Натисніть «' + esc($("#addBtn").textContent) + '».</p>';
     return;
   }
-  const isProj = cat === "projects";
+  const isProj = photoOnly(cat);
   el.innerHTML = list.map((d, i) => {
     const title = d.title || (isProj ? "Фото " + (i + 1) : "");
     const sub = isProj ? "" : [d.size, cat === "paintings" ? (d.hall || "без зали") : ""].filter(Boolean).join(" · ");
@@ -503,7 +508,7 @@ function bindOps(el) {
 }
 
 function applyCatFields(c) {
-  const proj = c === "projects";
+  const proj = photoOnly(c);
   $("#fMain").style.display = proj ? "none" : "";
   $("#fTech").style.display = proj ? "none" : "";
   $("#fDesc").style.display = proj ? "none" : "";
@@ -628,51 +633,106 @@ function fillPage(el) {
 }
 
 // The list of texts is read from the live index.html (every element with data-en), so it never goes stale.
+// Texts are grouped by where they stand on the page and labelled by what they are (menu item, title, small
+// label, text), so a paragraph doesn't end up in a menu item or a small label.
+const TEXT_PLACES = {
+  top: "Головний екран", halls: "Зали", paper: "Листівки", boxes: "Брендована продукція", projects: "Реалізовані проєкти",
+  about: "Про мене", interior: "В інтер'єрі", order: "На замовлення", workshops: "Майстер-класи",
+  collab: "Мерч і колаборації", contact: "Контакти"
+};
+let textItems = [];
+
+// Same rule as index.html → textKey().
+function textKey(n, ua) {
+  return n.getAttribute("data-key") || ((n.closest(".dc-nav, .dc-mmenu") ? "menu:" : "") + ua);
+}
+
+function textPlace(n) {
+  if (n.closest(".dc-nav, .dc-mmenu")) return "Меню";
+  if (n.closest(".dc-ribbon")) return "Стрічка над меню";
+  if (n.closest("header")) return "Шапка";
+  const sec = n.closest("section[id]");
+  if (sec) return TEXT_PLACES[sec.id] || sec.id;
+  return "Вікна картини й кошика";
+}
+
+function textRole(n) {
+  const tag = n.tagName.toLowerCase(), st = n.getAttribute("style") || "";
+  if (n.closest(".dc-nav, .dc-mmenu")) return "пункт меню";
+  if (tag === "h1" || tag === "h2") return "заголовок";
+  if (/uppercase/.test(st)) return "дрібний підпис великими літерами";
+  if (tag === "p") return "текст";
+  if (tag === "a" || tag === "button") return "кнопка / посилання";
+  return "підзаголовок";
+}
+
 async function loadTexts() {
   const box = $("#txtList");
   let html;
   try { html = await (await fetch("index.html", { cache: "no-store" })).text(); } catch (e) { box.innerHTML = '<p class="muted">Не вдалося завантажити тексти.</p>'; return; }
   if (!$("#txtList")) return;
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const seen = new Set(), items = [];
+  const byKey = new Map();
   doc.querySelectorAll("[data-en]").forEach((n) => {
     const ua = n.textContent;
-    if (!ua.trim() || seen.has(ua)) return;
-    seen.add(ua);
-    items.push({ ua, en: n.getAttribute("data-en") || "" });
+    if (!ua.trim()) return;
+    const key = textKey(n, ua);
+    const seen = byKey.get(key);
+    if (seen) { seen.count++; return; }
+    byKey.set(key, { key, ua, en: n.getAttribute("data-en") || "", place: textPlace(n), role: textRole(n), count: 1 });
   });
+  // grouped by place, places in page order (the phone menu comes later in the markup than the header)
+  const all = [...byKey.values()];
+  const places = [...new Set(all.map(t => t.place))];
+  const items = textItems = places.flatMap(pl => all.filter(t => t.place === pl));
   const edits = textEdits();
+  let lastPlace = "";
   box.innerHTML = items.map((it, i) => {
-    const e = edits[it.ua] || {};
-    return `<div class="txt" data-i="${i}" style="border-top:1px solid rgba(27,26,22,.12); padding:14px 0;">
+    const e = edits[it.key] || {};
+    const head = it.place !== lastPlace ? `<h3 class="txt-place" style="font-family:Georgia,serif; font-weight:400; font-size:17px; margin:22px 0 2px;">${esc(it.place)}</h3>` : "";
+    lastPlace = it.place;
+    const where = it.role + (it.count > 1 ? (it.role === "пункт меню" ? " · у меню на комп'ютері й на телефоні" : " · стоїть у " + it.count + " місцях, зміниться всюди") : "");
+    return `${head}<div class="txt" data-i="${i}" style="border-top:1px solid rgba(27,26,22,.12); padding:12px 0 14px;">
+      <div class="muted" style="font-size:12.5px; margin-bottom:6px;">${esc(where)}</div>
       <div class="grid2">
-        <label>Українською<textarea rows="2" data-ua placeholder="${esc(it.ua)}">${esc(e.ua || "")}</textarea></label>
-        <label>English<textarea rows="2" data-en placeholder="${esc(it.en)}">${esc(e.en || "")}</textarea></label>
+        <label>Українською<textarea rows="${it.ua.length > 90 ? 4 : 2}" data-ua placeholder="${esc(it.ua)}">${esc(e.ua || "")}</textarea></label>
+        <label>English<textarea rows="${it.ua.length > 90 ? 4 : 2}" data-en placeholder="${esc(it.en)}">${esc(e.en || "")}</textarea></label>
       </div>
       <button class="btn btn-line" data-save="${i}">Зберегти</button>
     </div>`;
   }).join("");
   box.querySelectorAll("[data-save]").forEach((b) => b.addEventListener("click", () => {
     const row = b.closest(".txt"), it = items[Number(b.dataset.save)];
-    saveText(it.ua, row.querySelector("[data-ua]").value.trim(), row.querySelector("[data-en]").value.trim());
+    const ua = row.querySelector("[data-ua]").value.trim(), en = row.querySelector("[data-en]").value.trim();
+    // a whole paragraph pasted into a menu item or a small label breaks the page — ask first
+    const long = (v) => v.length > Math.max(60, it.ua.length * 3);
+    if (it.ua.length <= 40 && (long(ua) || long(en)) && !confirm("Це поле — «" + it.ua + "» (" + it.place + ", " + it.role + "). Новий текст значно довший — точно сюди?\n\nДовгий текст пишіть у поле «текст» потрібного розділу.")) return;
+    saveText(it.key, ua, en);
   }));
   const find = $("#txtFind");
   const filter = () => {
     const q = find.value.trim().toLowerCase();
     box.querySelectorAll(".txt").forEach((row) => {
       const it = items[Number(row.dataset.i)];
-      const hay = (it.ua + " " + it.en + " " + row.querySelector("[data-ua]").value + " " + row.querySelector("[data-en]").value).toLowerCase();
+      const hay = (it.ua + " " + it.en + " " + it.place + " " + row.querySelector("[data-ua]").value + " " + row.querySelector("[data-en]").value).toLowerCase();
       row.style.display = !q || hay.includes(q) ? "" : "none";
+    });
+    box.querySelectorAll(".txt-place").forEach((h) => {
+      let n = h.nextElementSibling, any = false;
+      while (n && n.classList.contains("txt")) { if (n.style.display !== "none") any = true; n = n.nextElementSibling; }
+      h.style.display = any ? "" : "none";
     });
   };
   find.addEventListener("input", filter);
   filter();
 }
 
-async function saveText(ua, newUa, newEn) {
+async function saveText(key, newUa, newEn) {
   if (!(await requireAuth())) return;
   const edits = textEdits();
-  if (newUa || newEn) edits[ua] = { ua: newUa, en: newEn }; else delete edits[ua];
+  if (newUa || newEn) edits[key] = { ua: newUa, en: newEn }; else delete edits[key];
+  // drop edits of texts that are no longer on the page (they never show anywhere)
+  if (textItems.length) { const live = new Set(textItems.map(t => t.key)); Object.keys(edits).forEach((k) => { if (!live.has(k)) delete edits[k]; }); }
   const value = JSON.stringify(edits);
   const { error } = await sb.from("settings").upsert([{ key: "texts", value }], { onConflict: "key" });
   if (error) { toast("Помилка: " + error.message); return; }
@@ -722,6 +782,16 @@ function fillExtra(el) {
       <button class="btn btn-dark" id="stIntroSave" ${settingsOk ? "" : "disabled"}>Зберегти текст</button>
     </div>`;
     $("#stIntroSave").addEventListener("click", () => saveSettings({ projects_intro: $("#stIntro").value.trim(), projects_intro_en: $("#stIntroEn").value.trim() }));
+  } else if (cat === "workshops") {
+    el.innerHTML = `<div class="card">
+      <h2>Текст про майстер-класи</h2>
+      <p class="muted" style="margin-bottom:14px;">Показується на сайті в розділі «Майстер-класи» над фото, поруч із кнопкою «Замовити майстер-клас». Порожнє поле — стандартний текст («Проводжу виїзні майстер-класи з живопису…»). Фото додавайте кнопкою «Додати фото» нижче — можна кілька одразу.</p>
+      ${settingsOk ? "" : SETTINGS_NOTE}
+      <label style="margin-top:12px;">Українською<textarea id="stWs" rows="4" placeholder="Проводжу виїзні майстер-класи з живопису — приїжджаю до вас: додому, в офіс, кафе чи на свято…">${esc(settings.workshops_intro)}</textarea></label>
+      <label>Англійською (необов.)<textarea id="stWsEn" rows="3">${esc(settings.workshops_intro_en)}</textarea></label>
+      <button class="btn btn-dark" id="stWsSave" ${settingsOk ? "" : "disabled"}>Зберегти текст</button>
+    </div>`;
+    $("#stWsSave").addEventListener("click", () => saveSettings({ workshops_intro: $("#stWs").value.trim(), workshops_intro_en: $("#stWsEn").value.trim() }));
   } else if (cat === "settings") {
     const legacy = rows.filter(r => r.img && !isOptimized(r.img));
     el.innerHTML = `<div class="card">
@@ -960,14 +1030,14 @@ $("#addBtn").addEventListener("click", () => {
   if (cat === "halls") {
     window._heOrder = halls.reduce((m, h) => Math.max(m, h.sort_order || 0), 0) + 1;
     openHallEditor(null);
-  } else if (cat === "projects") {
+  } else if (photoOnly(cat)) {
     $("#multiImg").value = "";
     $("#multiImg").click();
   } else {
     openEditor(null);
   }
 });
-$("#multiImg").addEventListener("change", () => addProjectPhotos([...$("#multiImg").files]));
+$("#multiImg").addEventListener("change", () => addPhotos([...$("#multiImg").files], cat));
 $("#edClose").addEventListener("click", closeEditor);
 $("#edCancel").addEventListener("click", closeEditor);
 $("#edSave").addEventListener("click", saveItem);
@@ -986,7 +1056,7 @@ $$("#tabs .tab").forEach(t => t.addEventListener("click", () => {
   $$("#tabs .tab").forEach(x => x.classList.remove("active"));
   t.classList.add("active");
   cat = t.dataset.cat;
-  $("#addBtn").textContent = cat === "halls" ? "Додати залу" : cat === "projects" ? "Додати фото" : "Додати";
+  $("#addBtn").textContent = cat === "halls" ? "Додати залу" : photoOnly(cat) ? "Додати фото" : "Додати";
   render();
 }));
 

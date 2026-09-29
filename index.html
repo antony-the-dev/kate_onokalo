@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Катерина Онокало — абстрактний живопис, авторські картини</title>
-<meta name="description" content="Катерина Онокало — українська художниця. Авторські картини в наявності, листівки, подарункові бокси. Олія та акрил, 15 років, 1200 робіт. Картина на замовлення.">
+<meta name="description" content="Катерина Онокало — українська художниця. Авторські картини в наявності, листівки, брендована продукція. Олія та акрил, 15 років, 1200 робіт. Картина на замовлення, виїзні майстер-класи.">
 <meta name="theme-color" content="#E9E4DC">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="uk_UA">
 <meta property="og:site_name" content="Катерина Онокало">
 <meta property="og:title" content="Катерина Онокало — абстрактний живопис">
-<meta property="og:description" content="Авторські картини в наявності, листівки та подарункові бокси. Олія та акрил. Картина на замовлення з авторським ескізом.">
+<meta property="og:description" content="Авторські картини в наявності, листівки та брендована продукція. Олія та акрил. Картина на замовлення з авторським ескізом, виїзні майстер-класи.">
 <meta property="og:url" content="https://antony-the-dev.github.io/kate_onokalo/">
 <meta property="og:image" content="https://antony-the-dev.github.io/kate_onokalo/img/og-1200.jpg">
 <meta property="og:image:width" content="1200">
@@ -145,6 +145,15 @@
   .dc-proj figure { break-inside: avoid; margin: 0 0 clamp(10px, 1.6vw, 22px); cursor: zoom-in; overflow: hidden; background: var(--cream2); }
   .dc-proj img { display: block; width: 100%; height: auto; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
   .dc-proj figure:hover img { transform: scale(1.03); }
+  /* Master-class photos: a swipeable strip, each photo at its own proportions. No .dc-reveal inside —
+     the strip is a scroll container, so a view() timeline would stick. */
+  .dc-strip { display: flex; gap: clamp(10px, 1.4vw, 18px); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior-x: contain; }
+  .dc-strip::-webkit-scrollbar { display: none; }
+  .dc-strip figure { flex: none; margin: 0; height: clamp(250px, 36vw, 520px); scroll-snap-align: start; cursor: zoom-in; overflow: hidden; background: rgba(233,228,220,.06); }
+  .dc-strip img { display: block; height: 100%; width: auto; max-width: none; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
+  .dc-strip figure:hover img { transform: scale(1.03); }
+  .dc-strip-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  @media (hover: none) { .dc-strip-nav { display: none; } }
   .dc-fit { position: relative; width: min(100%, calc(74vh * var(--r, 1))); aspect-ratio: var(--r, 1); box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
   .dc-lbfit { position: relative; flex: none; width: min(100%, calc((100vh - 200px) * var(--r, 1))); width: min(100%, calc((100svh - 200px) * var(--r, 1))); aspect-ratio: var(--r, 1); box-shadow: 0 50px 90px -30px rgba(0,0,0,.7); }
   .dc-fit > img, .dc-lbfit > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; object-fit: contain; }
@@ -176,13 +185,13 @@
   .dc-h { opacity: 0; filter: blur(10px); transform: translateY(14px); transition: opacity .9s ease, filter .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
   .dc-h.on { opacity: 1; filter: none; transform: none; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-  @media (max-width: 1180px) {
+  @media (max-width: 1270px) {
     .dc-nav { display: none !important; }
     .dc-burger { display: inline-flex !important; align-items: center; justify-content: center; }
     .dc-header-inner { display: grid !important; grid-template-columns: 44px 1fr auto; justify-content: normal !important; gap: 10px; }
     .dc-logo { justify-self: center; }
   }
-  @media (min-width: 1181px) {
+  @media (min-width: 1271px) {
     .dc-mmenu { display: none !important; }
   }
   .dc-cart-ico { display: none; }
@@ -203,7 +212,7 @@
   <div class="dc-light" aria-hidden="true"></div>
 
   <sc-if value="{{ ribbon }}" hint-placeholder-val="{{ true }}">
-    <div style="background: var(--navy-bg); color: var(--cream-text); padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
+    <div class="dc-ribbon" style="background: var(--navy-bg); color: var(--cream-text); padding: 9px 24px; display: flex; justify-content: center; gap: 14px; align-items: baseline; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 300;">
       <span data-en="Open to collaborations — merch, prints, joint projects">Відкрита до колаборацій — мерч, принти, спільні проєкти</span>
       <a href="#collab" style="color: var(--lgold); border-bottom: 1px solid rgba(199,161,122,.4);" data-en="Details">Детальніше</a>
     </div>
@@ -229,9 +238,19 @@
           </div>
         </div>
         <sc-if value="{{ hasProjects }}"><a href="#projects" data-en="Projects">Реалізовані</a></sc-if>
-        <sc-if value="{{ hasPaper }}"><a href="#paper" data-en="Postcards">Листівки</a></sc-if>
-        <sc-if value="{{ hasBoxes }}"><a href="#boxes" data-en="Gift boxes">Бокси</a></sc-if>
+        <sc-if value="{{ hasShop }}">
+          <div class="dc-dd">
+            <a href="{{ shopHref }}" class="dc-dd-toggle" data-en="Shop">Магазин</a>
+            <div class="dc-dd-menu">
+              <div class="dc-dd-box">
+                <sc-if value="{{ hasPaper }}"><a href="#paper" data-en="Postcards &amp; bookmarks">Листівки і закладинки</a></sc-if>
+                <sc-if value="{{ hasBoxes }}"><a href="#boxes" data-en="Branded goods">Брендована продукція</a></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
         <a href="#order" data-en="Commission">На замовлення</a>
+        <a href="#workshops" data-en="Workshops">Майстер-класи</a>
         <a href="#about" data-en="About">Про мене</a>
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
@@ -271,9 +290,10 @@
           <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
         </sc-if>
         <sc-if value="{{ hasBoxes }}">
-          <a href="#boxes" onClick="{{ closeMenu }}" data-en="Gift boxes" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Бокси</a>
+          <a href="#boxes" onClick="{{ closeMenu }}" data-en="Branded goods" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Брендована продукція</a>
         </sc-if>
         <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
+        <a href="#workshops" onClick="{{ closeMenu }}" data-en="Workshops" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Майстер-класи</a>
         <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
         <a href="#contact" onClick="{{ closeMenu }}" data-en="Contact" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Контакти</a>
       </nav>
@@ -452,8 +472,8 @@
     <section id="boxes" data-recede="1" style="border-top: 1px solid var(--border);">
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
         <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
-          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Gifts">Подарунки</div>
-          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gift boxes">Подарункові бокси</h2>
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Merch">Мерч</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Branded goods">Брендована продукція</h2>
           <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 12px 0 0;" data-en="In stock — ships within 2–3 days.">У наявності — відправка за 2–3 дні.</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 280px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
@@ -518,10 +538,11 @@
         </div>
       </div>
       <div>
-        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 24px;" data-en="About me">Про мене</div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 24px;" data-key="about:Про мене" data-en="About me">Про мене</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 56px); line-height: 1.08; margin: 0 0 28px;" data-en="I paint so that a room starts to breathe">Я малюю так, щоб кімната почала дихати</h2>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 46ch; margin: 0 0 18px; text-wrap: pretty;" data-en="Kateryna Onokalo. I have been painting for fifteen years — mostly abstraction, oil and acrylic, often with a palette knife.">Катерина Онокало. Малюю п’ятнадцять років — переважно абстракцію, олією та акрилом, часто мастихіном.</p>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 46ch; margin: 0 0 34px; text-wrap: pretty;" data-en="Over 1200 works now live in homes, cafés and offices. I care that a painting feels at home wherever it ends up.">Понад 1200 робіт уже живуть у домах, кафе й офісах. Мені важливо, щоб картині було добре там, де вона оселиться.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="Kateryna Onokalo. I have been painting for fifteen years, mostly in contemporary abstract techniques. I work with acrylic and oil paints, watercolour, texture pastes and pastel.">Катерина Онокало. Малюю вже п’ятнадцять років, переважно в сучасних абстрактних техніках. У своїх роботах використовую акрилові та олійні фарби, акварель, текстурні пасти й пастель.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="More than 1200 of my works already live in homes, cafés and offices. It matters to me that a painting feels at home wherever it settles, and that it becomes an extension of your character and personality, telling something about you as its owner.">Понад 1200 моїх робіт уже живуть у домівках, кафе й офісах. Для мене важливо, щоб картині було добре там, де вона оселиться, а також щоб вона стала продовженням вашого характеру й особистості, розповідала про вас як про її власника.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 34px; text-wrap: pretty;" data-en="I am truly passionate about my work. Decorating your homes is not just painting for me, it is a whole philosophy. I believe a painting can do more than complement an interior: it can fill it with a special atmosphere, convey a mood and make a space truly yours.">Я щиро горю своєю професією. Для мене прикрашання ваших осель — це не просто малювання, а ціла філософія. Я вірю, що картина здатна не лише доповнити інтер’єр, а й наповнити його особливою атмосферою, передати настрій і зробити простір по-справжньому вашим.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 26px; padding-top: 26px; border-top: 1px solid var(--lnav-b); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--lmut);">
           <span data-en="Oil · Acrylic · Palette knife">Олія · Акрил · Мастихін</span>
           <span data-en="Ships across Ukraine and abroad">Доставка Україною і за кордон</span>
@@ -602,6 +623,32 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section id="workshops" data-recede="1" style="background: var(--navy-bg); color: var(--ltext);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 26px 48px; margin-bottom: clamp(30px, 4vw, 52px);">
+        <div style="max-width: 60ch;">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 22px;" data-en="Workshops">Майстер-класи</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 24px;" data-en="On-site painting workshops">Виїзні майстер-класи з живопису</h2>
+          <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); margin: 0; text-wrap: pretty; white-space: pre-line;">{{ wsIntro }}</p>
+        </div>
+        <button onClick="{{ askWorkshop }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #C7A17A;">{{ lWsOrder }}</button>
+      </div>
+      <sc-if value="{{ hasWsPhotos }}">
+        <div class="dc-strip" ref="{{ wsStripRef }}">
+          <sc-for list="{{ wsPhotos }}" as="p">
+            <figure data-ws="{{ p.i }}" onClick="{{ openWs }}" tabindex="0" role="button" aria-label="{{ p.alt }}">
+              <img src="{{ p.thumb }}" alt="{{ p.alt }}" width="{{ p.w }}" height="{{ p.h }}" loading="lazy" decoding="async">
+            </figure>
+          </sc-for>
+        </div>
+        <div class="dc-strip-nav">
+          <button onClick="{{ wsPrev }}" aria-label="Попередні фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟵</button>
+          <button onClick="{{ wsNext }}" aria-label="Наступні фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟶</button>
+        </div>
+      </sc-if>
     </div>
   </section>
 
@@ -737,7 +784,7 @@
         <button onClick="{{ projPrev }}" aria-label="Попереднє фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #E4DED4;">⟵</button>
         <span style="min-width: 64px; text-align: center; font-size: 11px; letter-spacing: .22em; color: var(--lmut);">{{ pCounter }}</span>
         <button onClick="{{ projNext }}" aria-label="Наступне фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: #E4DED4;">⟶</button>
-        <button onClick="{{ askProj }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lSimilar }}</button>
+        <button onClick="{{ askProj }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: #C7A17A;">{{ lbAction }}</button>
       </div>
       <button onClick="{{ closeProj }}" aria-label="Закрити" style="position: fixed; top: 22px; right: 24px; width: 46px; height: 46px; border-radius: 999px; background: rgba(233,228,220,.1); border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 17px; cursor: pointer; line-height: 1;" style-hover="background: rgba(233,228,220,.2);">✕</button>
     </div>
@@ -801,12 +848,13 @@ class Component extends DCLogic {
   rootRef = React.createRef();
   heroRef = React.createRef();
   heroCanvasRef = React.createRef();
+  wsStripRef = React.createRef();
   fName = React.createRef();
   fContact = React.createRef();
   fIdea = React.createRef();
 
   state = {
-    lang: 'ua', activeId: null, projIdx: null, cart: [], drawer: false, toast: '', menuOpen: false,
+    lang: 'ua', activeId: null, projIdx: null, lbKind: 'projects', cart: [], drawer: false, toast: '', menuOpen: false,
     paints: null, postcards: null, boxes: null, projects: null, halls: null, settings: {},
     dataMode: (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) ? 'loading' : 'demo',
     hall: /^#hall-/.test(location.hash) ? location.hash.slice(1) : null,
@@ -885,6 +933,9 @@ class Component extends DCLogic {
       repeatMsg: 'Вітаю! Хочу замовити роботу, як у ваших реалізованих проєктах.',
       similarMsg: 'Вітаю! Хочу замовити роботу, як ця з ваших реалізованих проєктів:',
       projAlt: 'Реалізований проєкт',
+      wsIntro: 'Проводжу виїзні майстер-класи з живопису — приїжджаю до вас: додому, в офіс, кафе чи на свято. Напишіть, де, коли і скільки буде учасників, — запропоную формат і розповім деталі.',
+      wsOrder: 'Замовити майстер-клас', wsAlt: 'Майстер-клас',
+      wsMsg: 'Вітаю! Хочу замовити виїзний майстер-клас.\nДе: \nКоли: \nСкільки учасників: ',
       projIntro: 'Ці роботи вже живуть у своїх власників. Будь-яку з них я можу написати для вас ще раз — у вашому розмірі, зі змінами в кольорах чи деталях.',
       etsy: 'Живете за кордоном? Можна замовити й через мій магазин на Etsy ↗',
       share: 'Поділитися', linkCopied: 'Посилання скопійовано',
@@ -904,6 +955,9 @@ class Component extends DCLogic {
       repeatMsg: 'Hello! I would like to commission a piece like the ones in your completed projects.',
       similarMsg: 'Hello! I would like to commission a piece like this one from your completed projects:',
       projAlt: 'Completed project',
+      wsIntro: 'I run on-site painting workshops — I come to you: a home, an office, a café or a celebration. Tell me where, when and how many people there will be, and I will suggest a format and share the details.',
+      wsOrder: 'Book a workshop', wsAlt: 'Workshop',
+      wsMsg: 'Hello! I would like to book an on-site workshop.\nWhere: \nWhen: \nNumber of people: ',
       projIntro: 'These works already live with their owners. I can paint any of them again for you — in your size, with changes to the colours or details.',
       etsy: 'Outside Ukraine? You can also order via my Etsy shop ↗',
       share: 'Share', linkCopied: 'Link copied',
@@ -938,6 +992,9 @@ class Component extends DCLogic {
   }
   visible(list) { return list.filter(x => !x.hidden).sort(this.byOrder); }
   visibleProjects() { return this.visible(this.state.projects || []).filter(p => p.img); }
+  visibleWorkshops() { return this.visible(this.state.workshops || []).filter(p => p.img); }
+  // Photos shown in the full-screen lightbox: completed projects or master-class photos.
+  lbList() { return this.state.lbKind === 'workshops' ? this.visibleWorkshops() : this.visibleProjects(); }
   loc(it, l) { return (it && it[l] && it[l].t) ? it[l] : (it ? it.ua : {}); }
   setting(k) { return (this.state.settings && this.state.settings[k]) || ''; }
   etsyUrl() { const u = this.setting('etsy_url').trim(); return /^https?:\/\//i.test(u) ? u : ''; }
@@ -1297,7 +1354,7 @@ class Component extends DCLogic {
   }
 
   applyRows(rows) {
-    const paints = [], postcards = [], boxes = [], projects = [];
+    const paints = [], postcards = [], boxes = [], projects = [], workshops = [];
     rows.forEach((r) => {
       const item = {
         id: r.id, img: r.img || '', thumb: this.thumbOf(r.img), price: r.price || 0, year: r.year || '',
@@ -1308,9 +1365,10 @@ class Component extends DCLogic {
       if (r.cat === 'postcards') postcards.push(item);
       else if (r.cat === 'boxes') boxes.push(item);
       else if (r.cat === 'projects') projects.push(item);
+      else if (r.cat === 'workshops') workshops.push(item);
       else paints.push(item);
     });
-    this.setState({ paints, postcards, boxes, projects });
+    this.setState({ paints, postcards, boxes, projects, workshops });
   }
 
   translit(s) {
@@ -1636,8 +1694,10 @@ class Component extends DCLogic {
       if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.closest) {
         const art = e.target.closest('[data-art]');
         const proj = e.target.closest('[data-proj]');
+        const ws = e.target.closest('[data-ws]');
         if (art) { e.preventDefault(); this.setState({ activeId: String(art.dataset.art) }); }
-        else if (proj) { e.preventDefault(); this.setState({ projIdx: Number(proj.dataset.proj) }); }
+        else if (proj) { e.preventDefault(); this.setState({ projIdx: Number(proj.dataset.proj), lbKind: 'projects' }); }
+        else if (ws) { e.preventDefault(); this.setState({ projIdx: Number(ws.dataset.ws), lbKind: 'workshops' }); }
       }
     };
     window.addEventListener('keydown', this.onKey);
@@ -1686,7 +1746,7 @@ class Component extends DCLogic {
       if (s !== this.state.showTop) this.setState({ showTop: s });
     };
     window.addEventListener('scroll', this.onWinScroll, { passive: true });
-    this.onResize = () => { if (this.state.menuOpen && window.innerWidth > 1180) this.setState({ menuOpen: false }); };
+    this.onResize = () => { if (this.state.menuOpen && window.innerWidth > 1270) this.setState({ menuOpen: false }); };
     window.addEventListener('resize', this.onResize);
     this.initLivePaint();
     this.initAmbient();
@@ -1729,7 +1789,7 @@ class Component extends DCLogic {
     }
     const loaded = this.state.dataMode !== 'loading';
     const workOpen = !!(this.state.activeId && this.find(this.state.activeId));
-    const projOpen = this.state.projIdx !== null && !!this.visibleProjects()[this.state.projIdx];
+    const projOpen = this.state.projIdx !== null && !!this.lbList()[this.state.projIdx];
     if (loaded && this.state.activeId && !workOpen) { this.setState({ activeId: null }); return; }
     if (loaded && this.state.projIdx !== null && !projOpen) { this.setState({ projIdx: null }); return; }
     const lock = !!(this.state.menuOpen || this.state.drawer || workOpen || projOpen);
@@ -1756,6 +1816,13 @@ class Component extends DCLogic {
     return this._edits || {};
   }
 
+  // Key of a site text in settings.texts — the same rule as in admin.html (textKey): menu items are their own
+  // texts ("menu:<text>"), so renaming a menu item can't change a section title with the same words and back;
+  // data-key overrides it (the about eyebrow has one: an old edit of «Про мене» once put a paragraph into it).
+  textKey(el, ua) {
+    return el.getAttribute('data-key') || ((el.closest('.dc-nav, .dc-mmenu') ? 'menu:' : '') + ua);
+  }
+
   applyLang() {
     const r = this.rootRef.current;
     if (!r) return;
@@ -1764,7 +1831,7 @@ class Component extends DCLogic {
     document.documentElement.lang = en ? 'en' : 'uk';
     r.querySelectorAll('[data-en]').forEach(el => {
       if (!el.hasAttribute('data-ua')) el.setAttribute('data-ua', el.textContent);
-      const ua = el.getAttribute('data-ua'), o = edits[ua] || {};
+      const ua = el.getAttribute('data-ua'), o = edits[this.textKey(el, ua)] || {};
       const t = en ? (o.en || el.getAttribute('data-en')) : (o.ua || ua);
       if (el.textContent !== t) el.textContent = t;
     });
@@ -1786,9 +1853,16 @@ class Component extends DCLogic {
   }
 
   stepProj(dir) {
-    const n = this.visibleProjects().length;
+    const n = this.lbList().length;
     if (!n || this.state.projIdx === null) return;
     this.setState({ projIdx: (this.state.projIdx + dir + n) % n });
+  }
+
+  scrollStrip(dir) {
+    const el = this.wsStripRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' });
   }
 
   swipe(e, fn) {
@@ -1871,8 +1945,11 @@ class Component extends DCLogic {
     const aGroup = a ? this.groupOf(a.id, groups) : null;
     const aDims = a ? this.dims(a.img) : {};
     const projs = this.visibleProjects();
+    const wss = this.visibleWorkshops();
+    const lbWs = this.state.lbKind === 'workshops';
+    const lb = lbWs ? wss : projs;
     const pi = this.state.projIdx;
-    const pa = (pi !== null && projs[pi]) ? projs[pi] : null;
+    const pa = (pi !== null && lb[pi]) ? lb[pi] : null;
     const paDims = pa ? this.dims(pa.img) : {};
     const lines = this.cartLines(l);
     const etsy = this.etsyUrl();
@@ -1964,11 +2041,13 @@ class Component extends DCLogic {
       paper,
       hasBoxes: boxes.length > 0,
       boxes,
+      hasShop: paper.length > 0 || boxes.length > 0,
+      shopHref: paper.length ? '#paper' : '#boxes',
 
       hasProjects: projs.length > 0,
       projIntro: customIntro || L.projIntro,
       projects: projs.map((p, i) => { const d = this.dims(p.img); return { i, thumb: p.thumb || p.img, w: d.w, h: d.h, alt: (this.loc(p, l).t || L.projAlt) }; }),
-      openProj: (e) => this.setState({ projIdx: Number(e.currentTarget.dataset.proj) }),
+      openProj: (e) => this.setState({ projIdx: Number(e.currentTarget.dataset.proj), lbKind: 'projects' }),
       closeProj: () => this.setState({ projIdx: null }),
       projPrev: () => this.stepProj(-1),
       projNext: () => this.stepProj(1),
@@ -1976,12 +2055,22 @@ class Component extends DCLogic {
       pImg: pa ? pa.img : '',
       pThumb: pa ? (pa.thumb || pa.img) : '',
       pRatio: (paDims.w && paDims.h) ? (paDims.w / paDims.h).toFixed(4) : '1',
-      pAlt: pa ? (this.loc(pa, l).t || L.projAlt) : '',
-      pCounter: pa ? (pi + 1) + ' / ' + projs.length : '',
-      askProj: () => { if (pa) this.openTg(L.similarMsg + '\n' + pa.img); },
+      pAlt: pa ? (this.loc(pa, l).t || (lbWs ? L.wsAlt : L.projAlt)) : '',
+      pCounter: pa ? (pi + 1) + ' / ' + lb.length : '',
+      askProj: () => { if (pa) this.openTg(lbWs ? L.wsMsg : L.similarMsg + '\n' + pa.img); },
+      lbAction: lbWs ? L.wsOrder : L.similar,
+
+      wsIntro: (l === 'en' ? this.setting('workshops_intro_en') : this.setting('workshops_intro')) || L.wsIntro,
+      lWsOrder: L.wsOrder,
+      askWorkshop: () => this.openTg(L.wsMsg),
+      hasWsPhotos: wss.length > 0,
+      wsPhotos: wss.map((p, i) => { const d = this.dims(p.img); return { i, thumb: p.thumb || p.img, w: d.w, h: d.h, alt: (this.loc(p, l).t || L.wsAlt) }; }),
+      wsStripRef: this.wsStripRef,
+      openWs: (e) => this.setState({ projIdx: Number(e.currentTarget.dataset.ws), lbKind: 'workshops' }),
+      wsPrev: () => this.scrollStrip(-1),
+      wsNext: () => this.scrollStrip(1),
       askRepeat: () => this.openTg(L.repeatMsg),
       lRepeat: L.repeat,
-      lSimilar: L.similar,
       swipeStart: (e) => { const t = e.touches && e.touches[0]; this._touch = t ? { x: t.clientX, y: t.clientY } : null; },
       swipeProj: (e) => this.swipe(e, (d) => this.stepProj(d)),
       swipeWork: (e) => this.swipe(e, (d) => this.step(d)),
