@@ -576,7 +576,7 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 240px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
           <sc-for list="{{ paper }}" as="it" hint-placeholder-count="4">
             <div class="dc-reveal" style="display: flex; flex-direction: column; min-width: 0;">
-              <div class="dc-frame" style="cursor: default;">
+              <div class="dc-frame" data-art="{{ it.aid }}" onClick="{{ openWork }}" tabindex="0" role="button" aria-label="{{ it.title }}">
                 <sc-if value="{{ it.hasImg }}">
                   <img src="{{ it.img }}" alt="{{ it.title }}" width="{{ it.w }}" height="{{ it.h }}" loading="lazy" decoding="async">
                 </sc-if>
@@ -613,7 +613,7 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 280px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
           <sc-for list="{{ boxes }}" as="it" hint-placeholder-count="3">
             <div class="dc-reveal" style="display: flex; flex-direction: column; min-width: 0;">
-              <div class="dc-frame" style="cursor: default;">
+              <div class="dc-frame" data-art="{{ it.aid }}" onClick="{{ openWork }}" tabindex="0" role="button" aria-label="{{ it.title }}">
                 <sc-if value="{{ it.hasImg }}">
                   <img src="{{ it.img }}" alt="{{ it.title }}" width="{{ it.w }}" height="{{ it.h }}" loading="lazy" decoding="async">
                 </sc-if>
@@ -921,7 +921,7 @@
           </sc-if>
           <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 24px;">
             <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 3vw, 38px);">{{ aPrice }}</div>
-            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldim);">{{ lOne }}</div>
+            <div style="font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldim);">{{ aNote }}</div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 12px;">
             <sc-if value="{{ aCanBuy }}">
@@ -930,7 +930,7 @@
             <button onClick="{{ askTg }}" style="background: none; color: var(--ltext); border: 1px solid var(--lnav-b); padding: 15px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="border-color: #E4DED4;">{{ lAsk }}</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 18px; color: var(--lgold);">
-            <button class="dc-linkbtn" onClick="{{ shareWork }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 13v6.5h14V13"/></svg>{{ lShare }}</button>
+            <sc-if value="{{ aCanShare }}"><button class="dc-linkbtn" onClick="{{ shareWork }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 13v6.5h14V13"/></svg>{{ lShare }}</button></sc-if>
           </div>
           <div style="display: flex; gap: 22px; margin-top: 34px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--lmut);">
             <button onClick="{{ prevWork }}" style="background: none; border: none; color: inherit; font: inherit; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; padding: 8px 0;" style-hover="color: #E4DED4;">⟵ {{ lPrev }}</button>
@@ -1107,6 +1107,7 @@ class Component extends DCLogic {
       projIntro: 'Ці роботи вже живуть у своїх власників. Будь-яку з них я можу написати для вас ще раз — у вашому розмірі, зі змінами в кольорах чи деталях.',
       etsy: 'Живете за кордоном? Можна замовити й через мій магазин на Etsy ↗',
       share: 'Поділитися', linkCopied: 'Посилання скопійовано',
+      paperName: 'Листівки і закладинки', boxesName: 'Брендована продукція', inStock: 'В наявності',
       orderHead: 'Вітаю! Хочу замовити:', totalLine: 'Разом: ',
       commHead: 'Вітаю! Хочу замовити картину.', name: 'Ім’я: ', contact: 'Контакт: ', idea: 'Ідея: ', mailSubj: 'Запит на картину на замовлення' },
     en: { size: 'Size', tech: 'Technique', year: 'Year', one: 'One of a kind', add: 'Add to cart', ask: 'Ask in Telegram',
@@ -1129,6 +1130,7 @@ class Component extends DCLogic {
       projIntro: 'These works already live with their owners. I can paint any of them again for you — in your size, with changes to the colours or details.',
       etsy: 'Outside Ukraine? You can also order via my Etsy shop ↗',
       share: 'Share', linkCopied: 'Link copied',
+      paperName: 'Postcards & bookmarks', boxesName: 'Branded goods', inStock: 'In stock',
       orderHead: 'Hello! I would like to order:', totalLine: 'Total: ',
       commHead: 'Hello! I would like to commission a painting.', name: 'Name: ', contact: 'Contact: ', idea: 'Idea: ', mailSubj: 'Commission request' }
   };
@@ -1922,7 +1924,7 @@ class Component extends DCLogic {
         const art = e.target.closest('[data-art]');
         const proj = e.target.closest('[data-proj]');
         const ws = e.target.closest('[data-ws]');
-        if (art) { e.preventDefault(); this.setState({ activeId: String(art.dataset.art) }); }
+        if (art && art.dataset.art) { e.preventDefault(); this.setState({ activeId: String(art.dataset.art) }); }
         else if (proj) { e.preventDefault(); this.setState({ projIdx: Number(proj.dataset.proj), lbKind: 'projects' }); }
         else if (ws) { e.preventDefault(); this.setState({ projIdx: Number(ws.dataset.ws), lbKind: 'workshops' }); }
       }
@@ -2016,7 +2018,7 @@ class Component extends DCLogic {
     if (loaded && this.state.projIdx !== null && !projOpen) { this.setState({ projIdx: null }); return; }
     const lock = !!(this.state.menuOpen || this.state.drawer || workOpen || projOpen);
     if (lock !== this._locked) { this._locked = lock; document.body.style.overflow = lock ? 'hidden' : ''; }
-    const aid = this.state.activeId || null;
+    const aid = (this.state.activeId && this.kindOf(this.state.activeId) === 'w') ? this.state.activeId : null;
     if (aid !== (this._hashWork || null)) {
       // Keep the open work in the URL (#work-<id>) without adding history entries; restore the hall link on close.
       if (aid) { if (!this._hashWork) this._hashBack = location.hash; history.replaceState(null, '', '#work-' + aid); }
@@ -2073,19 +2075,30 @@ class Component extends DCLogic {
     });
   }
 
+  // The work modal also shows postcards and branded goods: their activeId is "p:<id>" / "b:<id>";
+  // a painting's is its plain id (that is what #work-<id> links carry).
+  kindOf(id) { const s = String(id || ''); return /^[pb]:/.test(s) ? s.charAt(0) : 'w'; }
+
   find(id) {
-    const s = String(id);
-    return this.paints().find(x => String(x.id) === s) || null;
+    const s = String(id), k = this.kindOf(s);
+    if (k === 'w') return this.paints().find(x => String(x.id) === s) || null;
+    const raw = s.slice(2);
+    return (k === 'p' ? this.posts() : this.boxes()).find(x => String(x.id) === raw) || null;
   }
 
-  // Prev/next inside the hall of the open work.
+  // Prev/next inside the hall of the open work, or among the goods of the same section.
   step(dir) {
-    const g = this.groupOf(this.state.activeId);
-    const arr = g ? g.works : this.visible(this.paints());
-    if (!arr.length) return;
-    const i = arr.findIndex(x => String(x.id) === String(this.state.activeId));
-    const n = (i + dir + arr.length) % arr.length;
-    this.setState({ activeId: String(arr[n].id) });
+    const cur = String(this.state.activeId), k = this.kindOf(cur);
+    let ids;
+    if (k === 'w') {
+      const g = this.groupOf(cur);
+      ids = (g ? g.works : this.visible(this.paints())).map(x => String(x.id));
+    } else {
+      ids = this.visible(k === 'p' ? this.posts() : this.boxes()).filter(x => x.img).map(x => k + ':' + x.id);
+    }
+    if (!ids.length) return;
+    const n = (ids.indexOf(cur) + dir + ids.length) % ids.length;
+    this.setState({ activeId: ids[n] });
   }
 
   stepProj(dir) {
@@ -2132,6 +2145,7 @@ class Component extends DCLogic {
     const buy = it.price > 0;
     return {
       id: String(it.id), sku: prefix + it.id, img, hasImg: !!img, noImg: !img, w: d.w, h: d.h,
+      aid: img ? (prefix === 'w' ? String(it.id) : prefix + ':' + it.id) : '', // what the card opens in the work modal
       title: t.t || '', size: this.fmtSize(t.size, l),
       meta: [t.tech, this.fmtSize(t.size, l), it.year].filter(Boolean).join(' · '),
       priceText: this.priceText(it.price), canBuy: buy, onRequest: !buy
@@ -2178,6 +2192,7 @@ class Component extends DCLogic {
     const tint = (i, al) => (pal ? this.rgba(pal[i % pal.length], this.state.theme === 'dark' ? al * 1.5 : al) : 'transparent');
     const a = this.state.activeId ? this.find(this.state.activeId) : null;
     const av = a ? this.loc(a, l) : null;
+    const aKind = a ? this.kindOf(this.state.activeId) : 'w';
     const aGroup = a ? this.groupOf(a.id, groups) : null;
     const aDims = a ? this.dims(a.img) : {};
     const projs = this.visibleProjects();
@@ -2317,7 +2332,7 @@ class Component extends DCLogic {
       swipeProj: (e) => this.swipe(e, (d) => this.stepProj(d)),
       swipeWork: (e) => this.swipe(e, (d) => this.step(d)),
 
-      openWork: (e) => this.setState({ activeId: String(e.currentTarget.dataset.art) }),
+      openWork: (e) => { const id = String(e.currentTarget.dataset.art || ''); if (id) this.setState({ activeId: id }); },
       closeWork: () => this.setState({ activeId: null }),
       prevWork: () => this.step(-1),
       nextWork: () => this.step(1),
@@ -2326,7 +2341,9 @@ class Component extends DCLogic {
       aThumb: a ? (a.thumb || a.img) : '',
       aRatio: (aDims.w && aDims.h) ? (aDims.w / aDims.h).toFixed(4) : '1',
       aTitle: av ? av.t : '',
-      aHall: aGroup ? this.hallText(aGroup, l).t : '',
+      aHall: aKind === 'p' ? L.paperName : aKind === 'b' ? L.boxesName : (aGroup ? this.hallText(aGroup, l).t : ''),
+      aNote: aKind === 'w' ? L.one : L.inStock,
+      aCanShare: aKind === 'w',
       aDesc: av ? av.d : '',
       aSize: av ? this.fmtSize(av.size, l) : '',
       aTech: av ? av.tech : '',
@@ -2358,8 +2375,11 @@ class Component extends DCLogic {
         el.style.setProperty('--so', '0');
       },
 
-      addToCart: () => this.addToCartSku('w' + this.state.activeId),
-      askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»\n' + this.workLink(a.id)); },
+      addToCart: () => {
+        const id = String(this.state.activeId);
+        this.addToCartSku(aKind === 'w' ? 'w' + id : aKind + id.slice(2));
+      },
+      askTg: () => { if (av) this.openTg(L.askMsg + '«' + av.t + '»' + (aKind === 'w' ? '\n' + this.workLink(a.id) : '')); },
       addSku: (e) => { e.stopPropagation(); this.addToCartSku(e.currentTarget.dataset.sku); },
       askWork: (e) => {
         e.stopPropagation();
@@ -2401,7 +2421,7 @@ class Component extends DCLogic {
         this.flash(L.copied);
       },
       toast: this.state.toast,
-      lSize: L.size, lTech: L.tech, lYear: L.year, lOne: L.one, lAdd: L.add, lAsk: L.ask,
+      lSize: L.size, lTech: L.tech, lYear: L.year, lAdd: L.add, lAsk: L.ask,
       lPrev: L.prev, lNext: L.next, lCart: L.cart, lEmpty: L.empty, lTotal: L.total,
       lCheckout: L.checkout, lCheckoutNote: L.note
     };
