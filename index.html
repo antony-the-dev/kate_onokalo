@@ -359,6 +359,7 @@
         <span class="dc-logo-sub" style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--muted); padding-left: 2px; white-space: nowrap;">Kateryna · Fine Art</span>
       </a>
       <nav class="dc-nav" style="display: flex; align-items: center; gap: clamp(14px, 1.7vw, 30px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3);">
+        <a href="#about" data-en="About">Про мене</a>
         <div class="dc-dd">
           <a href="#halls" class="dc-dd-toggle" data-en="Halls">Зали</a>
           <div class="dc-dd-menu">
@@ -370,7 +371,7 @@
             </div>
           </div>
         </div>
-        <sc-if value="{{ hasProjects }}"><a href="#projects" data-en="Projects">Реалізовані</a></sc-if>
+        <a href="#order" data-en="Commission">На замовлення</a>
         <sc-if value="{{ hasShop }}">
           <div class="dc-dd">
             <a href="{{ shopHref }}" class="dc-dd-toggle" data-en="Shop">Магазин</a>
@@ -382,9 +383,8 @@
             </div>
           </div>
         </sc-if>
-        <a href="#order" data-en="Commission">На замовлення</a>
         <a href="#workshops" data-en="Workshops">Майстер-класи</a>
-        <a href="#about" data-en="About">Про мене</a>
+        <sc-if value="{{ hasProjects }}"><a href="#projects" data-en="Projects">Реалізовані</a></sc-if>
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
       <div class="dc-hright" style="display: flex; align-items: center; gap: 18px; flex: none;">
@@ -410,24 +410,24 @@
         <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer;">✕</button>
       </div>
       <nav aria-label="Меню" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
+        <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
         <a href="#halls" onClick="{{ closeMenu }}" data-en="Halls" style="padding: 14px 0 8px; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Зали</a>
         <div style="display: flex; flex-direction: column; padding: 0 0 12px 4px; border-bottom: 1px solid var(--border);">
           <sc-for list="{{ hallNav }}" as="h">
             <a href="{{ h.href }}" onClick="{{ closeMenu }}" style="display: flex; gap: 12px; align-items: baseline; padding: 8px 0; font-family: 'Cormorant Garamond', serif; font-size: 20px; line-height: 1.2; color: var(--ink2);" style-hover="color: #B4501C;"><span style="flex: none; min-width: 28px; font-size: 12px; letter-spacing: .22em; color: var(--terracotta);">{{ h.num }}</span><span>{{ h.title }}</span></a>
           </sc-for>
         </div>
-        <sc-if value="{{ hasProjects }}">
-          <a href="#projects" onClick="{{ closeMenu }}" data-en="Completed projects" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Реалізовані проєкти</a>
-        </sc-if>
+        <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
         <sc-if value="{{ hasPaper }}">
           <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
         </sc-if>
         <sc-if value="{{ hasBoxes }}">
           <a href="#boxes" onClick="{{ closeMenu }}" data-en="Branded goods" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Брендована продукція</a>
         </sc-if>
-        <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
         <a href="#workshops" onClick="{{ closeMenu }}" data-en="Workshops" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Майстер-класи</a>
-        <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
+        <sc-if value="{{ hasProjects }}">
+          <a href="#projects" onClick="{{ closeMenu }}" data-en="Completed projects" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Реалізовані проєкти</a>
+        </sc-if>
         <a href="#contact" onClick="{{ closeMenu }}" data-en="Contact" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Контакти</a>
       </nav>
     </div>
@@ -686,10 +686,12 @@
       </div>
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 24px;" data-key="about:Про мене" data-en="About me">Про мене</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 56px); line-height: 1.08; margin: 0 0 28px;" data-en="I paint so that a room starts to breathe">Я малюю так, щоб кімната почала дихати</h2>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="Kateryna Onokalo. I have been painting for fifteen years, mostly in contemporary abstract techniques. I work with acrylic and oil paints, watercolour, texture pastes and pastel.">Катерина Онокало. Малюю вже п’ятнадцять років, переважно в сучасних абстрактних техніках. У своїх роботах використовую акрилові та олійні фарби, акварель, текстурні пасти й пастель.</p>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="More than 1200 of my works already live in homes, cafés and offices. It matters to me that a painting feels at home wherever it settles, and that it becomes an extension of your character and personality, telling something about you as its owner.">Понад 1200 моїх робіт уже живуть у домівках, кафе й офісах. Для мене важливо, щоб картині було добре там, де вона оселиться, а також щоб вона стала продовженням вашого характеру й особистості, розповідала про вас як про її власника.</p>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 34px; text-wrap: pretty;" data-en="I am truly passionate about my work. Decorating your homes is not just painting for me, it is a whole philosophy. I believe a painting can do more than complement an interior: it can fill it with a special atmosphere, convey a mood and make a space truly yours.">Я щиро горю своєю професією. Для мене прикрашання ваших осель — це не просто малювання, а ціла філософія. Я вірю, що картина здатна не лише доповнити інтер’єр, а й наповнити його особливою атмосферою, передати настрій і зробити простір по-справжньому вашим.</p>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 56px); line-height: 1.08; margin: 0 0 28px;" data-en="Hi, I’m Kateryna Onokalo">Привіт, я Катерина Онокало</h2>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="I have been painting all my life. My path began in childhood, at art school, and it continues to this day.">Я малюю все своє життя. Мій шлях розпочався ще в дитинстві, з художньої школи, і триває досі.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="My calling is to bring your dreams and ideas to life on canvas and to create a special atmosphere with paintings into which I put my soul, experience and craft.">Моє покликання — втілювати ваші мрії та ідеї на полотні, створювати особливу атмосферу за допомогою картин, у які я вкладаю свою душу, досвід і майстерність.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="In 15 years in the profession I have gained a great deal of experience and worked in the most varied techniques and materials. Today more than 1200 of my canvases live in homes, cafés and offices, bringing comfort and inspiring their owners.">За 15 років у професії я здобула великий досвід і працювала в найрізноманітніших техніках та з різними матеріалами. Сьогодні понад 1200 моїх полотен живуть у домівках, кафе та офісах, створюючи затишок і надихаючи своїх власників.</p>
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); max-width: 52ch; margin: 0 0 18px; text-wrap: pretty;" data-en="I am truly passionate about what I do. Every painting is special to me, because each one keeps a piece of my soul and a small story.">Я щиро горю своєю справою. Для мене кожна картина — по-справжньому особлива, адже в кожній залишається частинка моєї душі та маленька історія.</p>
+        <p class="dc-coda" style="color: var(--ltext); max-width: 52ch; margin: 26px 0 34px;" data-en="I create paintings that do more than decorate a space — they become its mood, its character and an extension of the people who live in it.">Я створюю картини, які не просто прикрашають простір, а стають його настроєм, характером і продовженням людей, які в ньому живуть.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 26px; padding-top: 26px; border-top: 1px solid var(--lnav-b); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--lmut);">
           <span data-en="Oil · Acrylic · Palette knife">Олія · Акрил · Мастихін</span>
           <span data-en="Ships across Ukraine and abroad">Доставка Україною і за кордон</span>
@@ -846,7 +848,7 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(32px, 5vw, 70px); align-items: end;">
         <div>
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 22px;" data-en="Contact">Контакти</div>
-          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4.2vw, 58px); line-height: 1.05; margin: 0 0 22px;" data-en="Write to me — I answer myself">Напишіть мені — відповідаю сама</h2>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4.2vw, 58px); line-height: 1.05; margin: 0 0 22px;" data-en="Write to me">Напишіть мені</h2>
           <p style="font-size: 15.5px; line-height: 1.7; color: var(--ltext2); max-width: 40ch; margin: 0;" data-en="Telegram is fastest. Tell me the work you like or the size you need, and I will send everything available.">Найшвидше — у Telegram. Скажіть, яка робота сподобалась або який розмір потрібен, і я надішлю все, що є.</p>
         </div>
         <div style="display: flex; flex-direction: column; gap: 2px;">

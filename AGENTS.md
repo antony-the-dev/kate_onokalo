@@ -97,6 +97,7 @@ Storage bucket **`items`** (public). Uploads are named `<itemId>/<base36 stamp>-
 - Overlays (`.dc-modal`) re-declare the light-text palette for dark theme via CSS variables; don't reintroduce `#artModal` attribute selectors.
 - SEO in the static `<head>`: `canonical`, hero-image preload (`fetchpriority="high"`), JSON-LD `WebSite` + `Person` (address Ніжин, sameAs Instagram/Telegram/Etsy — the Etsy URL is hardcoded there, keep it in sync with settings `etsy_url`). All of these, plus `sitemap.xml`/`robots.txt`, carry the absolute GitHub Pages URL — update them together with `og:url` on a domain change.
 - Title/description/OG tags live in the static `<head>` (crawlers don't run JS, `<helmet>` is runtime-only); `og:url`/`og:image` are absolute GitHub Pages URLs — update them if a custom domain is added. `<head>` also preconnects to the Supabase host.
+- Menu order is Kateryna's (2026-09-30): Про мене · Зали · На замовлення · Магазин · Майстер-класи · Реалізовані · Контакти — on desktop and in the phone menu; it intentionally differs from the order of the sections on the page.
 - Nav switches to the burger at ≤1270px (7 items incl. the «Магазин ▾» dropdown = Листівки і закладинки + Брендована продукція, shown when either has items; 8 flat items didn't fit even at 1440). The phone menu stays a flat list.
 - `.gitignore`: `.DS_Store`, `uploads/`, `.image-slots.state.json`, `node_modules/`. `uploads/` was untracked.
 - Supabase anonKey is public — committing `supabase-config.js` is fine. Never commit admin password.
