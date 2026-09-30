@@ -209,14 +209,14 @@ function page(it, v, group, more, moreTitle) {
     return `<a href="${esc(String(w.id))}.html"><span class="frame"><img src="${esc(rel(thumbOf(w.img)))}" alt="${esc(titleOf(w))}"${t ? ` width="${t.w}" height="${t.h}"` : ''} loading="lazy" decoding="async"></span><span class="t">${esc(titleOf(w))}</span><span class="p">${esc(w.price > 0 ? money(w.price) : 'Ціна за запитом')}</span></a>`;
   };
   return `<!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(pageTitle)}</title>
 <meta name="description" content="${esc(metaDesc)}">
 <meta name="robots" content="max-image-preview:large">
-<meta name="theme-color" content="#E9E4DC">
+<meta name="theme-color" content="#0A1C3B">
 <link rel="canonical" href="${esc(self)}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="uk_UA">
@@ -233,7 +233,7 @@ function page(it, v, group, more, moreTitle) {
 <link rel="apple-touch-icon" href="../img/favicon-180.png">
 <link rel="preload" href="${esc(rel(it.img))}" as="image" fetchpriority="high">
 <link rel="stylesheet" href="../fonts/fonts.css">
-<script>try{if(localStorage.getItem('ko_theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+<script>try{if(localStorage.getItem('ko_theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 <style>${CSS}</style>
 </head>

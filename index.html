@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Катерина Онокало — абстрактний живопис, авторські картини</title>
 <meta name="description" content="Катерина Онокало — українська художниця. Авторські картини в наявності, листівки, брендована продукція. Олія та акрил, 15 років, 1200 робіт. Картина на замовлення, виїзні майстер-класи.">
-<meta name="theme-color" content="#E9E4DC">
+<meta name="theme-color" content="#0A1C3B">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="uk_UA">
 <meta property="og:site_name" content="Катерина Онокало">
@@ -70,7 +70,8 @@
  ]
 }
 </script>
-<script>try{if(localStorage.getItem('ko_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name="theme-color"]').setAttribute('content','#0A1C3B');}}catch(e){}</script>
+<!-- Dark theme by default (set on <html> above, so it holds without JS too); light only if the visitor chose it with ☀. -->
+<script>try{if(localStorage.getItem('ko_theme')==='light'){document.documentElement.setAttribute('data-theme','light');document.querySelector('meta[name="theme-color"]').setAttribute('content','#E9E4DC');}}catch(e){}</script>
 <!-- React from the site itself: support.js then skips its unpkg download (no CDN, no visitor IPs to third parties). -->
 <script src="vendor/react.production.min.js"></script>
 <script src="vendor/react-dom.production.min.js"></script>
@@ -167,6 +168,20 @@
   .dc-frame:hover img, .dc-hallcard:hover .dc-frame img { transform: scale(1.025); }
   .dc-frame-empty { width: 100%; height: 100%; background: var(--cream3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta); }
   .dc-hallcard:hover .dc-hallgo { color: var(--terracotta); }
+  /* A hall card reads as a set of works, not one painting: «Зала I · 8 картин» above, and the next works of the hall
+     stacked behind the cover like a deck of canvases (same axis, each further one up-right and dimmer). */
+  .dc-hallcap { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; padding-bottom: 12px; margin-bottom: clamp(14px, 1.6vw, 22px); border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .dc-hallno { color: var(--terracotta); }
+  .dc-stack { position: relative; }
+  .dc-stack .dc-front { position: relative; z-index: 2; }
+  .dc-stack[data-n="2"] .dc-front, .dc-stack[data-n="3"] .dc-front { max-width: 84%; max-height: 86%; margin-right: 12%; }
+  .dc-stack .dc-back { position: absolute; left: 44%; bottom: 0; max-width: 84%; max-height: 86%; filter: brightness(.55) saturate(.8); transition: transform .8s cubic-bezier(.2,.7,.2,1), filter .8s ease; }
+  .dc-stack .dc-back[data-i="0"] { z-index: 1; transform: translate(-43%, -5%); }
+  .dc-stack .dc-back[data-i="1"] { z-index: 0; transform: translate(-36%, -10%); }
+  .dc-hallcard:hover .dc-stack .dc-back { filter: brightness(.7) saturate(.9); }
+  .dc-hallcard:hover .dc-stack .dc-back[data-i="0"] { transform: translate(-41%, -7%); }
+  .dc-hallcard:hover .dc-stack .dc-back[data-i="1"] { transform: translate(-32%, -14%); }
+  .dc-hallcard:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 6px; }
   .dc-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
   .dc-chips::-webkit-scrollbar { display: none; }
   .dc-chip { flex: none; display: inline-flex; align-items: center; min-height: 40px; white-space: nowrap; border: 1px solid var(--border); border-radius: 999px; padding: 0 18px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink3); }
@@ -443,7 +458,7 @@
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Available">В наявності</div>
           <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gallery halls">Зали галереї</h2>
         </div>
-        <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 40ch; margin: 0;" data-en="Everything in the halls is in stock or ready to ship within 2–3 days.">Усе, що в залах, — у наявності або буде готове до відправки за 2–3 дні.</p>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 44ch; margin: 0;" data-en="The paintings hang in themed halls — open a hall to see every work in it. Everything is in stock or ready to ship within 2–3 days.">Картини розвішані по тематичних залах — відкрийте залу, щоб побачити всі роботи в ній. Усе в наявності або буде готове до відправки за 2–3 дні.</p>
       </div>
 
       <sc-if value="{{ dataLoading }}">
@@ -462,17 +477,18 @@
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(44%, 250px), 1fr)); gap: clamp(34px, 3.6vw, 52px) clamp(14px, 2vw, 32px); align-items: start;">
         <sc-for list="{{ hallCards }}" as="h" hint-placeholder-count="4">
-          <a href="{{ h.href }}" class="dc-hallcard dc-reveal" style="display: flex; flex-direction: column; min-width: 0; color: var(--ink);">
-            <div class="dc-frame">
-              <img src="{{ h.cover }}" alt="{{ h.title }}" width="{{ h.w }}" height="{{ h.h }}" loading="lazy" decoding="async">
+          <a href="{{ h.href }}" class="dc-hallcard dc-reveal" aria-label="{{ h.aria }}" style="display: flex; flex-direction: column; min-width: 0; color: var(--ink);">
+            <div class="dc-hallcap"><span class="dc-hallno">{{ h.label }}</span><span>{{ h.count }}</span></div>
+            <div class="dc-frame dc-stack" data-n="{{ h.n }}">
+              <sc-for list="{{ h.back }}" as="b">
+                <img class="dc-back" data-i="{{ b.i }}" src="{{ b.src }}" alt="" width="{{ b.w }}" height="{{ b.h }}" loading="lazy" decoding="async">
+              </sc-for>
+              <img class="dc-front" src="{{ h.cover }}" alt="{{ h.title }}" width="{{ h.w }}" height="{{ h.h }}" loading="lazy" decoding="async">
             </div>
-            <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 22px;">
-              <span style="flex: none; font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: .26em; color: var(--terracotta);">{{ h.num }}</span>
-              <span style="font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2.1vw, 30px); line-height: 1.12;">{{ h.title }}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);">
-              <span style="display: inline-flex; align-items: center; gap: 12px;">{{ h.count }}<span class="dc-dabs dc-dabs-sm" aria-hidden="true"><sc-for list="{{ h.dabs }}" as="d"><span class="dc-dab" style="background: {{ d.c }};"></span></sc-for></span></span>
-              <span class="dc-hallgo" data-en="Enter ⟶">Увійти ⟶</span>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2.1vw, 30px); line-height: 1.12; margin-top: 20px;">{{ h.title }}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin-top: 14px; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);">
+              <span class="dc-dabs dc-dabs-sm" aria-hidden="true"><sc-for list="{{ h.dabs }}" as="d"><span class="dc-dab" style="background: {{ d.c }};"></span></sc-for></span>
+              <span class="dc-hallgo">{{ h.go }}</span>
             </div>
           </a>
         </sc-for>
@@ -966,7 +982,7 @@ class Component extends DCLogic {
     paints: null, postcards: null, boxes: null, projects: null, halls: null, settings: {},
     dataMode: (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) ? 'loading' : 'demo',
     hall: /^#hall-/.test(location.hash) ? location.hash.slice(1) : null,
-    theme: 'light', showTop: false, palTick: 0
+    theme: 'dark', showTop: false, palTick: 0
   };
 
   // Demo content — shown only when Supabase is not configured (local preview).
@@ -1035,7 +1051,7 @@ class Component extends DCLogic {
       sendTg: 'Надіслати в Telegram', sendMail: 'Написати на пошту',
       phName: 'Ваше ім’я', phContact: 'Телефон або @telegram', phIdea: 'Розмір, кольори, кімната — кілька слів',
       sent: 'Запит відкрито в Telegram', needName: 'Напишіть, будь ласка, ім’я і контакт',
-      hall: 'Зала', works: ['робота', 'роботи', 'робіт'], halls: ['зала', 'зали', 'зал'], other: 'Інші роботи',
+      hall: 'Зала', works: ['робота', 'роботи', 'робіт'], paintings: ['картина', 'картини', 'картин'], openHall: 'Відкрити залу ⟶', halls: ['зала', 'зали', 'зал'], other: 'Інші роботи',
       repeat: 'Замовити повтор', similar: 'Хочу таку',
       askMsg: 'Вітаю! Розкажіть детальніше про ',
       repeatMsg: 'Вітаю! Хочу замовити роботу, як у ваших реалізованих проєктах.',
@@ -1057,7 +1073,7 @@ class Component extends DCLogic {
       sendTg: 'Send via Telegram', sendMail: 'Send an email',
       phName: 'Your name', phContact: 'Phone or @telegram', phIdea: 'Size, colours, room — a few words',
       sent: 'Request opened in Telegram', needName: 'Please add your name and contact',
-      hall: 'Hall', works: ['work', 'works', 'works'], halls: ['hall', 'halls', 'halls'], other: 'Other works',
+      hall: 'Hall', works: ['work', 'works', 'works'], paintings: ['painting', 'paintings', 'paintings'], openHall: 'Open the hall ⟶', halls: ['hall', 'halls', 'halls'], other: 'Other works',
       repeat: 'Order a repeat', similar: 'I want one like this',
       askMsg: 'Hello! Tell me more about ',
       repeatMsg: 'Hello! I would like to commission a piece like the ones in your completed projects.',
@@ -1643,7 +1659,10 @@ class Component extends DCLogic {
     });
     const list = [...groups.values()].filter(g => g.works.length).sort((a, b) => (a.other ? 1 : 0) - (b.other ? 1 : 0));
     const used = new Set();
+    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
     list.forEach((g, i) => {
+      // Hall label: the admin's «Мітка» («|||» typed for III reads as Roman), else its place in the list.
+      g.num = String(g.num || '').trim().replace(/\|/g, 'I') || (g.other ? '' : (roman[i] || String(i + 1)));
       let slug = 'hall-' + (this.translit(g.ua.t) || String(i + 1));
       while (used.has(slug)) slug += '-' + (i + 1);
       used.add(slug);
@@ -1842,7 +1861,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
-    try { const t = localStorage.getItem('ko_theme'); if (t === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); this.setState({ theme: 'dark' }); } } catch (e) {}
+    try { const t = localStorage.getItem('ko_theme') === 'light' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); if (t !== this.state.theme) this.setState({ theme: t }); } catch (e) {}
     try { if (localStorage.getItem('ko_lang') === 'en') this.setState({ lang: 'en' }); } catch (e) {}
     try {
       const c = JSON.parse(localStorage.getItem('ko_cart') || '[]');
@@ -2178,10 +2197,16 @@ class Component extends DCLogic {
       hallCards: groups.map((g) => {
         const c = g.works[0];
         const d = this.dims(c.img);
+        const n = g.works.length;
+        const label = g.other ? L.other : L.hall + (g.num ? ' ' + g.num : '');
+        const count = n + ' ' + this.plural(n, L.paintings);
+        const title = this.hallText(g, l).t;
         return {
-          href: '#' + g.slug, num: g.num, title: this.hallText(g, l).t,
-          cover: c.thumb || c.img, w: d.w, h: d.h,
-          count: g.works.length + ' ' + this.plural(g.works.length, L.works),
+          href: '#' + g.slug, num: g.num, title, label: g.other ? '' : label, count,
+          aria: (g.other ? title : label + ' · ' + title) + ', ' + count,
+          cover: c.thumb || c.img, w: d.w, h: d.h, n: Math.min(n, 3),
+          back: g.works.slice(1, 3).map((w, i) => { const bd = this.dims(w.img); return { i, src: w.thumb || w.img, w: bd.w, h: bd.h }; }),
+          go: L.openHall,
           dabs: (this.palOf(g) || []).map(col => ({ c: col }))
         };
       }),
@@ -2193,7 +2218,7 @@ class Component extends DCLogic {
       hEyebrow: cur ? (cur.other ? L.other : L.hall + (cur.num ? ' ' + cur.num : '')) : '',
       hTitle: curText ? curText.t : '',
       hNote: curText ? curText.n : '',
-      hCount: cur ? cur.works.length + ' ' + this.plural(cur.works.length, L.works) : '',
+      hCount: cur ? cur.works.length + ' ' + this.plural(cur.works.length, L.paintings) : '',
       hallWorks: cur ? cur.works.map(w => this.card(w, 'w', l)) : [],
 
       hasPaper: paper.length > 0,
