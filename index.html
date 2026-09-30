@@ -182,6 +182,26 @@
   .dc-hallcard:hover .dc-stack .dc-back[data-i="0"] { transform: translate(-41%, -7%); }
   .dc-hallcard:hover .dc-stack .dc-back[data-i="1"] { transform: translate(-32%, -14%); }
   .dc-hallcard:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 6px; }
+  /* Side text of a section header (next to its title): readable on the textured navy without going white. */
+  .dc-aside { font-size: 15px; line-height: 1.65; font-weight: 350; color: var(--ink3); max-width: 46ch; margin: 0; text-wrap: pretty; }
+  /* «Реалізовані проєкти» header: title + CTA on the left, the artist's text on the right —
+     first paragraph as a serif lead, the rest in columns, a short last paragraph as a closing line. */
+  .dc-projhead { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); grid-template-areas: "t x" "c x"; grid-template-rows: auto 1fr; gap: 28px clamp(32px, 5vw, 96px); padding-bottom: clamp(30px, 4vw, 52px); border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px); }
+  .dc-projhead > .t { grid-area: t; } .dc-projhead > .x { grid-area: x; } .dc-projhead > .c { grid-area: c; align-self: end; }
+  .dc-lead { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(21px, 1.9vw, 28px); line-height: 1.38; margin: 0; color: var(--ink); text-wrap: pretty; white-space: pre-line; }
+  .dc-cols { columns: 2 30ch; column-gap: clamp(28px, 3vw, 56px); margin-top: clamp(20px, 2.2vw, 30px); }
+  .dc-cols p { font-size: 15.5px; line-height: 1.75; font-weight: 350; color: var(--ink3); margin: 0 0 1.1em; break-inside: avoid; text-wrap: pretty; white-space: pre-line; }
+  .dc-coda { display: flex; align-items: baseline; gap: 18px; margin: 10px 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(19px, 1.6vw, 23px); line-height: 1.4; color: var(--ink); }
+  .dc-coda::before { content: ""; flex: none; width: 36px; height: 1px; background: var(--terracotta); transform: translateY(-.3em); }
+  /* Merch & collaborations: three offers across the width, each marked with a paint dab (the site's palette motif). */
+  .dc-offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .dc-offer { background: var(--bg); padding: clamp(24px, 2.8vw, 42px) clamp(20px, 2.4vw, 36px); }
+  .dc-offer .dc-dab { width: 26px; height: 20px; margin-bottom: clamp(18px, 2vw, 28px); }
+  .dc-ordercard { border: 1px solid var(--border); background: rgba(255,255,255,.28); padding: clamp(22px, 3vw, 44px); }
+  .dc-ctanote { font-size: 14px; line-height: 1.6; font-weight: 350; color: var(--ink3); margin: 0 0 16px; max-width: 34ch; }
+  @media (max-width: 900px) {
+    .dc-projhead { grid-template-columns: minmax(0, 1fr); grid-template-areas: "t" "x" "c"; grid-template-rows: auto; }
+  }
   .dc-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
   .dc-chips::-webkit-scrollbar { display: none; }
   .dc-chip { flex: none; display: inline-flex; align-items: center; min-height: 40px; white-space: nowrap; border: 1px solid var(--border); border-radius: 999px; padding: 0 18px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink3); }
@@ -458,7 +478,7 @@
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Available">В наявності</div>
           <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Gallery halls">Зали галереї</h2>
         </div>
-        <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 44ch; margin: 0;" data-en="The paintings hang in themed halls — open a hall to see every work in it. Everything is in stock or ready to ship within 2–3 days.">Картини розвішані по тематичних залах — відкрийте залу, щоб побачити всі роботи в ній. Усе в наявності або буде готове до відправки за 2–3 дні.</p>
+        <p class="dc-aside" data-en="The paintings hang in themed halls — open a hall to see every work in it. Everything is in stock or ready to ship within 2–3 days.">Картини розвішані по тематичних залах — відкрийте залу, щоб побачити всі роботи в ній. Усе в наявності або буде готове до відправки за 2–3 дні.</p>
       </div>
 
       <sc-if value="{{ dataLoading }}">
@@ -622,13 +642,26 @@
   <sc-if value="{{ hasProjects }}">
     <section id="projects" data-recede="1" style="border-top: 1px solid var(--border);">
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px 40px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
-          <div style="max-width: 62ch;">
+        <div class="dc-projhead">
+          <div class="t">
             <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Portfolio">Портфоліо</div>
             <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Completed projects">Реалізовані проєкти</h2>
-            <p style="font-size: 15.5px; line-height: 1.7; color: var(--ink2); margin: 18px 0 0; text-wrap: pretty; white-space: pre-line;">{{ projIntro }}</p>
           </div>
-          <button onClick="{{ askRepeat }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: var(--terracotta); color: #F3EFE8;">{{ lRepeat }}</button>
+          <div class="x">
+            <p class="dc-lead">{{ projLead }}</p>
+            <sc-if value="{{ hasProjBody }}">
+              <div class="dc-cols">
+                <sc-for list="{{ projBody }}" as="pp"><p>{{ pp.t }}</p></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasProjCoda }}">
+              <p class="dc-coda">{{ projCoda }}</p>
+            </sc-if>
+          </div>
+          <div class="c">
+            <p class="dc-ctanote" data-en="Like one of these? I can paint a similar piece — in your size and colours.">Сподобалась якась робота? Напишу схожу — у вашому розмірі й кольорах.</p>
+            <button onClick="{{ askRepeat }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 15px 28px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 46px;" style-hover="background: var(--terracotta); color: #F3EFE8;">{{ lRepeat }}</button>
+          </div>
         </div>
         <div class="dc-proj">
           <sc-for list="{{ projects }}" as="p">
@@ -671,7 +704,7 @@
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="At home">В інтер’єрі</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="How it lives on a real wall">Як це живе на справжній стіні</h2>
       </div>
-      <p style="font-size: 14px; line-height: 1.6; color: var(--ink5); max-width: 34ch; margin: 0;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
+      <p class="dc-aside" style="max-width: 36ch;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
@@ -686,12 +719,39 @@
   </section>
 
   <section id="order" data-recede="1" style="background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 76px);">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 88px); align-items: start;">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Commission">На замовлення</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 26px;" data-en="A painting made for your room">Картина, яку я напишу під вашу кімнату</h2>
-        <p style="font-size: 16px; line-height: 1.75; color: var(--ink2); max-width: 44ch; margin: 0 0 30px; text-wrap: pretty;" data-en="I take commissions. We start with a conversation about the mood, then I draw an individual sketch — and only after you approve it do I touch the canvas.">Беру замовлення. Починаємо з розмови про настрій, далі — індивідуальний ескіз, і тільки після вашого «так» пишу полотно.</p>
-        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
+        <p style="font-size: 16px; line-height: 1.75; color: var(--ink2); max-width: 44ch; margin: 0; text-wrap: pretty;" data-en="I take commissions. We start with a conversation about the mood, then I draw an individual sketch — and only after you approve it do I touch the canvas.">Беру замовлення. Починаємо з розмови про настрій, далі — індивідуальний ескіз, і тільки після вашого «так» пишу полотно.</p>
+        <div style="display: flex; flex-direction: column; gap: 0; margin-top: clamp(30px, 3.4vw, 46px);">
+          <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">01</div>
+            <div>
+              <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="A conversation">Розмова</div>
+              <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Your room, the light, the colours you live with, and what the painting should do for you.">Ваша кімната, світло, кольори, з якими живете, і що картина має для вас робити.</p>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">02</div>
+            <div>
+              <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="Individual sketch">Індивідуальний ескіз</div>
+              <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="I develop a sketch for the piece and show it in scale on a photo of your wall. Changes are normal at this stage.">Розробляю ескіз майбутньої роботи й показую в масштабі на фото вашої стіни. Правки на цьому етапі — норма.</p>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">03</div>
+            <div>
+              <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="The canvas">Полотно</div>
+              <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Two to four weeks depending on size. I send progress photos, and the painting ships varnished and packed.">Два–чотири тижні залежно від розміру. Надсилаю фото процесу, відправляю полотно залакованим і запакованим.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dc-ordercard">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; margin: 0 0 6px;" data-en="Tell me about your idea">Розкажіть про вашу ідею</div>
+        <p style="font-size: 14px; line-height: 1.6; font-weight: 350; color: var(--ink4); margin: 0 0 20px;" data-en="A few words are enough — I will reply and we will work out the details.">Досить кількох слів — я відповім, і деталі обговоримо разом.</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
           <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
           <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
           <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
@@ -711,29 +771,6 @@
             <a href="{{ mailLink }}" aria-label="Email" title="Email" style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 999px; color: var(--ink);" style-hover="border-color: var(--terracotta); color: var(--terracotta);">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             </a>
-          </div>
-        </div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 0;">
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">01</div>
-          <div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="A conversation">Розмова</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Your room, the light, the colours you live with, and what the painting should do for you.">Ваша кімната, світло, кольори, з якими живете, і що картина має для вас робити.</p>
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">02</div>
-          <div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="Individual sketch">Індивідуальний ескіз</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="I develop a sketch for the piece and show it in scale on a photo of your wall. Changes are normal at this stage.">Розробляю ескіз майбутньої роботи й показую в масштабі на фото вашої стіни. Правки на цьому етапі — норма.</p>
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 46px 1fr; gap: 20px; padding: 24px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--terracotta);">03</div>
-          <div>
-            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px;" data-en="The canvas">Полотно</div>
-            <p style="font-size: 14.5px; line-height: 1.65; color: var(--ink4); margin: 0;" data-en="Two to four weeks depending on size. I send progress photos, and the painting ships varnished and packed.">Два–чотири тижні залежно від розміру. Надсилаю фото процесу, відправляю полотно залакованим і запакованим.</p>
           </div>
         </div>
       </div>
@@ -767,35 +804,40 @@
   </section>
 
   <section id="collab" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-    <div style="max-width: 76ch;">
-      <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
-      <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.8vw, 52px); line-height: 1.1; margin: 0 0 26px;" data-en="The paintings can live beyond the canvas">Картини можуть жити далі за полотно</h2>
-      <p style="font-size: 16px; line-height: 1.75; color: var(--ink2); margin: 0 0 40px; text-wrap: pretty;" data-en="I am open to merch and collaborations: prints, textiles, packaging, paintings for cafés, showrooms or hotels, and an individual pattern for your brand. Have an idea? Bring it — we will invent the format together.">Відкрита до мерчу й колаборацій: принти, текстиль, упаковка, картини для кафе, шоурумів чи готелів, індивідуальний патерн для вашого бренду. Є ідея — приносьте, формат придумаємо разом.</p>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--border);">
-        <div style="background: var(--bg); padding: 26px 22px;">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Prints &amp; merch">Принти й мерч</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Licensing a work for a print run.">Ліцензія на роботу для тиражу.</p>
-        </div>
-        <div style="background: var(--bg); padding: 26px 22px;">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Spaces">Простори</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Paintings on the walls of your café, hotel or showroom.">Картини на стінах вашого кафе, готелю чи шоуруму.</p>
-        </div>
-        <div style="background: var(--bg); padding: 26px 22px;">
-          <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; margin-bottom: 8px;" data-en="Brand pattern">Патерн для бренду</div>
-          <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="An individual painted pattern, drawn by hand.">Індивідуальний мальований патерн, від руки.</p>
-        </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px 48px; padding-bottom: 28px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
+      <div>
+        <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Merch &amp; collaborations">Мерч і колаборації</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.8vw, 52px); line-height: 1.1; margin: 12px 0 0; max-width: 21ch;" data-en="The paintings can live beyond the canvas">Картини можуть жити далі за полотно</h2>
       </div>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 34px;">
-        <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);" data-en="Proposals to">Пропозиції надсилайте на</span>
-        <a href="{{ tgLink }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-          {{ tgHandle }}
-        </a>
-        <a href="{{ mailLink }}" style="display: inline-flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-          {{ email }}
-        </a>
-      </div>
+      <p class="dc-aside" style="font-size: 16px; line-height: 1.7; max-width: 52ch;" data-en="I am open to merch and collaborations: prints, textiles, packaging, paintings for cafés, showrooms or hotels, and an individual pattern for your brand. Have an idea? Bring it — we will invent the format together.">Відкрита до мерчу й колаборацій: принти, текстиль, упаковка, картини для кафе, шоурумів чи готелів, індивідуальний патерн для вашого бренду. Є ідея — приносьте, формат придумаємо разом.</p>
+    </div>
+    <div class="dc-offers">
+      <div class="dc-offer">
+        <span class="dc-dab" style="background: #B4501C;" aria-hidden="true"></span>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(22px, 1.9vw, 26px); margin-bottom: 10px;" data-en="Prints &amp; merch">Принти й мерч</div>
+        <p style="font-size: 14.5px; line-height: 1.6; font-weight: 350; color: var(--ink3); margin: 0;" data-en="Licensing a work for a print run.">Ліцензія на роботу для тиражу.</p>
+        </div>
+        <div class="dc-offer">
+          <span class="dc-dab" style="background: #C7A17A;" aria-hidden="true"></span>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(22px, 1.9vw, 26px); margin-bottom: 10px;" data-en="Spaces">Простори</div>
+          <p style="font-size: 14.5px; line-height: 1.6; font-weight: 350; color: var(--ink3); margin: 0;" data-en="Paintings on the walls of your café, hotel or showroom.">Картини на стінах вашого кафе, готелю чи шоуруму.</p>
+        </div>
+        <div class="dc-offer">
+          <span class="dc-dab" style="background: #5F86B5;" aria-hidden="true"></span>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(22px, 1.9vw, 26px); margin-bottom: 10px;" data-en="Brand pattern">Патерн для бренду</div>
+          <p style="font-size: 14.5px; line-height: 1.6; font-weight: 350; color: var(--ink3); margin: 0;" data-en="An individual painted pattern, drawn by hand.">Індивідуальний мальований патерн, від руки.</p>
+        </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: clamp(26px, 3vw, 38px);">
+      <span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);" data-en="Proposals to">Пропозиції надсилайте на</span>
+      <a href="{{ tgLink }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        {{ tgHandle }}
+      </a>
+      <a href="{{ mailLink }}" style="display: inline-flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--terracotta); padding-bottom: 3px; font-size: 15px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        {{ email }}
+      </a>
     </div>
   </section>
 
@@ -1983,6 +2025,20 @@ class Component extends DCLogic {
     if (c !== this._savedCart) { this._savedCart = c; try { localStorage.setItem('ko_cart', c); } catch (e) {} }
   }
 
+  // The projects intro (Kateryna's free text) laid out for reading: a leading line that only repeats the section
+  // title is dropped, the first paragraph becomes the serif lead, the rest go to columns, and a short last
+  // paragraph (≥3 in all) closes it as a quote-like line.
+  projText(raw) {
+    const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zа-яіїєґ]+/g, '');
+    const edit = this.textEdits()['Реалізовані проєкти'] || {};
+    const titles = ['Реалізовані проєкти', 'Реалізовані проекти', 'Completed projects', edit.ua, edit.en].map(norm).filter(Boolean);
+    const paras = String(raw || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+    if (paras.length > 1 && titles.includes(norm(paras[0]))) paras.shift();
+    const coda = paras.length >= 3 && paras[paras.length - 1].length <= 160 ? paras.pop() : '';
+    const body = paras.slice(1).map(t => ({ t }));
+    return { projLead: paras[0] || '', projBody: body, hasProjBody: body.length > 0, projCoda: coda, hasProjCoda: !!coda };
+  }
+
   // Static texts: data-ua keeps the original Ukrainian text, which is also the key of Kateryna's edits
   // made in the admin («Сторінка» → settings.texts = {"<original UA>": {ua, en}}).
   textEdits() {
@@ -2229,7 +2285,7 @@ class Component extends DCLogic {
       shopHref: paper.length ? '#paper' : '#boxes',
 
       hasProjects: projs.length > 0,
-      projIntro: customIntro || L.projIntro,
+      ...this.projText(customIntro || L.projIntro),
       projects: projs.map((p, i) => { const d = this.dims(p.img); return { i, thumb: p.thumb || p.img, w: d.w, h: d.h, alt: (this.loc(p, l).t || L.projAlt) }; }),
       openProj: (e) => this.setState({ projIdx: Number(e.currentTarget.dataset.proj), lbKind: 'projects' }),
       closeProj: () => this.setState({ projIdx: null }),
