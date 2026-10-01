@@ -327,6 +327,9 @@
     .dc-mmenu { display: none !important; }
   }
   .dc-cart-ico { display: none; }
+  /* invisible touch padding: small header/cart buttons get a ~44px target without changing how they look */
+  .dc-hit { position: relative; }
+  .dc-hit::after { content: ''; position: absolute; inset: -8px -5px; }
   @media (max-width: 560px) {
     .dc-add { padding: 10px 14px !important; }
     .dc-hright { gap: 10px !important; }
@@ -388,9 +391,9 @@
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
       <div class="dc-hright" style="display: flex; align-items: center; gap: 18px; flex: none;">
-        <button onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ langLabel }}</button>
-        <button onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ themeIco }}</button>
-        <button onClick="{{ openCart }}" aria-label="Кошик" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
+        <button class="dc-hit" onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ langLabel }}</button>
+        <button class="dc-hit" onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ themeIco }}</button>
+        <button class="dc-hit" onClick="{{ openCart }}" aria-label="Кошик" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
           <svg class="dc-cart-ico" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
           <span class="dc-cart-label" data-en="Cart">Кошик</span>
           <span style="min-width: 20px; height: 20px; border-radius: 999px; background: var(--navy-bg); color: var(--cream-text); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
@@ -406,7 +409,7 @@
 
   <sc-if value="{{ menuOpen }}">
     <div class="dc-mmenu" onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 55; background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;">
-      <div style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px; min-height: 68px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
+      <div style="display: flex; justify-content: flex-start; align-items: center; padding: 12px clamp(18px, 4vw, 52px); min-height: 68px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
         <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer;">✕</button>
       </div>
       <nav aria-label="Меню" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
@@ -754,9 +757,9 @@
         <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; margin: 0 0 6px;" data-en="Tell me about your idea">Розкажіть про вашу ідею</div>
         <p style="font-size: 14px; line-height: 1.6; font-weight: 350; color: var(--ink4); margin: 0 0 20px;" data-en="A few words are enough — I will reply and we will work out the details.">Досить кількох слів — я відповім, і деталі обговоримо разом.</p>
         <div style="display: flex; flex-direction: column; gap: 12px;">
-          <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
-          <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
-          <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 14.5px; color: var(--ink); resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
+          <input ref="{{ fName }}" type="text" placeholder="{{ phName }}" aria-label="{{ phName }}" autocomplete="name" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 16px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
+          <input ref="{{ fContact }}" type="text" placeholder="{{ phContact }}" aria-label="{{ phContact }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 16px; color: var(--ink); min-height: 48px;" style-focus="outline: none; border-color: #B4501C;">
+          <textarea ref="{{ fIdea }}" rows="3" placeholder="{{ phIdea }}" aria-label="{{ phIdea }}" style="background: var(--bg); border: 1px solid var(--border); padding: 14px 16px; font: inherit; font-size: 16px; color: var(--ink); resize: vertical;" style-focus="outline: none; border-color: #B4501C;"></textarea>
           <p style="font-size: 12.5px; line-height: 1.6; color: var(--ink5); margin: 0;" data-en="Have a reference or a photo of your wall? Send it in the Telegram chat after the request.">Є референс чи фото стіни? Надішліть його в Telegram-чаті після запиту.</p>
           <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px;">
             <button onClick="{{ sendOrderTg }}" style="background: var(--navy-bg); color: var(--cream-text); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: var(--terracotta);">{{ lSendTg }}</button>
@@ -886,7 +889,7 @@
   </section>
 
   <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
-    <div class="dc-modal" onClick="{{ closeWork }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeWork }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
+    <div class="dc-modal" ref="{{ sheetRef }}" data-sheet="work" onClick="{{ closeWork }}" style="position: fixed; inset: 0; overscroll-behavior: contain; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
       <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; margin: auto 0; color: var(--ltext);">
         <div style="display: flex; justify-content: center; min-width: 0;">
           <div class="dc-sheen dc-fit" style="--r: {{ aRatio }};" onPointerMove="{{ sheenMove }}" onPointerLeave="{{ sheenLeave }}">
@@ -943,7 +946,7 @@
   </sc-if>
 
   <sc-if value="{{ projOpen }}" hint-placeholder-val="{{ false }}">
-    <div class="dc-modal" onClick="{{ closeProj }}" onTouchStart="{{ swipeStart }}" onTouchEnd="{{ swipeProj }}" style="position: fixed; inset: 0; z-index: 90; background: rgba(10,28,59,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 76px clamp(14px, 3vw, 44px) 26px; animation: floatIn .35s ease-out both;">
+    <div class="dc-modal" ref="{{ sheetRef }}" data-sheet="proj" onClick="{{ closeProj }}" style="position: fixed; inset: 0; overscroll-behavior: contain; z-index: 90; background: rgba(10,28,59,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 76px clamp(14px, 3vw, 44px) 26px; animation: floatIn .35s ease-out both;">
       <div class="dc-lbfit" style="--r: {{ pRatio }};" onClick="{{ stop }}">
         <img src="{{ pThumb }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
         <img src="{{ pImg }}" alt="{{ pAlt }}" loading="lazy" decoding="async">
@@ -959,7 +962,7 @@
   </sc-if>
 
   <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeCart }}" style="position: fixed; inset: 0; z-index: 95; background: rgba(10,28,59,.6); display: flex; justify-content: flex-end;">
+    <div ref="{{ sheetRef }}" data-sheet="cart" onClick="{{ closeCart }}" style="position: fixed; inset: 0; z-index: 95; background: rgba(10,28,59,.6); display: flex; justify-content: flex-end; overscroll-behavior: contain;">
       <aside onClick="{{ stop }}" style="width: min(440px, 100%); background: var(--bg); height: 100%; display: flex; flex-direction: column; box-shadow: -30px 0 60px rgba(0,0,0,.35); animation: floatIn .3s ease-out both;">
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 24px clamp(20px, 3vw, 32px); border-bottom: 1px solid var(--border);">
           <div style="font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">{{ lCart }}</div>
@@ -982,7 +985,7 @@
                 <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 5px;">{{ it.size }}</div>
                 <div style="font-size: 13.5px; margin-top: 6px;">{{ it.priceText }}</div>
               </div>
-              <button data-sku="{{ it.sku }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: var(--ink5); font-size: 13px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">✕</button>
+              <button class="dc-hit" data-sku="{{ it.sku }}" onClick="{{ removeItem }}" aria-label="Прибрати" style="background: none; border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 999px; cursor: pointer; color: var(--ink5); font-size: 13px;" style-hover="border-color: var(--terracotta); color: var(--terracotta);">✕</button>
             </div>
           </sc-for>
         </div>
@@ -1888,7 +1891,8 @@ class Component extends DCLogic {
   scrollToId(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    const top = this.docTop(el) - 84; // layout position: a receding (scaled) section would report a shifted rect
+    // layout position: a receding (scaled) section would report a shifted rect. #top = the very top, ribbon included.
+    const top = id === 'top' ? 0 : this.docTop(el) - 84;
     const start = window.scrollY;
     const dist = top - start;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(dist) < 4) {
@@ -1946,6 +1950,13 @@ class Component extends DCLogic {
       if (!document.getElementById(id)) return;
       e.preventDefault();
       if (a.blur) a.blur();
+      if (id === 'top') {
+        // the logo = home: the very top (collab ribbon included), halls back to the overview, no hash in the URL
+        if (this.state.hall || this.state.menuOpen) this.setState({ hall: null, menuOpen: false });
+        this.scrollToId('top');
+        if (location.hash) history.pushState(null, '', location.pathname + location.search);
+        return;
+      }
       this.scrollToId(id);
       if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
     };
@@ -2114,13 +2125,117 @@ class Component extends DCLogic {
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: reduce ? 'auto' : 'smooth' });
   }
 
-  swipe(e, fn) {
-    const t = e.changedTouches && e.changedTouches[0];
-    if (!t || !this._touch) return;
-    const dx = t.clientX - this._touch.x, dy = t.clientY - this._touch.y;
-    this._touch = null;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 2) fn(dx < 0 ? 1 : -1);
-  }
+  // Touch gestures on the overlays (ref on the overlay; data-sheet="work" modal | "proj" lightbox | "cart" drawer).
+  // Modal/lightbox: a sideways flick steps to the previous/next one; a pull down — while the overlay is scrolled to the
+  // top — drags the content with the finger like iPhone Photos (the page shows through as the backdrop fades) and
+  // closes it past ~a fifth of the screen or on a quick flick, otherwise springs back. Cart drawer: the same, pulled
+  // to the right. Native non-passive listeners: React's touchmove is passive, so it couldn't stop the overlay from
+  // rubber-banding. Two fingers / a zoomed page = no gesture.
+  sheetRef = (el) => {
+    if (!el || el._koSheet) return;
+    el._koSheet = true;
+    let g = null;
+    const kind = el.getAttribute('data-sheet'), side = kind === 'cart';
+    const bf0 = el.style.backdropFilter || '', wbf0 = el.style.getPropertyValue('-webkit-backdrop-filter') || '';
+    const parts = () => { const c = el.firstElementChild; return { c, rest: Array.from(el.children).slice(1) }; };
+    const paint = (d) => {
+      const { c, rest } = parts(), p = Math.min(1, d / ((side ? window.innerWidth : window.innerHeight) * 0.55));
+      if (c) c.style.transform = d <= 0 ? '' : side ? 'translate3d(' + d.toFixed(1) + 'px,0,0)' : 'translate3d(0,' + d.toFixed(1) + 'px,0) scale(' + (1 - p * 0.14).toFixed(4) + ')';
+      el.style.backgroundColor = 'rgba(' + g.rgb + ',' + (g.a * (1 - p * 0.8)).toFixed(3) + ')';
+      rest.forEach((r) => { r.style.opacity = String(Math.max(0, 1 - p * 2.5)); });
+    };
+    const reset = () => {
+      const { c, rest } = parts();
+      [c, el].concat(rest).forEach((n) => { if (n) { n.style.transition = ''; n.style.transform = ''; n.style.opacity = ''; n.style.transformOrigin = ''; } });
+      el.style.backgroundColor = '';
+      el.style.backdropFilter = bf0; el.style.setProperty('-webkit-backdrop-filter', wbf0);
+    };
+    const animate = (fn, ms) => {
+      const { c, rest } = parts(), tr = 'transform ' + ms + 'ms cubic-bezier(.2,.8,.2,1), opacity ' + ms + 'ms ease, background-color ' + ms + 'ms ease';
+      [c, el].concat(rest).forEach((n) => { if (n) n.style.transition = tr; });
+      fn();
+    };
+    const begin = (t) => {
+      // the blur is invisible under the 95% navy and costly to keep while dragging; without it the page shows through sharp
+      const m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g) || [10, 28, 59, 0.95];
+      g.rgb = m.slice(0, 3).join(','); g.a = m[3] !== undefined ? Number(m[3]) : 1;
+      el.style.animation = 'none';
+      el.style.backdropFilter = 'none'; el.style.setProperty('-webkit-backdrop-filter', 'none');
+      const { c } = parts();
+      if (c) {
+        const r = c.getBoundingClientRect();
+        c.style.animation = 'none'; // the entrance animation's fill would override the drag transform
+        c.style.transition = 'none';
+        c.style.transformOrigin = (t.clientX - r.left) + 'px ' + (t.clientY - r.top) + 'px';
+      }
+    };
+    const done = (close) => {
+      if (close) {
+        // no reset: the overlay unmounts in its faded-out state
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { this.closeSheet(kind); return; }
+        animate(() => {
+          paint(g.d + (side ? window.innerWidth : window.innerHeight * 0.35));
+          const { c } = parts();
+          if (c && !side) c.style.opacity = '0';
+          el.style.backgroundColor = 'rgba(' + g.rgb + ',0)';
+        }, 200);
+        setTimeout(() => this.closeSheet(kind), 190);
+      } else {
+        animate(() => paint(0), 280);
+        setTimeout(() => { if (!g || g.mode !== 'drag') reset(); }, 300);
+      }
+    };
+    el.addEventListener('touchstart', (e) => {
+      const zoomed = window.visualViewport && window.visualViewport.scale > 1.05;
+      if (e.touches.length !== 1 || zoomed) { g = null; return; }
+      const t = e.touches[0];
+      g = { x: t.clientX, y: t.clientY, mode: null, d: 0, v: 0, lt: performance.now(), lp: side ? t.clientX : t.clientY };
+    }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+      if (!g || g.mode === 'scroll') return;
+      if (e.touches.length !== 1) { if (g.mode === 'drag') done(false); g = { mode: 'scroll' }; return; }
+      const t = e.touches[0], dx = t.clientX - g.x, dy = t.clientY - g.y;
+      const top = el.scrollTop <= 0;
+      if (!g.mode) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) {
+          // undecided yet, but a pull down at the top must be held from the first move (no rubber-band / pull-to-refresh)
+          if (!side && top && dy > 0 && dy >= Math.abs(dx) && e.cancelable) e.preventDefault();
+          return;
+        }
+        if (side) {
+          if (dx > 0 && dx > Math.abs(dy)) { g.mode = 'drag'; begin(t); } else { g.mode = 'scroll'; return; } // the cart list scrolls vertically
+        } else if (Math.abs(dx) > Math.abs(dy)) g.mode = 'swipe';
+        else if (dy > 0 && top) { g.mode = 'drag'; begin(t); }
+        else { g.mode = 'scroll'; return; } // reading the description: ordinary scrolling
+      }
+      if (e.cancelable) e.preventDefault();
+      if (g.mode === 'drag') {
+        const now = performance.now(), pos = side ? t.clientX : t.clientY;
+        if (now > g.lt) { g.v = (pos - g.lp) / (now - g.lt); g.lt = now; g.lp = pos; }
+        g.d = Math.max(0, side ? dx : dy);
+        paint(g.d);
+      }
+    }, { passive: false });
+    const end = (e) => {
+      if (!g || !g.mode || g.mode === 'scroll') { g = null; return; }
+      const t = e.changedTouches && e.changedTouches[0];
+      if (g.mode === 'swipe') {
+        const dx = t ? t.clientX - g.x : 0;
+        if (e.type === 'touchend' && Math.abs(dx) > 50) this.stepSheet(kind, dx < 0 ? 1 : -1);
+      } else {
+        const fast = performance.now() - g.lt < 80 && g.v > 0.5;
+        const far = g.d > (side ? Math.min(140, window.innerWidth * 0.3) : Math.min(150, window.innerHeight * 0.2));
+        done(e.type === 'touchend' && (far || (fast && g.d > 30)));
+      }
+      g = null;
+    };
+    el.addEventListener('touchend', end);
+    el.addEventListener('touchcancel', end);
+  };
+
+  closeSheet(kind) { this.setState(kind === 'proj' ? { projIdx: null } : kind === 'cart' ? { drawer: false } : { activeId: null }); }
+
+  stepSheet(kind, dir) { if (kind === 'proj') this.stepProj(dir); else this.step(dir); }
 
   // Cart line for a SKU (w<id> painting, p<id> postcard, b<id> box); hidden/unknown items resolve to an empty title.
   item(sku, l) {
@@ -2328,9 +2443,7 @@ class Component extends DCLogic {
       wsNext: () => this.scrollStrip(1),
       askRepeat: () => this.openTg(L.repeatMsg),
       lRepeat: L.repeat,
-      swipeStart: (e) => { const t = e.touches && e.touches[0]; this._touch = t ? { x: t.clientX, y: t.clientY } : null; },
-      swipeProj: (e) => this.swipe(e, (d) => this.stepProj(d)),
-      swipeWork: (e) => this.swipe(e, (d) => this.step(d)),
+      sheetRef: this.sheetRef,
 
       openWork: (e) => { const id = String(e.currentTarget.dataset.art || ''); if (id) this.setState({ activeId: id }); },
       closeWork: () => this.setState({ activeId: null }),
