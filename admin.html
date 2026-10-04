@@ -116,8 +116,8 @@
     </select></label>
     <div id="fMain">
       <div class="grid2">
-        <label>Назва *<input id="edTua" type="text"></label>
-        <label>Назва англ. (необов.)<input id="edTen" type="text"></label>
+        <label><span id="edTuaCap">Назва *</span><input id="edTua" type="text"></label>
+        <label><span id="edTenCap">Назва англ. (необов.)</span><input id="edTen" type="text"></label>
         <label>Ціна, грн<input id="edPrice" type="number" min="0" placeholder="0 — «ціна за запитом»"></label>
         <label>Розмір<input id="edSize" type="text" placeholder="80 × 80 см"></label>
       </div>
@@ -514,6 +514,8 @@ function applyCatFields(c) {
   $("#fTech").style.display = proj ? "none" : "";
   $("#fDesc").style.display = proj ? "none" : "";
   $("#hallLbl").style.display = c === "paintings" ? "" : "none";
+  $("#edTuaCap").textContent = proj ? "Підпис для Google (необов.)" : "Назва *";
+  $("#edTenCap").textContent = proj ? "Підпис англ. (необов.)" : "Назва англ. (необов.)";
 }
 
 function openEditor(id) {
