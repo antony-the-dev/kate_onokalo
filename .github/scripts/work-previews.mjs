@@ -145,6 +145,9 @@ h1{font:italic 300 clamp(34px,4.6vw,60px)/1.05 "Cormorant Garamond",serif;margin
 .price{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 0 24px}
 .price b{font:400 clamp(28px,3vw,36px) "Cormorant Garamond",serif}
 .price span{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.price b[data-st]::before{content:"";display:inline-block;width:.32em;height:.32em;border-radius:50%;margin-right:.4em;vertical-align:.12em}
+.price b[data-st=sold]::before{background:#C4552A;box-shadow:0 0 0 .14em rgba(196,85,42,.18)}
+.price b[data-st=reserved]::before{box-shadow:inset 0 0 0 1.5px #C7A17A}
 .actions{display:flex;flex-wrap:wrap;gap:12px}
 .btn{display:inline-flex;align-items:center;min-height:48px;padding:0 28px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;background:var(--btn);color:var(--btn-ink);transition:background-color .3s ease,color .3s ease,border-color .3s ease}
 .btn:hover{background:var(--terra);color:#F3EFE8}
@@ -164,6 +167,10 @@ footer nav{display:flex;flex-wrap:wrap;gap:10px 22px}`;
 const titleOf = (it) => String(it.title || '').trim() || 'Картина';
 const detailsOf = (it) => [String(it.tech || '').trim(), fmtSize(it.size), String(it.year || '').trim()].filter(Boolean).join(' · ');
 
+// «Продано» / «Резерв» set in the admin: settings.status = {"<item id>": "sold" | "reserved"} (filled after loadData()).
+let STATUS = {};
+const statusOf = (id) => (STATUS[String(id)] === 'sold' || STATUS[String(id)] === 'reserved' ? STATUS[String(id)] : '');
+
 function page(it, v, group, more, moreTitle) {
   const id = String(it.id);
   const title = titleOf(it);
@@ -172,17 +179,21 @@ function page(it, v, group, more, moreTitle) {
   const tech = String(it.tech || '').trim();
   const details = detailsOf(it);
   const text = String(it.description || '').trim();
+  const st = statusOf(it.id);
   const priced = it.price > 0;
-  const price = priced ? money(it.price) : 'Ціна за запитом';
+  const price = st === 'sold' ? 'Продано' : st === 'reserved' ? 'Резерв' : priced ? money(it.price) : 'Ціна за запитом';
+  const note = st === 'sold' ? 'Вже у новому домі' : st === 'reserved' ? 'Можна стати в чергу' : 'Єдиний екземпляр';
   const self = `${site}w/${id}.html`;
   const d = dims(it.img);
   const kind = [tech ? tech.charAt(0).toLowerCase() + tech.slice(1) : 'картина', size].filter(Boolean).join(', ');
   const pageTitle = `«${title}» — ${kind} | Катерина Онокало`;
   const summary = (details ? details + '. ' : '') + 'Авторська робота Катерини Онокало, єдиний екземпляр.';
-  const metaDesc = `«${title}» — ${details ? details + '. ' : ''}${text ? text.replace(/\s+/g, ' ').slice(0, 110) + (text.length > 110 ? '…' : '') + ' ' : ''}${priced ? 'Ціна ' + price + '.' : 'Ціна за запитом.'} Авторська робота Катерини Онокало.`;
-  const msg = priced
-    ? `Вітаю! Хочу замовити «${title}»${size ? ', ' + size : ''}, ${price}.\n${self}`
-    : `Вітаю! Розкажіть детальніше про «${title}»\n${self}`;
+  const metaDesc = `«${title}» — ${details ? details + '. ' : ''}${text ? text.replace(/\s+/g, ' ').slice(0, 110) + (text.length > 110 ? '…' : '') + ' ' : ''}${st ? price + '.' : priced ? 'Ціна ' + price + '.' : 'Ціна за запитом.'} Авторська робота Катерини Онокало.`;
+  const msg = st === 'sold'
+    ? `Вітаю! Мені дуже сподобалась ваша робота «${title}» — бачу, що вона вже продана. Чи можете написати схожу?\n${self}`
+    : priced && !st
+      ? `Вітаю! Хочу замовити «${title}»${size ? ', ' + size : ''}, ${price}.\n${self}`
+      : `Вітаю! Розкажіть детальніше про «${title}»\n${self}`;
   const order = `https://t.me/${tg}?text=${encodeURIComponent(msg)}`;
   const hallName = group.key ? group.name : OTHER;
   const artwork = {
@@ -194,7 +205,7 @@ function page(it, v, group, more, moreTitle) {
   if (it.year) artwork.dateCreated = String(it.year);
   if (priced) {
     artwork.brand = { '@type': 'Brand', name: 'Катерина Онокало' };
-    artwork.offers = { '@type': 'Offer', price: String(it.price), priceCurrency: 'UAH', availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition', url: self, seller: { '@id': site + '#artist' } };
+    artwork.offers = { '@type': 'Offer', price: String(it.price), priceCurrency: 'UAH', availability: 'https://schema.org/' + (st === 'sold' ? 'SoldOut' : st === 'reserved' ? 'Reserved' : 'InStock'), itemCondition: 'https://schema.org/NewCondition', url: self, seller: { '@id': site + '#artist' } };
   }
   const ld = {
     '@context': 'https://schema.org',
@@ -247,8 +258,8 @@ function page(it, v, group, more, moreTitle) {
 <div>
 <nav class="crumbs" aria-label="Навігація"><a href="../">Галерея</a> · <a href="../#${esc(group.slug)}">${esc(hallName)}</a></nav>
 <h1>${esc(title)}</h1>
-${titleEn && titleEn !== title ? `<p class="en" lang="en">${esc(titleEn)}</p>\n` : ''}${details ? `<p class="meta">${esc(details)}</p>\n` : ''}${text ? `<p class="desc">${esc(text)}</p>\n` : ''}<div class="price"><b>${esc(price)}</b><span>Єдиний екземпляр</span></div>
-<div class="actions"><a class="btn" href="${esc(order)}" target="_blank" rel="noopener">${priced ? 'Замовити в Telegram' : 'Запитати в Telegram'}</a><a class="btn line" href="../#work-${esc(id)}">Відкрити в галереї</a></div>
+${titleEn && titleEn !== title ? `<p class="en" lang="en">${esc(titleEn)}</p>\n` : ''}${details ? `<p class="meta">${esc(details)}</p>\n` : ''}${text ? `<p class="desc">${esc(text)}</p>\n` : ''}<div class="price"><b${st ? ` data-st="${st}"` : ''}>${esc(price)}</b><span>${esc(note)}</span></div>
+<div class="actions"><a class="btn" href="${esc(order)}" target="_blank" rel="noopener">${st === 'sold' ? 'Хочу схожу — у Telegram' : priced && !st ? 'Замовити в Telegram' : 'Запитати в Telegram'}</a><a class="btn line" href="../#work-${esc(id)}">Відкрити в галереї</a></div>
 <p class="note">Оплата й доставка — у Telegram: відповідаю сама. Доставка Україною і за кордон.</p>
 </div>
 </main>
@@ -275,6 +286,7 @@ const inject = (html, name, content) => {
 
 // ---- run ----
 const data = await loadData();
+try { const s = data.settings.find((x) => x.key === 'status'); const m = JSON.parse((s && s.value) || '{}'); STATUS = m && typeof m === 'object' ? m : {}; } catch (e) { STATUS = {}; }
 const byOrder = (a, b) => (a.sort_order || 0) - (b.sort_order || 0) || String(a.id || a.name || '').localeCompare(String(b.id || b.name || ''));
 const rows = data.items.filter(it => it && it.id && !it.hidden).sort(byOrder);
 const halls = data.halls.slice().sort(byOrder);

@@ -40,6 +40,14 @@
   .ops button { border: 1px solid rgba(27,26,22,.25); background: none; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
   .ops button:hover { border-color: #0A1C3B; }
   .hidden-tag { color: #B4501C; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-left: 8px; }
+  .new-tag { color: #9A7A55; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-left: 8px; }
+  /* painting status: В наявності / Резерв / Продано (settings.status) */
+  .seg { display: inline-flex; margin-top: 8px; border: 1px solid rgba(27,26,22,.25); border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; background: none; padding: 6px 12px; font-size: 12.5px; font-weight: 400; color: #3B3830; }
+  .seg button + button { border-left: 1px solid rgba(27,26,22,.15); }
+  .seg button.on { background: #0A1C3B; color: #E9E4DC; }
+  .seg button.on[data-st="sold"] { background: #B4501C; }
+  .seg button.on[data-st="reserved"] { background: #9A7A55; }
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0A1C3B; color: #E9E4DC; padding: 12px 22px; border-radius: 999px; font-size: 13.5px; display: none; z-index: 50; max-width: 92vw; text-align: center; }
   .note { background: #F6E7DC; border: 1px solid rgba(180,80,28,.25); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; color: #5A3A26; }
   .extra { margin-bottom: 16px; }
@@ -442,6 +450,17 @@ async function addPhotos(files, c) {
   await load();
 }
 
+// «Продано» / «Резерв» for paintings live in settings.status = {"<item id>": "sold" | "reserved"} (no table change needed).
+const STATUSES = [["", "В наявності"], ["reserved", "Резерв"], ["sold", "Продано"]];
+function statusMap() {
+  try { const m = JSON.parse(settings.status || "{}"); return m && typeof m === "object" ? m : {}; } catch (e) { return {}; }
+}
+// The site shows «Нове» for 14 days after a painting is added (counted from 2026-10-04, when the badge appeared).
+function isNewWork(d) {
+  const t = Date.parse(d.created_at || "");
+  return t >= Date.parse("2026-10-04T17:00:00Z") && Date.now() - t < 14 * 864e5 && !statusMap()[d.id];
+}
+
 function renderList(data) {
   const list = data.filter(d => (d.cat || "paintings") === cat).sort(byOrder);
   $("#count").textContent = list.length + " шт.";
@@ -455,12 +474,14 @@ function renderList(data) {
     const title = d.title || (isProj ? "Фото " + (i + 1) : "");
     const sub = isProj ? "" : [d.size, cat === "paintings" ? (d.hall || "без зали") : ""].filter(Boolean).join(" · ");
     const price = isProj ? "" : (d.price ? Number(d.price).toLocaleString("uk-UA") + " грн" : "ціна за запитом");
+    const st = cat === "paintings" ? (statusMap()[d.id] || "") : null;
     return `<div class="item">
       ${d.img ? `<img src="${esc(thumbOf(d.img))}" alt="" loading="lazy">` : '<div class="thumb">◦</div>'}
       <div>
-        <div class="t">${esc(title)}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}</div>
+        <div class="t">${esc(title)}${d.hidden ? '<span class="hidden-tag">сховано</span>' : ''}${cat === "paintings" && isNewWork(d) ? '<span class="new-tag" title="Позначка «Нове» на сайті — 14 днів після додавання">нове</span>' : ''}</div>
         ${sub ? `<div class="s">${esc(sub)}</div>` : ""}
         ${price ? `<div class="price">${esc(price)}</div>` : ""}
+        ${st !== null ? `<div class="seg" role="group" aria-label="Статус">${STATUSES.map(([v, l]) => `<button data-st="${v}" data-id="${esc(d.id)}" class="${st === v ? "on" : ""}" ${settingsOk ? "" : "disabled"}>${l}</button>`).join("")}</div>` : ""}
       </div>
       <div class="ops">
         <button data-act="up" data-id="${esc(d.id)}">↑</button>
@@ -475,6 +496,13 @@ function renderList(data) {
 }
 
 function bindOps(el) {
+  el.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", async () => {
+    const m = statusMap(), v = b.dataset.st, id = b.dataset.id;
+    if ((m[id] || "") === v) return;
+    if (v) m[id] = v; else delete m[id];
+    for (const k of Object.keys(m)) if (!rows.some(r => r.id === k)) delete m[k]; // forget deleted works
+    await saveSettings({ status: JSON.stringify(m) });
+  }));
   el.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", async () => {
     const act = b.dataset.act, id = b.dataset.id;
     const d = rows.find(x => x.id === id);
