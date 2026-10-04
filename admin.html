@@ -152,6 +152,10 @@
       <label>Рік<input id="edYear" type="text" placeholder="2026"></label>
     </div>
     <label id="fDesc">Опис (необов.)<textarea id="edDesc" rows="3" placeholder="Кілька слів про роботу — показується у вікні картини"></textarea></label>
+    <div id="fEn" class="grid2">
+      <label>Техніка англ. (необов.)<input id="edTechEn" type="text" placeholder="Oil on canvas"></label>
+      <label>Опис англ. (необов.)<textarea id="edDescEn" rows="3" placeholder="Для іноземних покупців. Порожнє — як українською"></textarea></label>
+    </div>
     <div class="row" style="margin-bottom:14px;">
       <label style="margin:0; display:flex; align-items:center; gap:8px; font-size:14px; text-transform:none; letter-spacing:0;">
         <input type="checkbox" id="edHidden" style="width:auto; margin:0;">Сховати з сайту
@@ -409,13 +413,14 @@ async function saveItem() {
     const sizeUa = $("#edSize").value.trim();
     const descUa = $("#edDesc").value.trim();
     const titleEn = $("#edTen").value.trim() || titleUa;
+    const techEn = $("#edTechEn").value.trim(), descEn = $("#edDescEn").value.trim();
     const row = Object.assign(blankRow(id, icat), {
       sort_order: sort, price: isNaN(price) ? 0 : price,
       year: $("#edYear").value.trim(), img, hidden: $("#edHidden").checked,
       title: titleUa, title_en: titleEn,
       hall: hallUa, hall_en: hallUa ? ((hallRow && hallRow.name_en) || HALLS[hallUa] || hallUa) : "",
-      size: sizeUa, size_en: sizeUa, tech: techUa, tech_en: techUa,
-      description: descUa, description_en: descUa
+      size: sizeUa, size_en: sizeUa, tech: techUa, tech_en: techEn || techUa,
+      description: descUa, description_en: descEn || descUa
     });
     const { error } = await sb.from("items").upsert(row, { onConflict: "id" });
     if (error) {
@@ -557,6 +562,7 @@ function applyCatFields(c) {
   $("#fMain").style.display = proj ? "none" : "";
   $("#fTech").style.display = proj ? "none" : "";
   $("#fDesc").style.display = proj ? "none" : "";
+  $("#fEn").style.display = proj ? "none" : "";
   $("#hallLbl").style.display = c === "paintings" ? "" : "none";
   $("#edTuaCap").textContent = proj ? "Підпис для Google (необов.)" : "Назва *";
   $("#edTenCap").textContent = proj ? "Підпис англ. (необов.)" : "Назва англ. (необов.)";
@@ -576,6 +582,7 @@ function openEditor(id) {
   prev.style.display = "none"; prev.removeAttribute("data-current");
   $("#edImgNote").style.display = "";
   $("#edTua").value = $("#edTen").value = $("#edPrice").value = $("#edSize").value = $("#edTech").value = $("#edYear").value = $("#edDesc").value = "";
+  $("#edTechEn").value = $("#edDescEn").value = "";
   $("#edHidden").checked = false;
   if (d) {
     $("#edTua").value = d.title || "";
@@ -585,6 +592,8 @@ function openEditor(id) {
     $("#edTech").value = d.tech || "";
     $("#edYear").value = d.year || "";
     $("#edDesc").value = d.description || "";
+    $("#edTechEn").value = (d.tech_en && d.tech_en !== d.tech) ? d.tech_en : "";
+    $("#edDescEn").value = (d.description_en && d.description_en !== d.description) ? d.description_en : "";
     $("#edHall").value = d.hall || "";
     $("#edHidden").checked = !!d.hidden;
     if (d.img) { prev.src = thumbOf(d.img); prev.style.display = ""; prev.setAttribute("data-current", d.img); $("#edImgNote").style.display = "none"; }
@@ -933,6 +942,7 @@ function fillExtra(el) {
       <label style="margin-top:12px;">Посилання<input id="stEtsy" type="url" placeholder="https://www.etsy.com/shop/…" value="${esc(settings.etsy_url)}"></label>
       <button class="btn btn-dark" id="stEtsySave" ${settingsOk ? "" : "disabled"}>Зберегти</button>
     </div>
+    <div id="enImport"></div>
     <div class="card">
       <h2>Пароль до адмінки</h2>
       <p class="muted" style="margin-bottom:14px;">Придумайте свій пароль (мінімум 8 символів). Після зміни входьте вже з новим.</p>
@@ -962,6 +972,7 @@ function fillExtra(el) {
     $("#pwSave").addEventListener("click", changePassword);
     if ($("#optBtn")) $("#optBtn").addEventListener("click", optimizeLegacy);
     if ($("#cleanBtn")) $("#cleanBtn").addEventListener("click", cleanupStorage);
+    fillEnImport();
   } else {
     el.innerHTML = "";
   }
@@ -976,6 +987,79 @@ async function changePassword() {
   if (error) { toast("Помилка: " + error.message); return; }
   $("#pw1").value = $("#pw2").value = "";
   toast("Пароль змінено");
+}
+
+// ---------- One-off: English translations prepared in en-import.json (items / halls / settings / page texts) ----------
+// The card shows only while something in the file differs from the database, so it disappears once applied.
+
+let enImport = null;
+const diffOf = (cur, want) => Object.fromEntries(Object.entries(want).filter(([k, v]) => String(cur[k] || "") !== v));
+
+function enPending(data) {
+  let n = 0;
+  Object.entries(data.items || {}).forEach(([id, f]) => { const r = rows.find((x) => x.id === id); if (r && Object.keys(diffOf(r, f)).length) n++; });
+  Object.entries(data.halls || {}).forEach(([name, f]) => { const h = halls.find((x) => x.name === name); if (h && Object.keys(diffOf(h, f)).length) n++; });
+  Object.entries(data.settings || {}).forEach(([k, v]) => { if ((settings[k] || "") !== v) n++; });
+  let texts = {};
+  try { texts = JSON.parse(settings.texts || "{}") || {}; } catch (e) {}
+  Object.entries(data.texts || {}).forEach(([k, en]) => { if (((texts[k] || {}).en || "") !== en) n++; });
+  return n;
+}
+
+async function fillEnImport() {
+  const box = $("#enImport");
+  if (!box) return;
+  if (!enImport) {
+    try { const r = await fetch("en-import.json?v=" + Date.now()); enImport = r.ok ? await r.json() : {}; } catch (e) { enImport = {}; }
+  }
+  const n = settingsOk ? enPending(enImport) : 0;
+  if (!n || !$("#enImport")) { box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="card">
+      <h2>Англійська версія сайту</h2>
+      <p class="muted" style="margin-bottom:14px;">Готові переклади англійською: назви, техніка й описи робіт, описи зал, тексти «Реалізованих проєктів», «Майстер-класів» і змінені тексти сторінки (${n} шт.). Один клік — і англійська версія сайту стане повністю англійською. Далі все редагується як звичайно.</p>
+      <button class="btn btn-dark" id="enImportBtn">Додати англійські переклади</button>
+    </div>`;
+  $("#enImportBtn").addEventListener("click", applyEnImport);
+}
+
+async function applyEnImport() {
+  if (busy || !enImport) return;
+  if (!(await requireAuth())) return;
+  busy = true;
+  const btn = $("#enImportBtn");
+  if (btn) btn.disabled = true;
+  try {
+    for (const [id, f] of Object.entries(enImport.items || {})) {
+      const r = rows.find((x) => x.id === id), upd = r ? diffOf(r, f) : {};
+      if (!Object.keys(upd).length) continue;
+      const { error } = await sb.from("items").update(upd).eq("id", id);
+      if (error) throw error;
+    }
+    for (const [name, f] of Object.entries(enImport.halls || {})) {
+      const h = halls.find((x) => x.name === name), upd = h ? diffOf(h, f) : {};
+      if (!Object.keys(upd).length) continue;
+      const { error } = await sb.from("halls").update(upd).eq("id", h.id);
+      if (error) throw error;
+      if (upd.name_en) await sb.from("items").update({ hall_en: upd.name_en }).eq("hall", name);
+    }
+    const s = {};
+    Object.entries(enImport.settings || {}).forEach(([k, v]) => { if ((settings[k] || "") !== v) s[k] = v; });
+    let texts = {};
+    try { texts = JSON.parse(settings.texts || "{}") || {}; } catch (e) {}
+    let changed = false;
+    Object.entries(enImport.texts || {}).forEach(([k, en]) => {
+      const cur = texts[k] || {};
+      if ((cur.en || "") !== en) { texts[k] = { ua: cur.ua || "", en }; changed = true; }
+    });
+    if (changed) s.texts = JSON.stringify(texts);
+    busy = false;
+    if (Object.keys(s).length) await saveSettings(s);
+    else { toast("Збережено"); await load(); }
+  } catch (e) {
+    busy = false;
+    if (btn) btn.disabled = false;
+    toast("Помилка: " + (e.message || e));
+  }
 }
 
 async function saveSettings(obj) {
