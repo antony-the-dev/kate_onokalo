@@ -795,6 +795,18 @@ function fillExtra(el) {
       <button class="btn btn-dark" id="stWsSave" ${settingsOk ? "" : "disabled"}>Зберегти текст</button>
     </div>`;
     $("#stWsSave").addEventListener("click", () => saveSettings({ workshops_intro: $("#stWs").value.trim(), workshops_intro_en: $("#stWsEn").value.trim() }));
+  } else if (cat === "boxes") {
+    // the site shows this section only when settings.boxes_on === "1" (hidden by default since 2026-10-04)
+    const on = settings.boxes_on === "1";
+    el.innerHTML = `<div class="card">
+      <h2>Розділ на сайті</h2>
+      <p class="muted" style="margin-bottom:14px;">${on
+        ? "Розділ «Брендована продукція» зараз <b>показується</b> на сайті й у меню «Магазин»."
+        : "Розділ «Брендована продукція» зараз <b>прихований</b>: товари тут зберігаються, але відвідувачі сайту їх не бачать. Коли будете готові — натисніть «Показати на сайті»."}</p>
+      ${settingsOk ? "" : SETTINGS_NOTE}
+      <button class="btn ${on ? "btn-line" : "btn-dark"}" id="boxesToggle" ${settingsOk ? "" : "disabled"}>${on ? "Приховати розділ" : "Показати на сайті"}</button>
+    </div>`;
+    $("#boxesToggle").addEventListener("click", () => saveSettings({ boxes_on: on ? "0" : "1" }));
   } else if (cat === "settings") {
     const legacy = rows.filter(r => r.img && !isOptimized(r.img));
     el.innerHTML = `<div class="card">

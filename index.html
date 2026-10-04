@@ -394,7 +394,8 @@
           </div>
         </div>
         <a href="#order" data-en="Commission">На замовлення</a>
-        <sc-if value="{{ hasShop }}">
+        <sc-if value="{{ shopSingle }}"><a href="{{ shopHref }}" data-en="Shop">Магазин</a></sc-if>
+        <sc-if value="{{ shopMulti }}">
           <div class="dc-dd">
             <a href="{{ shopHref }}" class="dc-dd-toggle" data-en="Shop">Магазин</a>
             <div class="dc-dd-menu">
@@ -441,7 +442,7 @@
         </div>
         <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
         <sc-if value="{{ hasPaper }}">
-          <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки</a>
+          <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards &amp; bookmarks" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки і закладинки</a>
         </sc-if>
         <sc-if value="{{ hasBoxes }}">
           <a href="#boxes" onClick="{{ closeMenu }}" data-en="Branded goods" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Брендована продукція</a>
@@ -1191,7 +1192,11 @@ class Component extends DCLogic {
     if (this.state.postcards) return this.state.postcards;
     return this.state.dataMode === 'demo' ? this.goodsOf('p') : [];
   }
+  // «Брендована продукція» is switched on by Kateryna in the admin (settings boxes_on = '1'); off by default —
+  // 2026-10-04 she hid it until the merch is real. The items stay in the database.
+  boxesOn() { return this.setting('boxes_on') === '1'; }
   boxes() {
+    if (this.state.dataMode !== 'demo' && !this.boxesOn()) return [];
     if (this.state.boxes) return this.state.boxes;
     return this.state.dataMode === 'demo' ? this.goodsOf('b') : [];
   }
@@ -2513,6 +2518,8 @@ class Component extends DCLogic {
       hasBoxes: boxes.length > 0,
       boxes,
       hasShop: paper.length > 0 || boxes.length > 0,
+      shopMulti: paper.length > 0 && boxes.length > 0,
+      shopSingle: (paper.length > 0) !== (boxes.length > 0),
       shopHref: paper.length ? '#paper' : '#boxes',
 
       hasProjects: projs.length > 0,
