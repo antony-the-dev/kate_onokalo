@@ -10,7 +10,7 @@ Content is managed by the artist herself through a Supabase-backed admin panel �
   - `index.html` — single page. Component is an inline `<script type="text/x-dc" data-dc-script>` with `class Component extends DCLogic` + `renderVals()` returning `{{ binding }}` values.
   - Templates: `<x-dc>`, `<helmet>` (hoisted into `<head>`: fonts, title, meta, favicon), `<sc-if value="{{ x }}">`, `<sc-for list="{{ arr }}" as="it">`, `style-hover` attribute.
 - **Supabase** (Postgres + Storage + Auth), config in `supabase-config.js` (`window.SUPABASE_CONFIG = { url, anonKey }`). anonKey is **public by design** — never put secrets there.
-- **Hosting:** GitHub Pages — repo `antony-the-dev/kate_onokalo`, branch `main`, custom domain **`kateonokalo.com`** (since 2026-10-04; `CNAME` file in the repo root; DNS at Cloudflare: `CNAME @`/`www` → `antony-the-dev.github.io`, **DNS only**, GitHub issues the certificate; the old `antony-the-dev.github.io/kate_onokalo/` URL redirects). Keep every path **relative** (no leading `/`) anyway — local previews and the old URL rely on it. Deploy = `git push`. (netlify.toml was removed.)
+- **Hosting:** GitHub Pages — repo `antony-the-dev/kate_onokalo`, branch `main`, custom domain **`kateonokalo.com`** (since 2026-10-04; `CNAME` file in the repo root; DNS at Cloudflare: `CNAME @`/`www` → `antony-the-dev.github.io`, **DNS only**, GitHub issues the certificate; the old `antony-the-dev.github.io/kate_onokalo/` URL redirects; HTTPS enforced, Let's Encrypt cert auto-renewed — on 2026-10-04 it was only issued after removing and re-adding the custom domain). Keep every path **relative** (no leading `/`) anyway — local previews and the old URL rely on it. Deploy = `git push`. (netlify.toml was removed.)
 
 ## Key files
 
