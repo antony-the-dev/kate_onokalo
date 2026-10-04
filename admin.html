@@ -51,6 +51,21 @@
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0A1C3B; color: #E9E4DC; padding: 12px 22px; border-radius: 999px; font-size: 13.5px; display: none; z-index: 50; max-width: 92vw; text-align: center; }
   .note { background: #F6E7DC; border: 1px solid rgba(180,80,28,.25); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; color: #5A3A26; }
   .extra { margin-bottom: 16px; }
+  /* «Інструкція» tab: Kateryna's guide as an accordion */
+  .tab-help { border-style: dashed; }
+  .help { background: #F4F0E8; border: 1px solid rgba(27,26,22,.12); border-radius: 12px; margin-bottom: 8px; }
+  .help summary { cursor: pointer; list-style: none; padding: 15px 18px; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .help summary::-webkit-details-marker { display: none; }
+  .help summary::after { content: "+"; flex: none; font-size: 22px; line-height: 1; color: #B4501C; transition: transform .2s; }
+  .help[open] summary::after { transform: rotate(45deg); }
+  .help summary:focus-visible { outline: 2px solid #B4501C; outline-offset: -2px; border-radius: 12px; }
+  .help-body, .help-intro { font-size: 14.5px; line-height: 1.6; color: #2B2924; }
+  .help-body { padding: 0 18px 14px; }
+  .help-body p, .help-body ul, .help-body ol, .help-intro p { margin: 0 0 10px; }
+  .help-body ul, .help-body ol { padding-left: 20px; }
+  .help-body li { margin-bottom: 6px; }
+  .help code { background: #E9E4DC; padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+  .help-body a, .help-intro a { color: #B4501C; word-break: break-all; }
   .extra .card + .card { margin-top: 12px; }
   #editor, #hallEditor { position: fixed; inset: 0; background: rgba(10,28,59,.6); display: none; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; z-index: 40; }
   #editor .card, #hallEditor .card { max-width: 620px; width: 100%; max-height: 92vh; overflow-y: auto; }
@@ -90,6 +105,7 @@
       <button class="tab" data-cat="halls">Зали</button>
       <button class="tab" data-cat="page">Сторінка</button>
       <button class="tab" data-cat="settings">Налаштування</button>
+      <button class="tab tab-help" data-cat="help">Інструкція</button>
     </div>
 
     <div id="extra" class="extra"></div>
@@ -604,17 +620,87 @@ async function load() {
   render();
 }
 
+const NO_LIST = ["settings", "page", "help"];
+
 function render() {
-  $("#listBar").style.display = (cat === "settings" || cat === "page") ? "none" : "";
+  $("#listBar").style.display = NO_LIST.includes(cat) ? "none" : "";
   renderExtra();
   if (cat === "halls") renderHalls();
-  else if (cat === "settings" || cat === "page") $("#list").innerHTML = "";
+  else if (NO_LIST.includes(cat)) $("#list").innerHTML = "";
   else renderList(rows);
 }
 
 const SETTINGS_NOTE = '<p class="note">Це поле запрацює після разового налаштування бази — попросіть Антона (SQL у файлі ДОКУМЕНТАЦІЯ.md, розділ 8).</p>';
 
 // Re-rendering the tab (token refresh, reload after saving an item) must not wipe text being typed.
+// ---------- «Інструкція»: ІНСТРУКЦІЯ-ДЛЯ-КАТЕРИНИ.md (one text for the repo and the admin) as an accordion ----------
+
+let helpHtml = "";
+
+function mdInline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[\s(«])\*([^*\s][^*]*?)\*(?=[\s.,;:!?)»]|$)/g, "$1<i>$2</i>")
+    .replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)»])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+
+// Just what the guide uses: paragraphs (line breaks kept), - / 1. lists with indented continuation lines, ---.
+function mdBlocks(md) {
+  const out = [];
+  let list = null, para = [];
+  const flushPara = () => { if (para.length) { out.push("<p>" + para.map(mdInline).join("<br>") + "</p>"); para = []; } };
+  const flushList = () => {
+    if (list) out.push(`<${list.tag}>` + list.items.map((i) => "<li>" + i.map(mdInline).join("<br>") + "</li>").join("") + `</${list.tag}>`);
+    list = null;
+  };
+  md.split("\n").forEach((line) => {
+    const t = line.trim();
+    if (!t || t === "---") { flushPara(); flushList(); return; }
+    const m = t.match(/^(\d+)\.\s+(.*)/) || t.match(/^[-*]\s+(.*)/);
+    if (m) {
+      const tag = /^\d/.test(t) ? "ol" : "ul";
+      flushPara();
+      if (!list || list.tag !== tag) { flushList(); list = { tag, items: [] }; }
+      list.items.push([tag === "ol" ? m[2] : m[1]]);
+      return;
+    }
+    if (list && /^\s{2,}/.test(line)) { list.items[list.items.length - 1].push(t); return; }
+    flushList();
+    para.push(t);
+  });
+  flushPara(); flushList();
+  return out.join("");
+}
+
+function helpFromMd(md) {
+  const parts = md.replace(/\r/g, "").split(/^## /m);
+  const intro = parts.shift().replace(/^# .*\n/, "");
+  return `<div class="card help-intro" style="margin-bottom:10px;">${mdBlocks(intro)}</div>` + parts.map((p) => {
+    const nl = p.indexOf("\n");
+    return `<details class="help"><summary>${mdInline(p.slice(0, nl).trim())}</summary><div class="help-body">${mdBlocks(p.slice(nl + 1))}</div></details>`;
+  }).join("");
+}
+
+function fillHelp(el) {
+  if (el.querySelector("#helpList")) return; // already shown: keep the open sections as they are
+  el.innerHTML = `<div class="row" style="justify-content:space-between; flex-wrap:wrap; margin-bottom:12px;">
+      <p class="muted">Шпаргалка по адмінці — натисни на розділ, щоб розгорнути.</p>
+      <button class="btn btn-line" id="helpAll" type="button">Розгорнути все</button>
+    </div>
+    <div id="helpList">${helpHtml || '<p class="muted">Завантажую…</p>'}</div>`;
+  $("#helpAll").addEventListener("click", () => {
+    const ds = $$("#helpList details"), open = ds.some((d) => !d.open);
+    ds.forEach((d) => { d.open = open; });
+    $("#helpAll").textContent = open ? "Згорнути все" : "Розгорнути все";
+  });
+  if (helpHtml) return;
+  fetch(encodeURI("ІНСТРУКЦІЯ-ДЛЯ-КАТЕРИНИ.md") + "?v=" + Date.now())
+    .then((r) => (r.ok ? r.text() : Promise.reject(new Error("HTTP " + r.status))))
+    .then((md) => { helpHtml = helpFromMd(md); const l = $("#helpList"); if (l) l.innerHTML = helpHtml; })
+    .catch(() => { const l = $("#helpList"); if (l) l.innerHTML = '<p class="note">Не вдалося завантажити інструкцію — онови сторінку.</p>'; });
+}
+
 function renderExtra() {
   const el = $("#extra");
   const typed = {};
@@ -805,6 +891,7 @@ async function resetPagePhoto(key) {
 
 function fillExtra(el) {
   if (cat === "page") { fillPage(el); return; }
+  if (cat === "help") { fillHelp(el); return; }
   if (cat === "projects") {
     el.innerHTML = `<div class="card">
       <h2>Текст над реалізованими проєктами</h2>
