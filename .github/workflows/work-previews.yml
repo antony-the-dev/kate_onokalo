@@ -41,7 +41,7 @@ jobs:
         run: node .github/scripts/work-previews.mjs
       - name: Commit and push
         run: |
-          git add -A w sitemap.xml index.html
+          git add -A w en/w sitemap.xml index.html
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "Work pages: update catalogue"
