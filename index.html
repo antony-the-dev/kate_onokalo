@@ -187,6 +187,9 @@
   /* «Реалізовані проєкти» header: title + CTA on the left, the artist's text on the right —
      first paragraph as a serif lead, the rest in columns, a short last paragraph as a closing line. */
   .dc-projhead { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); grid-template-areas: "t x" "c x"; grid-template-rows: auto 1fr; gap: 28px clamp(32px, 5vw, 96px); padding-bottom: clamp(30px, 4vw, 52px); border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px); }
+  .dc-wshead { border-bottom-color: var(--lnav-b); }
+  .dc-wshead .dc-lead, .dc-wshead .dc-coda { color: var(--ltext); }
+  .dc-wshead .dc-cols p { color: var(--ltext2); }
   .dc-projhead > .t { grid-area: t; } .dc-projhead > .x { grid-area: x; } .dc-projhead > .c { grid-area: c; align-self: end; }
   .dc-lead { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(21px, 1.9vw, 28px); line-height: 1.38; margin: 0; color: var(--ink); text-wrap: pretty; white-space: pre-line; }
   .dc-cols { columns: 2 30ch; column-gap: clamp(28px, 3vw, 56px); margin-top: clamp(20px, 2.2vw, 30px); }
@@ -198,6 +201,7 @@
   .dc-offer { background: var(--bg); padding: clamp(24px, 2.8vw, 42px) clamp(20px, 2.4vw, 36px); }
   .dc-offer .dc-dab { width: 26px; height: 20px; margin-bottom: clamp(18px, 2vw, 28px); }
   .dc-ordercard { border: 1px solid var(--border); background: rgba(255,255,255,.28); padding: clamp(22px, 3vw, 44px); }
+  @media (min-width: 900px) { .dc-ordercard { position: sticky; top: 96px; } } /* follows the 01–03 steps instead of ending half-way */
   .dc-ctanote { font-size: 14px; line-height: 1.6; font-weight: 350; color: var(--ink3); margin: 0 0 16px; max-width: 34ch; }
   @media (max-width: 900px) {
     .dc-projhead { grid-template-columns: minmax(0, 1fr); grid-template-areas: "t" "x" "c"; grid-template-rows: auto; }
@@ -736,11 +740,11 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
         <img src="{{ interiorImg1 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
-        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
+        <figcaption style="font-size: 13.5px; line-height: 1.5; letter-spacing: .01em; color: var(--ink3); margin-top: 12px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
       </figure>
       <figure style="margin: 0;">
         <img src="{{ interiorImg2 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
-        <figcaption style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 14px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
+        <figcaption style="font-size: 13.5px; line-height: 1.5; letter-spacing: .01em; color: var(--ink3); margin-top: 12px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
       </figure>
     </div>
   </section>
@@ -806,13 +810,26 @@
 
   <section id="workshops" data-recede="1" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 26px 48px; margin-bottom: clamp(30px, 4vw, 52px);">
-        <div style="max-width: 60ch;">
-          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 22px;" data-en="Workshops">Майстер-класи</div>
-          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 24px;" data-en="On-site painting workshops">Виїзні майстер-класи з живопису</h2>
-          <p style="font-size: 16px; line-height: 1.75; color: var(--ltext2); margin: 0; text-wrap: pretty; white-space: pre-line;">{{ wsIntro }}</p>
+      <!-- same layout as «Реалізовані проєкти»: title + button on the left, Kateryna's text on the right -->
+      <div class="dc-projhead dc-wshead">
+        <div class="t">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 12px;" data-en="Workshops">Майстер-класи</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0;" data-en="On-site painting workshops">Виїзні майстер-класи з живопису</h2>
         </div>
-        <button onClick="{{ askWorkshop }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #C7A17A;">{{ lWsOrder }}</button>
+        <div class="x">
+          <p class="dc-lead">{{ wsLead }}</p>
+          <sc-if value="{{ hasWsBody }}">
+            <div class="dc-cols">
+              <sc-for list="{{ wsBody }}" as="pp"><p>{{ pp.t }}</p></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasWsCoda }}">
+            <p class="dc-coda">{{ wsCoda }}</p>
+          </sc-if>
+        </div>
+        <div class="c">
+          <button onClick="{{ askWorkshop }}" style="background: var(--bg); color: var(--navy-ink); border: none; padding: 16px 30px; font: inherit; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; min-height: 48px;" style-hover="background: #C7A17A;">{{ lWsOrder }}</button>
+        </div>
       </div>
       <sc-if value="{{ hasWsPhotos }}">
         <div class="dc-strip" ref="{{ wsStripRef }}">
@@ -2122,15 +2139,26 @@ class Component extends DCLogic {
   // The projects intro (Kateryna's free text) laid out for reading: a leading line that only repeats the section
   // title is dropped, the first paragraph becomes the serif lead, the rest go to columns, and a short last
   // paragraph (≥3 in all) closes it as a quote-like line.
-  projText(raw) {
+  // Kateryna's section intro → serif lead, the rest in columns, a short last paragraph as a closing line. A first
+  // paragraph that only repeats the section title (incl. her edit of it in «Сторінка») is dropped; blank-line runs collapse.
+  introText(raw, titleKey, alt) {
     const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zа-яіїєґ]+/g, '');
-    const edit = this.textEdits()['Реалізовані проєкти'] || {};
-    const titles = ['Реалізовані проєкти', 'Реалізовані проекти', 'Completed projects', edit.ua, edit.en].map(norm).filter(Boolean);
+    const edit = this.textEdits()[titleKey] || {};
+    const titles = [titleKey, edit.ua, edit.en].concat(alt).map(norm).filter(Boolean);
     const paras = String(raw || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
     if (paras.length > 1 && titles.includes(norm(paras[0]))) paras.shift();
     const coda = paras.length >= 3 && paras[paras.length - 1].length <= 160 ? paras.pop() : '';
-    const body = paras.slice(1).map(t => ({ t }));
-    return { projLead: paras[0] || '', projBody: body, hasProjBody: body.length > 0, projCoda: coda, hasProjCoda: !!coda, hasProjMore: body.length > 0 || !!coda };
+    return { lead: paras[0] || '', body: paras.slice(1).map(t => ({ t })), coda };
+  }
+
+  projText(raw) {
+    const t = this.introText(raw, 'Реалізовані проєкти', ['Реалізовані проекти', 'Completed projects']);
+    return { projLead: t.lead, projBody: t.body, hasProjBody: t.body.length > 0, projCoda: t.coda, hasProjCoda: !!t.coda, hasProjMore: t.body.length > 0 || !!t.coda };
+  }
+
+  wsText(raw) {
+    const t = this.introText(raw, 'Виїзні майстер-класи з живопису', ['On-site painting workshops', 'Майстер-класи', 'Workshops']);
+    return { wsLead: t.lead, wsBody: t.body, hasWsBody: t.body.length > 0, wsCoda: t.coda, hasWsCoda: !!t.coda };
   }
 
   // Static texts: data-ua keeps the original Ukrainian text, which is also the key of Kateryna's edits
@@ -2544,7 +2572,7 @@ class Component extends DCLogic {
       askProj: () => { if (pa) this.openTg(lbWs ? L.wsMsg : L.similarMsg + '\n' + pa.img); },
       lbAction: lbWs ? L.wsOrder : L.similar,
 
-      wsIntro: (l === 'en' ? this.setting('workshops_intro_en') : this.setting('workshops_intro')) || L.wsIntro,
+      ...this.wsText((l === 'en' ? this.setting('workshops_intro_en') : this.setting('workshops_intro')) || L.wsIntro),
       lWsOrder: L.wsOrder,
       askWorkshop: () => this.openTg(L.wsMsg),
       hasWsPhotos: wss.length > 0,
