@@ -331,11 +331,16 @@ const homeChanged = html !== index;
 if (homeChanged) await fs.writeFile(path.join(ROOT, 'index.html'), html);
 const home = homeChanged || !manifest.home ? today : manifest.home;
 
+// Static info pages next to index.html (no lastmod: a checkout's file times would change it on every run).
+const STATIC_PAGES = ['delivery.html', 'privacy.html'];
+const staticPages = [];
+for (const f of STATIC_PAGES) { try { await fs.access(path.join(ROOT, f)); staticPages.push(f); } catch (e) {} }
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by .github/scripts/work-previews.mjs: the site and every work page. Submit in Google Search Console. -->
+<!-- Written by .github/scripts/work-previews.mjs: the site, its info pages and every work page. Submit in Google Search Console. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${esc(site)}</loc><lastmod>${home}</lastmod></url>
-${works.filter(it => next[String(it.id)]).map(it => `  <url><loc>${esc(`${site}w/${it.id}.html`)}</loc><lastmod>${next[String(it.id)].mod}</lastmod>${/^https?:\/\//.test(it.img) ? `<image:image><image:loc>${esc(it.img)}</image:loc></image:image>` : ''}</url>`).join('\n')}
+${staticPages.map(f => `  <url><loc>${esc(site + f)}</loc></url>\n`).join('')}${works.filter(it => next[String(it.id)]).map(it => `  <url><loc>${esc(`${site}w/${it.id}.html`)}</loc><lastmod>${next[String(it.id)].mod}</lastmod>${/^https?:\/\//.test(it.img) ? `<image:image><image:loc>${esc(it.img)}</image:loc></image:image>` : ''}</url>`).join('\n')}
 </urlset>
 `;
 let curMap = '';
