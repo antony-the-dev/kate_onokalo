@@ -7,7 +7,8 @@
 //  · index.html, between <!-- ko:snapshot --> markers: a JSON snapshot of the catalogue — the site shows it at once
 //    and then refreshes from Supabase; between <!-- ko:catalog --> markers: «Усі роботи», a plain list of every
 //    work linking to its page (in the contact section) — readable without JS.
-//  · sitemap.xml — the site and every work page (with its image).
+//  · en/w/<id>.html — the same page in English (title_en / tech_en / description_en, hall name_en), hreflang pairs.
+//  · sitemap.xml — the site (UA + ?lang=en), info pages and every work page in both languages (with its image).
 // Nothing is rewritten when nothing changed. Run by .github/workflows/work-previews.yml (needs `sharp`).
 // Local test without Supabase (in a copy of the repo — it rewrites index.html and sitemap.xml in place):
 //   PREVIEW_ITEMS=data.json node .github/scripts/work-previews.mjs
@@ -18,6 +19,7 @@ import crypto from 'node:crypto';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'w');
+const OUT_EN = path.join(ROOT, 'en', 'w'); // English twins of the work pages
 const MANIFEST = path.join(OUT, 'previews.json');
 const RENDER_VERSION = 1; // bump to re-render every image
 const W = 1200, H = 630;
@@ -133,6 +135,8 @@ a:hover{color:var(--terra)}
 .logo b{font:400 19px/1.05 "Cormorant Garamond",serif;letter-spacing:.18em;text-transform:uppercase}
 .logo span{font-size:8.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);padding-left:2px}
 .back{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.tr{display:flex;align-items:center;gap:18px}
+.lang{font-size:10.5px;letter-spacing:.18em;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
 .work{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;padding-top:clamp(28px,5vw,64px);padding-bottom:clamp(40px,6vw,80px)}
 @media (max-width:820px){.work{grid-template-columns:1fr}}
 .art{margin:0;display:flex;justify-content:center}
@@ -171,56 +175,92 @@ const detailsOf = (it) => [String(it.tech || '').trim(), fmtSize(it.size), Strin
 let STATUS = {};
 const statusOf = (id) => (STATUS[String(id)] === 'sold' || STATUS[String(id)] === 'reserved' ? STATUS[String(id)] : '');
 
-function page(it, v, group, more, moreTitle) {
+// Page texts per language. English pages (en/w/<id>.html) use the *_en columns, falling back to Ukrainian.
+const T = {
+  uk: {
+    htmlLang: 'uk', locale: 'uk_UA', alt: 'en_US', site: 'Катерина Онокало', artist: 'Катерина Онокало', painting: 'картина',
+    one: 'Єдиний екземпляр', sold: 'Продано', reserved: 'Резерв', soldNote: 'Вже у новому домі', reservedNote: 'Можна стати в чергу',
+    onRequest: 'Ціна за запитом', onRequestLc: 'ціна за запитом', price: 'Ціна', original: 'Авторська робота Катерини Онокало',
+    oneLc: 'єдиний екземпляр', gallery: 'Галерея', toHall: 'До зали', toGallery: 'До галереї', other: OTHER,
+    btnSold: 'Хочу схожу — у Telegram', btnOrder: 'Замовити в Telegram', btnAsk: 'Запитати в Telegram', open: 'Відкрити в галереї',
+    note: 'Оплата й доставка — у Telegram: відповідаю сама. Доставка Україною і за кордон.', commission: 'Картина на замовлення',
+    nav: 'Навігація', switchLabel: 'EN', switchTitle: 'English',
+    msgSold: (t, l) => `Вітаю! Мені дуже сподобалась ваша робота «${t}» — бачу, що вона вже продана. Чи можете написати схожу?\n${l}`,
+    msgOrder: (t, s, p, l) => `Вітаю! Хочу замовити «${t}»${s ? ', ' + s : ''}, ${p}.\n${l}`,
+    msgAsk: (t, l) => `Вітаю! Розкажіть детальніше про «${t}»\n${l}`,
+    q: (t) => `«${t}»`, artform: 'Живопис'
+  },
+  en: {
+    htmlLang: 'en', locale: 'en_US', alt: 'uk_UA', site: 'Kateryna Onokalo', artist: 'Kateryna Onokalo', painting: 'painting',
+    one: 'One of a kind', sold: 'Sold', reserved: 'Reserved', soldNote: 'Already in its new home', reservedNote: 'Join the waiting list',
+    onRequest: 'Price on request', onRequestLc: 'price on request', price: 'Price', original: 'An original work by Kateryna Onokalo',
+    oneLc: 'one of a kind', gallery: 'Gallery', toHall: 'Back to the hall', toGallery: 'Back to the gallery', other: 'Other works',
+    btnSold: 'I want a similar one — Telegram', btnOrder: 'Order via Telegram', btnAsk: 'Ask via Telegram', open: 'Open in the gallery',
+    note: 'Payment and delivery are arranged in Telegram — I reply myself. Shipping within Ukraine and worldwide.', commission: 'Commission a painting',
+    nav: 'Breadcrumbs', switchLabel: 'UA', switchTitle: 'Українською',
+    msgSold: (t, l) => `Hello! I love your painting “${t}” — I see it has been sold. Could you paint a similar one?\n${l}`,
+    msgOrder: (t, s, p, l) => `Hello! I would like to order “${t}”${s ? ', ' + s : ''}, ${p}.\n${l}`,
+    msgAsk: (t, l) => `Hello! Could you tell me more about “${t}”?\n${l}`,
+    q: (t) => `“${t}”`, artform: 'Painting'
+  }
+};
+const pageUrl = (id, lang) => `${site}${lang === 'en' ? 'en/' : ''}w/${id}.html`;
+const loc = (it, f, lang) => String((lang === 'en' && it[f + '_en']) || it[f] || '').trim();
+const sizeOf = (it, lang) => { const s = fmtSize(it.size); return lang === 'en' ? s.replace(/ см/g, ' cm') : s; };
+const hallTitle = (g, lang) => (g.key ? (lang === 'en' && g.nameEn) || g.name : T[lang].other);
+
+function page(it, v, group, more, moreTitle, lang = 'uk') {
+  const L = T[lang];
+  const up = lang === 'en' ? '../../' : '../';          // en/w/<id>.html sits one level deeper than w/<id>.html
+  const home = lang === 'en' ? up + '?lang=en' : up;    // the gallery in the same language
+  const relL = (src) => (/^https?:\/\//.test(src) ? src : up + src);
   const id = String(it.id);
-  const title = titleOf(it);
-  const titleEn = String(it.title_en || '').trim();
-  const size = fmtSize(it.size);
-  const tech = String(it.tech || '').trim();
-  const details = detailsOf(it);
-  const text = String(it.description || '').trim();
+  const title = loc(it, 'title', lang) || titleOf(it);
+  const titleUa = titleOf(it);
+  const size = sizeOf(it, lang);
+  const tech = loc(it, 'tech', lang);
+  const details = [tech, size, String(it.year || '').trim()].filter(Boolean).join(' · ');
+  const text = loc(it, 'description', lang);
   const st = statusOf(it.id);
   const priced = it.price > 0;
-  const price = st === 'sold' ? 'Продано' : st === 'reserved' ? 'Резерв' : priced ? money(it.price) : 'Ціна за запитом';
-  const note = st === 'sold' ? 'Вже у новому домі' : st === 'reserved' ? 'Можна стати в чергу' : 'Єдиний екземпляр';
-  const self = `${site}w/${id}.html`;
+  const price = st ? L[st] : priced ? money(it.price) : L.onRequest;
+  const note = st === 'sold' ? L.soldNote : st === 'reserved' ? L.reservedNote : L.one;
+  const self = pageUrl(id, lang);
   const d = dims(it.img);
-  const kind = [tech ? tech.charAt(0).toLowerCase() + tech.slice(1) : 'картина', size].filter(Boolean).join(', ');
-  const pageTitle = `«${title}» — ${kind} | Катерина Онокало`;
-  const summary = (details ? details + '. ' : '') + 'Авторська робота Катерини Онокало, єдиний екземпляр.';
-  const metaDesc = `«${title}» — ${details ? details + '. ' : ''}${text ? text.replace(/\s+/g, ' ').slice(0, 110) + (text.length > 110 ? '…' : '') + ' ' : ''}${st ? price + '.' : priced ? 'Ціна ' + price + '.' : 'Ціна за запитом.'} Авторська робота Катерини Онокало.`;
-  const msg = st === 'sold'
-    ? `Вітаю! Мені дуже сподобалась ваша робота «${title}» — бачу, що вона вже продана. Чи можете написати схожу?\n${self}`
-    : priced && !st
-      ? `Вітаю! Хочу замовити «${title}»${size ? ', ' + size : ''}, ${price}.\n${self}`
-      : `Вітаю! Розкажіть детальніше про «${title}»\n${self}`;
+  const kind = [tech ? tech.charAt(0).toLowerCase() + tech.slice(1) : L.painting, size].filter(Boolean).join(', ');
+  const pageTitle = `${L.q(title)} — ${kind} | ${L.site}`;
+  const summary = (details ? details + '. ' : '') + L.original + ', ' + L.oneLc + '.';
+  const metaDesc = `${L.q(title)} — ${details ? details + '. ' : ''}${text ? text.replace(/\s+/g, ' ').slice(0, 110) + (text.length > 110 ? '…' : '') + ' ' : ''}${st ? price + '.' : priced ? L.price + ' ' + price + '.' : L.onRequest + '.'} ${L.original}.`;
+  const msg = st === 'sold' ? L.msgSold(title, self) : priced && !st ? L.msgOrder(title, size, price, self) : L.msgAsk(title, self);
   const order = `https://t.me/${tg}?text=${encodeURIComponent(msg)}`;
-  const hallName = group.key ? group.name : OTHER;
+  const hallName = hallTitle(group, lang);
   const artwork = {
     '@type': priced ? ['Product', 'VisualArtwork'] : 'VisualArtwork',
-    '@id': self + '#artwork', name: title, url: self, image: [it.img, `${site}w/${id}.jpg`],
-    description: text || summary, creator: { '@id': site + '#artist' }, artform: 'Живопис'
+    '@id': self + '#artwork', name: title, url: self, image: [it.img, `${site}w/${id}.jpg`], inLanguage: L.htmlLang,
+    description: text || summary, creator: { '@id': site + '#artist' }, artform: L.artform
   };
   if (tech) artwork.artMedium = tech;
   if (it.year) artwork.dateCreated = String(it.year);
   if (priced) {
-    artwork.brand = { '@type': 'Brand', name: 'Катерина Онокало' };
+    artwork.brand = { '@type': 'Brand', name: L.artist };
     artwork.offers = { '@type': 'Offer', price: String(it.price), priceCurrency: 'UAH', availability: 'https://schema.org/' + (st === 'sold' ? 'SoldOut' : st === 'reserved' ? 'Reserved' : 'InStock'), itemCondition: 'https://schema.org/NewCondition', url: self, seller: { '@id': site + '#artist' } };
   }
+  const homeUrl = lang === 'en' ? site + '?lang=en' : site;
   const ld = {
     '@context': 'https://schema.org',
     '@graph': [artwork, { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Катерина Онокало', item: site },
-      { '@type': 'ListItem', position: 2, name: hallName, item: site + '#' + group.slug },
+      { '@type': 'ListItem', position: 1, name: L.artist, item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: hallName, item: homeUrl + '#' + group.slug },
       { '@type': 'ListItem', position: 3, name: title, item: self }
     ] }]
   };
   const card = (w) => {
-    const t = dims(w.img);
-    return `<a href="${esc(String(w.id))}.html"><span class="frame"><img src="${esc(rel(thumbOf(w.img)))}" alt="${esc(titleOf(w))}"${t ? ` width="${t.w}" height="${t.h}"` : ''} loading="lazy" decoding="async"></span><span class="t">${esc(titleOf(w))}</span><span class="p">${esc(w.price > 0 ? money(w.price) : 'Ціна за запитом')}</span></a>`;
+    const t = dims(w.img), wt = loc(w, 'title', lang) || titleOf(w), ws = statusOf(w.id);
+    return `<a href="${esc(String(w.id))}.html"><span class="frame"><img src="${esc(relL(thumbOf(w.img)))}" alt="${esc(wt)}"${t ? ` width="${t.w}" height="${t.h}"` : ''} loading="lazy" decoding="async"></span><span class="t">${esc(wt)}</span><span class="p">${esc(ws ? L[ws] : w.price > 0 ? money(w.price) : L.onRequest)}</span></a>`;
   };
+  const other = lang === 'en' ? `../../w/${esc(id)}.html` : `../en/w/${esc(id)}.html`;
   return `<!DOCTYPE html>
-<html lang="uk" data-theme="dark">
+<html lang="${L.htmlLang}" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -229,10 +269,14 @@ function page(it, v, group, more, moreTitle) {
 <meta name="robots" content="max-image-preview:large">
 <meta name="theme-color" content="#0A1C3B">
 <link rel="canonical" href="${esc(self)}">
+<link rel="alternate" hreflang="uk" href="${esc(pageUrl(id, 'uk'))}">
+<link rel="alternate" hreflang="en" href="${esc(pageUrl(id, 'en'))}">
+<link rel="alternate" hreflang="x-default" href="${esc(pageUrl(id, 'uk'))}">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="uk_UA">
-<meta property="og:site_name" content="Катерина Онокало">
-<meta property="og:title" content="${esc(`«${title}» — ${priced ? price : 'ціна за запитом'}`)}">
+<meta property="og:locale" content="${L.locale}">
+<meta property="og:locale:alternate" content="${L.alt}">
+<meta property="og:site_name" content="${esc(L.site)}">
+<meta property="og:title" content="${esc(`${L.q(title)} — ${st ? price : priced ? price : L.onRequestLc}`)}">
 <meta property="og:description" content="${esc(summary)}">
 <meta property="og:url" content="${esc(self)}">
 <meta property="og:image" content="${esc(`${site}w/${id}.jpg?v=${v}`)}">
@@ -240,30 +284,30 @@ function page(it, v, group, more, moreTitle) {
 <meta property="og:image:height" content="${H}">
 <meta property="og:image:alt" content="${esc(title)}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
-<link rel="apple-touch-icon" href="../img/favicon-180.png">
-<link rel="preload" href="${esc(rel(it.img))}" as="image" fetchpriority="high">
-<link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="icon" type="image/svg+xml" href="${up}img/favicon.svg">
+<link rel="apple-touch-icon" href="${up}img/favicon-180.png">
+<link rel="preload" href="${esc(relL(it.img))}" as="image" fetchpriority="high">
+<link rel="stylesheet" href="${up}fonts/fonts.css">
 <script>try{if(localStorage.getItem('ko_theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 <style>${CSS}</style>
 </head>
 <body>
 <header class="top">
-<a class="logo" href="../"><b>Онокало</b><span>Kateryna · Fine Art</span></a>
-<a class="back" href="../#${esc(group.slug)}">⟵ ${esc(group.key ? 'До зали' : 'До галереї')}</a>
+<a class="logo" href="${home}"><b>${lang === 'en' ? 'Onokalo' : 'Онокало'}</b><span>Kateryna · Fine Art</span></a>
+<span class="tr"><a class="back" href="${home}#${esc(group.slug)}">⟵ ${esc(group.key ? L.toHall : L.toGallery)}</a><a class="lang" href="${other}" hreflang="${lang === 'en' ? 'uk' : 'en'}" lang="${lang === 'en' ? 'uk' : 'en'}" title="${L.switchTitle}">${L.switchLabel}</a></span>
 </header>
 <main class="work">
-<figure class="art"><img src="${esc(rel(it.img))}" alt="${esc(`${title} — ${kind}, Катерина Онокало`)}"${d ? ` width="${d.w}" height="${d.h}"` : ''} fetchpriority="high" decoding="async"></figure>
+<figure class="art"><img src="${esc(relL(it.img))}" alt="${esc(`${title} — ${kind}, ${L.artist}`)}"${d ? ` width="${d.w}" height="${d.h}"` : ''} fetchpriority="high" decoding="async"></figure>
 <div>
-<nav class="crumbs" aria-label="Навігація"><a href="../">Галерея</a> · <a href="../#${esc(group.slug)}">${esc(hallName)}</a></nav>
+<nav class="crumbs" aria-label="${L.nav}"><a href="${home}">${L.gallery}</a> · <a href="${home}#${esc(group.slug)}">${esc(hallName)}</a></nav>
 <h1>${esc(title)}</h1>
-${titleEn && titleEn !== title ? `<p class="en" lang="en">${esc(titleEn)}</p>\n` : ''}${details ? `<p class="meta">${esc(details)}</p>\n` : ''}${text ? `<p class="desc">${esc(text)}</p>\n` : ''}<div class="price"><b${st ? ` data-st="${st}"` : ''}>${esc(price)}</b><span>${esc(note)}</span></div>
-<div class="actions"><a class="btn" href="${esc(order)}" target="_blank" rel="noopener">${st === 'sold' ? 'Хочу схожу — у Telegram' : priced && !st ? 'Замовити в Telegram' : 'Запитати в Telegram'}</a><a class="btn line" href="../#work-${esc(id)}">Відкрити в галереї</a></div>
-<p class="note">Оплата й доставка — у Telegram: відповідаю сама. Доставка Україною і за кордон.</p>
+${lang === 'uk' && title !== loc(it, 'title', 'en') && loc(it, 'title', 'en') ? `<p class="en" lang="en">${esc(loc(it, 'title', 'en'))}</p>\n` : lang === 'en' && titleUa !== title ? `<p class="en" lang="uk">${esc(titleUa)}</p>\n` : ''}${details ? `<p class="meta">${esc(details)}</p>\n` : ''}${text ? `<p class="desc">${esc(text)}</p>\n` : ''}<div class="price"><b${st ? ` data-st="${st}"` : ''}>${esc(price)}</b><span>${esc(note)}</span></div>
+<div class="actions"><a class="btn" href="${esc(order)}" target="_blank" rel="noopener">${st === 'sold' ? L.btnSold : priced && !st ? L.btnOrder : L.btnAsk}</a><a class="btn line" href="${home}#work-${esc(id)}">${L.open}</a></div>
+<p class="note">${L.note}</p>
 </div>
 </main>
-${more.length ? `<section class="more"><h2>${esc(moreTitle)}</h2><div class="grid">${more.map(card).join('')}</div></section>\n` : ''}<footer><span>© ${new Date().getFullYear()} Kateryna Onokalo</span><nav><a href="../">Галерея</a><a href="https://t.me/${esc(tg)}" target="_blank" rel="noopener">Telegram</a><a href="../#order">Картина на замовлення</a></nav></footer>
+${more.length ? `<section class="more"><h2>${esc(moreTitle)}</h2><div class="grid">${more.map(card).join('')}</div></section>\n` : ''}<footer><span>© ${new Date().getFullYear()} Kateryna Onokalo</span><nav><a href="${home}">${L.gallery}</a><a href="https://t.me/${esc(tg)}" target="_blank" rel="noopener">Telegram</a><a href="${home}#order">${L.commission}</a></nav></footer>
 </body>
 </html>
 `;
@@ -292,10 +336,12 @@ const rows = data.items.filter(it => it && it.id && !it.hidden).sort(byOrder);
 const halls = data.halls.slice().sort(byOrder);
 const works = rows.filter(it => it.img && !NOT_PAINTINGS.includes(it.cat) && /^[A-Za-z0-9-]+$/.test(String(it.id)));
 const groups = hallGroups(works, halls);
+groups.forEach((g) => { const hr = halls.find((x) => (x.name || '') === g.key); g.nameEn = String((hr && hr.name_en) || '').trim(); });
 const groupOf = new Map();
 groups.forEach(g => g.works.forEach(w => groupOf.set(String(w.id), g)));
 
 await fs.mkdir(OUT, { recursive: true });
+await fs.mkdir(OUT_EN, { recursive: true });
 let manifest = {};
 try { manifest = JSON.parse(await fs.readFile(MANIFEST, 'utf8')); } catch (e) {}
 const old = manifest.works || Object.fromEntries(Object.entries(manifest).map(([k, v]) => [k, typeof v === 'string' ? { v } : v]));
@@ -315,19 +361,26 @@ for (const it of works) {
   const same = g.works.filter(w => w !== it);
   const more = (same.length >= 2 ? same : same.concat(works.filter(w => w !== it && !same.includes(w)))).slice(0, 4);
   const moreTitle = same.length >= 2 ? `Ще із зали «${g.title}»` : 'Ще роботи';
-  const html = page(it, v, g, more, moreTitle);
-  const h = hash(html);
-  next[id] = { v, h, mod: prev.h === h && prev.mod ? prev.mod : today };
-  const file = path.join(OUT, id + '.html');
-  let cur = '';
-  try { cur = await fs.readFile(file, 'utf8'); } catch (e) {}
-  if (cur !== html) { await fs.writeFile(file, html); pages++; }
+  const moreTitleEn = same.length >= 2 ? `More from the hall “${(g.nameEn || g.title).replace(/^Зала\s+\S+\s*·\s*/, '')}”` : 'More works';
+  const html = page(it, v, g, more, moreTitle, 'uk');
+  const htmlEn = page(it, v, g, more, moreTitleEn, 'en');
+  const h = hash(html), he = hash(htmlEn);
+  next[id] = { v, h, mod: prev.h === h && prev.mod ? prev.mod : today, he, modEn: prev.he === he && prev.modEn ? prev.modEn : today };
+  for (const [file, body] of [[path.join(OUT, id + '.html'), html], [path.join(OUT_EN, id + '.html'), htmlEn]]) {
+    let cur = '';
+    try { cur = await fs.readFile(file, 'utf8'); } catch (e) {}
+    if (cur !== body) { await fs.writeFile(file, body); pages++; }
+  }
 }
 // works that were hidden or deleted lose their pages
 let removed = 0;
 for (const f of await fs.readdir(OUT)) {
   const m = f.match(/^(.+)\.(html|jpg)$/);
   if (m && !next[m[1]]) { await fs.rm(path.join(OUT, f)); removed++; }
+}
+for (const f of await fs.readdir(OUT_EN)) {
+  const m = f.match(/^(.+)\.html$/);
+  if (m && !next[m[1]]) { await fs.rm(path.join(OUT_EN, f)); removed++; }
 }
 
 // index.html: snapshot (what the site's loadSupabase() would fetch) + the plain catalogue
@@ -344,15 +397,21 @@ if (homeChanged) await fs.writeFile(path.join(ROOT, 'index.html'), html);
 const home = homeChanged || !manifest.home ? today : manifest.home;
 
 // Static info pages next to index.html (no lastmod: a checkout's file times would change it on every run).
-const STATIC_PAGES = ['delivery.html', 'privacy.html'];
+const STATIC_PAGES = ['delivery.html', 'privacy.html', 'en/delivery.html', 'en/privacy.html'];
 const staticPages = [];
 for (const f of STATIC_PAGES) { try { await fs.access(path.join(ROOT, f)); staticPages.push(f); } catch (e) {} }
 
+const alt = (uk, en) => `<xhtml:link rel="alternate" hreflang="uk" href="${esc(uk)}"/><xhtml:link rel="alternate" hreflang="en" href="${esc(en)}"/><xhtml:link rel="alternate" hreflang="x-default" href="${esc(uk)}"/>`;
+const img = (it) => (/^https?:\/\//.test(it.img) ? `<image:image><image:loc>${esc(it.img)}</image:loc></image:image>` : '');
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by .github/scripts/work-previews.mjs: the site, its info pages and every work page. Submit in Google Search Console. -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>${esc(site)}</loc><lastmod>${home}</lastmod></url>
-${staticPages.map(f => `  <url><loc>${esc(site + f)}</loc></url>\n`).join('')}${works.filter(it => next[String(it.id)]).map(it => `  <url><loc>${esc(`${site}w/${it.id}.html`)}</loc><lastmod>${next[String(it.id)].mod}</lastmod>${/^https?:\/\//.test(it.img) ? `<image:image><image:loc>${esc(it.img)}</image:loc></image:image>` : ''}</url>`).join('\n')}
+<!-- Written by .github/scripts/work-previews.mjs: the site (UA + ?lang=en), its info pages and every work page in both languages. Submit in Google Search Console. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>${esc(site)}</loc><lastmod>${home}</lastmod>${alt(site, site + '?lang=en')}</url>
+  <url><loc>${esc(site + '?lang=en')}</loc><lastmod>${home}</lastmod>${alt(site, site + '?lang=en')}</url>
+${staticPages.map(f => `  <url><loc>${esc(site + f)}</loc></url>\n`).join('')}${works.filter(it => next[String(it.id)]).map(it => {
+  const id = String(it.id), n = next[id], a = alt(pageUrl(id, 'uk'), pageUrl(id, 'en'));
+  return `  <url><loc>${esc(pageUrl(id, 'uk'))}</loc><lastmod>${n.mod}</lastmod>${a}${img(it)}</url>\n  <url><loc>${esc(pageUrl(id, 'en'))}</loc><lastmod>${n.modEn || n.mod}</lastmod>${a}${img(it)}</url>`;
+}).join('\n')}
 </urlset>
 `;
 let curMap = '';

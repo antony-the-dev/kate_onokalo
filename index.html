@@ -20,6 +20,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <link rel="canonical" href="https://kateonokalo.com/">
+<link rel="alternate" hreflang="uk" href="https://kateonokalo.com/">
+<link rel="alternate" hreflang="en" href="https://kateonokalo.com/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://kateonokalo.com/">
 <link rel="preconnect" href="https://gdekiqdwjyaxvnxnbvpc.supabase.co" crossorigin>
 <link rel="preload" href="img/hero-1600.webp" as="image" fetchpriority="high">
 <link rel="preload" href="fonts/commissioner-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
@@ -396,9 +399,9 @@
 
   <header style="position: sticky; top: 0; z-index: 40; background: var(--header-bg); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);">
     <div class="dc-header-inner" style="max-width: 1680px; margin: 0 auto; padding: 0 clamp(18px, 4vw, 52px); height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
-      <button class="dc-burger" onClick="{{ toggleMenu }}" aria-label="Меню" aria-expanded="{{ menuOpen }}" style="display: none; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer; align-items: center; justify-content: center;">{{ menuIco }}</button>
+      <button class="dc-burger" onClick="{{ toggleMenu }}" aria-label="Меню" data-en-label="Menu" aria-expanded="{{ menuOpen }}" style="display: none; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer; align-items: center; justify-content: center;">{{ menuIco }}</button>
       <a href="#top" class="dc-logo" style="display: flex; flex-direction: column; line-height: 1.05; flex: none;">
-        <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;">Онокало</span>
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 19px; letter-spacing: .18em; text-transform: uppercase;" data-en="Onokalo">Онокало</span>
         <span class="dc-logo-sub" style="font-size: 8.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--muted); padding-left: 2px; white-space: nowrap;">Kateryna · Fine Art</span>
       </a>
       <nav class="dc-nav" style="display: flex; align-items: center; gap: clamp(14px, 1.7vw, 30px); font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3);">
@@ -432,9 +435,9 @@
         <a href="#contact" data-en="Contact">Контакти</a>
       </nav>
       <div class="dc-hright" style="display: flex; align-items: center; gap: 18px; flex: none;">
-        <button class="dc-hit" onClick="{{ toggleLang }}" aria-label="Мова" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ langLabel }}</button>
-        <button class="dc-hit" onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ themeIco }}</button>
-        <button class="dc-hit" onClick="{{ openCart }}" aria-label="Кошик" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
+        <button class="dc-hit" onClick="{{ toggleLang }}" aria-label="Мова" data-en-label="Language" style="background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); cursor: pointer;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ langLabel }}</button>
+        <button class="dc-hit" onClick="{{ toggleTheme }}" aria-label="Тема" title="Тема" data-en-label="Theme" data-en-title="Theme" style="background: none; border: 1px solid var(--border); border-radius: 999px; width: 34px; height: 34px; font-size: 15px; line-height: 1; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--navy-bg); color: var(--cream-text); border-color: var(--navy-bg);">{{ themeIco }}</button>
+        <button class="dc-hit" onClick="{{ openCart }}" aria-label="Кошик" data-en-label="Cart" style="background: none; border: none; padding: 6px 0; font: inherit; font-size: 11.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px;" style-hover="color: var(--terracotta);">
           <svg class="dc-cart-ico" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
           <span class="dc-cart-label" data-en="Cart">Кошик</span>
           <span style="min-width: 20px; height: 20px; border-radius: 999px; background: var(--navy-bg); color: var(--cream-text); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0;">{{ cartCount }}</span>
@@ -449,11 +452,11 @@
   </header>
 
   <sc-if value="{{ menuOpen }}">
-    <div class="dc-mmenu" role="dialog" aria-modal="true" aria-label="Меню" onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 55; background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;">
+    <div class="dc-mmenu" role="dialog" aria-modal="true" aria-label="Меню" data-en-label="Menu" onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 55; background: var(--bg); display: flex; flex-direction: column; overflow-y: auto;">
       <div style="display: flex; justify-content: flex-start; align-items: center; padding: 12px clamp(18px, 4vw, 52px); min-height: 68px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
         <button class="dc-burger" onClick="{{ closeMenu }}" aria-label="Закрити меню" style="display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: 999px; width: 44px; height: 44px; font-size: 16px; line-height: 1; color: var(--ink); cursor: pointer;">✕</button>
       </div>
-      <nav aria-label="Меню" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
+      <nav aria-label="Меню" data-en-label="Menu" style="display: flex; flex-direction: column; padding: 12px 28px 40px; animation: menuDrop .45s cubic-bezier(.2,.7,.2,1) both;">
         <a href="#about" onClick="{{ closeMenu }}" data-en="About" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Про мене</a>
         <a href="#halls" onClick="{{ closeMenu }}" data-en="Halls" style="padding: 14px 0 8px; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink);" style-hover="color: #B4501C;">Зали</a>
         <div style="display: flex; flex-direction: column; padding: 0 0 12px 4px; border-bottom: 1px solid var(--border);">
@@ -506,7 +509,7 @@
     <div style="position: relative; display: flex; justify-content: center; animation: floatIn 1.1s .1s ease-out both;">
       <div style="animation: breathe 6.3s ease-in-out infinite;">
         <div ref="{{ heroRef }}" style="position: relative; width: min(560px, 82vw); box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
-          <img src="img/hero-1600.webp" alt="Абстракція, олія на полотні" width="1582" height="1600" fetchpriority="high" style="display: block; width: 100%; height: auto;">
+          <img src="img/hero-1600.webp" alt="Абстракція, олія на полотні" data-en-alt="Abstract oil painting on canvas" width="1582" height="1600" fetchpriority="high" style="display: block; width: 100%; height: auto;">
           <canvas ref="{{ heroCanvasRef }}" class="dc-live" aria-hidden="true"></canvas>
         </div>
       </div>
@@ -726,8 +729,8 @@
   <section id="about" data-recede="1" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <img src="{{ aboutImg1 }}" alt="Катерина у студії" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
-        <img src="{{ aboutImg2 }}" alt="Катерина Онокало" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ aboutImg1 }}" alt="Катерина у студії" data-en-alt="Kateryna in her studio" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
+        <img src="{{ aboutImg2 }}" alt="Катерина Онокало" data-en-alt="Kateryna Onokalo" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <div style="border: 1px solid var(--lnav-b); padding: 18px; display: flex; flex-direction: column; justify-content: flex-end;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 15px; letter-spacing: .3em; color: #D9662A;">2011</div>
           <div style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--lmut); margin-top: 8px;" data-en="first canvas">перше полотно</div>
@@ -759,11 +762,11 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
-        <img src="{{ interiorImg1 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ interiorImg1 }}" alt="Картина в інтер’єрі" data-en-alt="A painting in an interior" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 13.5px; line-height: 1.5; letter-spacing: .01em; color: var(--ink3); margin-top: 12px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
       </figure>
       <figure style="margin: 0;">
-        <img src="{{ interiorImg2 }}" alt="Картина в інтер’єрі" loading="lazy" decoding="async" style="display: block; width: 100%;">
+        <img src="{{ interiorImg2 }}" alt="Картина в інтер’єрі" data-en-alt="A painting in an interior" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 13.5px; line-height: 1.5; letter-spacing: .01em; color: var(--ink3); margin-top: 12px;" data-en="Antique diptych, 2×60×80 — dining room">Диптих «Антика», 2×60×80 — їдальня</figcaption>
       </figure>
     </div>
@@ -860,8 +863,8 @@
           </sc-for>
         </div>
         <div class="dc-strip-nav">
-          <button onClick="{{ wsPrev }}" aria-label="Попередні фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟵</button>
-          <button onClick="{{ wsNext }}" aria-label="Наступні фото" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟶</button>
+          <button onClick="{{ wsPrev }}" aria-label="Попередні фото" data-en-label="Previous photos" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟵</button>
+          <button onClick="{{ wsNext }}" aria-label="Наступні фото" data-en-label="Next photos" style="width: 46px; height: 46px; border-radius: 999px; background: none; border: 1px solid var(--lnav-b); color: var(--ltext); font-size: 14px; cursor: pointer; line-height: 1;" style-hover="border-color: var(--ltext);">⟶</button>
         </div>
       </sc-if>
     </div>
@@ -942,8 +945,8 @@
       <!-- ko:catalog --><details class="dc-catalog"><summary><span data-en="All works">Усі роботи</span><span>18</span></summary><p><b>Сучасні абстракції</b> <a href="w/c5bae920-a47f-4098-a5f6-6cd170601ba2.html">Чисте небо</a>, <a href="w/59d36b02-2bf9-44a8-86f0-4f81676abf1e.html">Зігріті сонцем</a>, <a href="w/b06ea7e8-a1a2-462a-88a2-0aec2b3ed222.html">Ніжний дотик природи</a>, <a href="w/48ad2a24-84cd-4446-b1b7-fd67a741dd08.html">Грайливі барви</a>, <a href="w/d5fc9b81-1263-45ae-acf6-82850c7f0b22.html">Теплий подих вітру</a>, <a href="w/98218ea7-edec-44a1-883d-60f14a6bb546.html">За мить до осені</a>, <a href="w/0b71cf51-7918-4b65-96bd-2eca2f3b3a20.html">Під спекотним сонцем</a>, <a href="w/a884b5c9-9575-41c8-ad1f-41713d534ed4.html">Відтінок дощу</a></p><p><b>Київські пейзажі в сучасному живописі</b> <a href="w/60d5c7f9-9d45-45ed-9784-95cb5aa11ebc.html">Мініатюра Київський пейзаж «Поділ»</a>, <a href="w/24c69565-f7fa-45ad-8928-00803438964b.html">Мініатюра Київський пейзаж «Храм»</a>, <a href="w/7ae3a40b-8799-4628-bcd3-4a336ec3a03d.html">Мініатюра Київський пейзаж «Софіївська площа»</a>, <a href="w/553cc161-b589-47e7-b27e-c166096a9d1f.html">Мініатюра Київський пейзаж «Хрещатик»</a>, <a href="w/d11ab338-4c6e-4be6-bb5d-ebcc31896a29.html">Мініатюра Київський пейзаж «Батьківщина мати»</a>, <a href="w/593c8fa2-034d-4681-8e40-6a859abfb29c.html">Kyiv in the Glow of Sunset</a>, <a href="w/afd50100-ae7a-4835-9005-77d6bbc908e7.html">Mother Ukraine — Guardian of Kyiv</a>, <a href="w/b583141f-3d2b-444c-be6f-ba6318cf1cb6.html">Kyiv in the Gentle Embrace of Dawn</a></p><p><b>Pop-Street Art</b> <a href="w/68c4b0f5-d0d8-4ae4-a3ee-3b147f9f5ec4.html">Route 66</a>, <a href="w/ab0cf2ed-31ed-49eb-9375-6c7d63493e0f.html">Bugs Bunny Love</a></p></details><!-- /ko:catalog -->
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: clamp(40px, 6vw, 80px); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ldim);">
         <span>© 2026 Kateryna Onokalo</span>
-        <a href="delivery.html" data-en="Payment &amp; delivery">Оплата і доставка</a>
-        <a href="privacy.html" data-en="Privacy">Конфіденційність</a>
+        <a href="{{ deliveryHref }}" data-en="Payment &amp; delivery">Оплата і доставка</a>
+        <a href="{{ privacyHref }}" data-en="Privacy">Конфіденційність</a>
         <span data-en="Nizhyn · Ukraine">Ніжин · Україна</span>
       </div>
     </div>
@@ -1066,7 +1069,7 @@
           <sc-if value="{{ notEmpty }}">
             <a href="{{ cartMail }}" style="display: block; width: fit-content; font-size: 12px; line-height: 1.6; color: var(--ink4); margin-top: 10px; border-bottom: 1px solid var(--border);">{{ lNoTg }}</a>
           </sc-if>
-          <a href="delivery.html" target="_blank" rel="noopener" data-en="How payment and delivery work" style="display: block; width: fit-content; font-size: 12px; line-height: 1.6; color: var(--ink4); margin-top: 10px; border-bottom: 1px solid var(--border);">Як проходить оплата і доставка</a>
+          <a href="{{ deliveryHref }}" target="_blank" rel="noopener" data-en="How payment and delivery work" style="display: block; width: fit-content; font-size: 12px; line-height: 1.6; color: var(--ink4); margin-top: 10px; border-bottom: 1px solid var(--border);">Як проходить оплата і доставка</a>
           <sc-if value="{{ hasEtsy }}">
             <a href="{{ etsyUrl }}" target="_blank" rel="noopener" style="display: inline-block; font-size: 12px; line-height: 1.6; color: var(--ink4); margin-top: 10px; border-bottom: 1px solid var(--border);">{{ lEtsy }}</a>
           </sc-if>
@@ -1079,7 +1082,7 @@
     <div style="position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 120; background: var(--navy-bg); color: var(--cream-text); padding: 14px 26px; font-size: 12.5px; letter-spacing: .04em; box-shadow: 0 20px 40px -16px rgba(0,0,0,.5); animation: floatIn .3s ease-out both; max-width: 90vw; text-align: center;">{{ toast }}</div>
   </sc-if>
 
-  <button class="dc-top" onClick="{{ scrollTop }}" aria-label="Вгору" title="Вгору" style="opacity: {{ topOpacity }}; transform: {{ topTransform }}; pointer-events: {{ topPointer }};">
+  <button class="dc-top" onClick="{{ scrollTop }}" aria-label="Вгору" title="Вгору" data-en-label="Back to top" data-en-title="Back to top" style="opacity: {{ topOpacity }}; transform: {{ topTransform }}; pointer-events: {{ topPointer }};">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
 </div>
@@ -1686,7 +1689,7 @@ class Component extends DCLogic {
   workLink(id) {
     const here = location.href.split('#')[0].split('?')[0];
     if (location.protocol === 'file:' || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname)) return here + '#work-' + id;
-    return here.replace(/[^/]*$/, '') + 'w/' + encodeURIComponent(id) + '.html';
+    return here.replace(/[^/]*$/, '') + (this.state.lang === 'en' ? 'en/w/' : 'w/') + encodeURIComponent(id) + '.html';
   }
 
   tgSend(msg) { return this.tgUrl + '?text=' + encodeURIComponent(msg); }
@@ -2034,7 +2037,12 @@ class Component extends DCLogic {
 
   componentDidMount() {
     try { const t = localStorage.getItem('ko_theme') === 'light' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); if (t !== this.state.theme) this.setState({ theme: t }); } catch (e) {}
-    try { if (localStorage.getItem('ko_lang') === 'en') this.setState({ lang: 'en' }); } catch (e) {}
+    try {
+      const q = new URLSearchParams(location.search).get('lang');
+      const want = q === 'en' ? 'en' : q === 'uk' || q === 'ua' ? 'ua' : (localStorage.getItem('ko_lang') === 'en' ? 'en' : 'ua');
+      if (q) localStorage.setItem('ko_lang', want);
+      if (want === 'en') this.setState({ lang: 'en' });
+    } catch (e) {}
     try {
       const c = JSON.parse(localStorage.getItem('ko_cart') || '[]');
       if (Array.isArray(c) && c.length) { this._savedCart = JSON.stringify(c); this.setState({ cart: c.filter(x => typeof x === 'string').slice(0, 60) }); }
@@ -2223,10 +2231,40 @@ class Component extends DCLogic {
     return el.getAttribute('data-key') || ((el.closest('.dc-nav, .dc-mmenu') ? 'menu:' : '') + ua);
   }
 
+  // <head> in the visitor's language: title, description, canonical (?lang=en is its own page for search engines).
+  applyHead(en) {
+    if (this._headLang === en) return;
+    this._headLang = en;
+    const d = document, meta = (sel) => d.querySelector(sel);
+    if (!this._headUa) this._headUa = { title: d.title, desc: (meta('meta[name="description"]') || {}).content || '', canon: (meta('link[rel="canonical"]') || {}).href || '' };
+    const ua = this._headUa;
+    d.title = en ? 'Kateryna Onokalo — abstract paintings, original art and commissions' : ua.title;
+    const m = meta('meta[name="description"]');
+    if (m) m.content = en ? 'Kateryna Onokalo is a Ukrainian artist: abstract paintings in oil and acrylic, palette-knife landscapes of Kyiv, commissions for your interior and on-site painting workshops. Shipping within Ukraine and worldwide.' : ua.desc;
+    const c = meta('link[rel="canonical"]');
+    if (c && ua.canon) c.href = en ? ua.canon.replace(/\/?$/, '/') + '?lang=en' : ua.canon;
+    const ol = meta('meta[property="og:locale"]');
+    if (ol) ol.content = en ? 'en_US' : 'uk_UA';
+  }
+
   applyLang() {
     const r = this.rootRef.current;
     if (!r) return;
     const en = this.state.lang === 'en';
+    this.applyHead(en);
+    // aria-label / title / alt of static elements: data-en-label / data-en-title / data-en-alt (original kept in data-ua-*)
+    [['label', 'aria-label'], ['title', 'title'], ['alt', 'alt']].forEach(([k, attr]) => {
+      r.querySelectorAll('[data-en-' + k + ']').forEach((x) => {
+        if (!x.hasAttribute('data-ua-' + k)) x.setAttribute('data-ua-' + k, x.getAttribute(attr) || '');
+        const v = x.getAttribute((en ? 'data-en-' : 'data-ua-') + k);
+        if (x.getAttribute(attr) !== v) x.setAttribute(attr, v);
+      });
+    });
+    // «Усі роботи» (plain links written by the bot) → the work pages in the visitor's language
+    r.querySelectorAll('.dc-catalog a[href]').forEach((x) => {
+      const hr = x.getAttribute('href'), want = en ? hr.replace(/^w\//, 'en/w/') : hr.replace(/^en\/w\//, 'w/');
+      if (want !== hr) x.setAttribute('href', want);
+    });
     const edits = this.textEdits();
     document.documentElement.lang = en ? 'en' : 'uk';
     r.querySelectorAll('[data-en]').forEach(el => {
@@ -2514,9 +2552,17 @@ class Component extends DCLogic {
       heroCanvasRef: this.heroCanvasRef,
       ribbon: this.props.showCollabRibbon ?? true,
       langLabel: l === 'ua' ? 'EN' : 'UA',
+      deliveryHref: l === 'en' ? 'en/delivery.html' : 'delivery.html',
+      privacyHref: l === 'en' ? 'en/privacy.html' : 'privacy.html',
       toggleLang: () => {
         const next = l === 'ua' ? 'en' : 'ua';
         try { localStorage.setItem('ko_lang', next); } catch (e) {}
+        // the address says the language, so a copied link opens in it (?lang=en; Ukrainian = no parameter)
+        try {
+          const u = new URL(location.href);
+          if (next === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
+          history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+        } catch (e) {}
         this.setState({ lang: next });
       },
       theme: this.state.theme,
