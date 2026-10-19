@@ -424,7 +424,7 @@
             <a href="{{ shopHref }}" class="dc-dd-toggle" data-en="Shop">Магазин</a>
             <div class="dc-dd-menu">
               <div class="dc-dd-box">
-                <sc-if value="{{ hasPaper }}"><a href="#paper" data-en="Postcards &amp; bookmarks">Листівки і закладинки</a></sc-if>
+                <sc-if value="{{ hasPaper }}"><a href="#paper" data-en="Postcards &amp; posters">Листівки та постери</a></sc-if>
                 <sc-if value="{{ hasBoxes }}"><a href="#boxes" data-en="Branded goods">Брендована продукція</a></sc-if>
               </div>
             </div>
@@ -466,7 +466,7 @@
         </div>
         <a href="#order" onClick="{{ closeMenu }}" data-en="Commission" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">На замовлення</a>
         <sc-if value="{{ hasPaper }}">
-          <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards &amp; bookmarks" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки і закладинки</a>
+          <a href="#paper" onClick="{{ closeMenu }}" data-en="Postcards &amp; posters" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Листівки та постери</a>
         </sc-if>
         <sc-if value="{{ hasBoxes }}">
           <a href="#boxes" onClick="{{ closeMenu }}" data-en="Branded goods" style="padding: 14px 0; font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--border);" style-hover="color: #B4501C;">Брендована продукція</a>
@@ -620,7 +620,7 @@
       <div style="max-width: 1680px; margin: 0 auto; padding: clamp(48px, 7vw, 100px) clamp(18px, 4vw, 52px);">
         <div style="padding-bottom: 26px; border-bottom: 1px solid var(--border); margin-bottom: clamp(28px, 4vw, 48px);">
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta);" data-en="Paper">Папір</div>
-          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original postcards and bookmarks">Авторські листівки і закладинки</h2>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); margin: 12px 0 0;" data-en="Original postcards and posters">Авторські листівки та постери</h2>
           <p style="font-size: 13.5px; line-height: 1.6; color: var(--ink5); margin: 12px 0 0;" data-en="In stock — ships within 2–3 days.">У наявності — відправка за 2–3 дні.</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 240px), 1fr)); gap: clamp(34px, 3.4vw, 52px) clamp(14px, 2vw, 30px); align-items: start;">
@@ -1188,7 +1188,7 @@ class Component extends DCLogic {
       projIntro: 'Ці роботи вже живуть у своїх власників. Будь-яку з них я можу написати для вас ще раз — у вашому розмірі, зі змінами в кольорах чи деталях.',
       etsy: 'Живете за кордоном? Можна замовити й через мій магазин на Etsy ↗',
       share: 'Поділитися', linkCopied: 'Посилання скопійовано',
-      paperName: 'Листівки і закладинки', boxesName: 'Брендована продукція', inStock: 'В наявності',
+      paperName: 'Листівки та постери', boxesName: 'Брендована продукція', inStock: 'В наявності',
       orderHead: 'Вітаю! Хочу замовити:', totalLine: 'Разом: ',
       commHead: 'Вітаю! Хочу замовити картину.', name: 'Ім’я: ', contact: 'Контакт: ', idea: 'Ідея: ', mailSubj: 'Запит на картину на замовлення' },
     en: { size: 'Size', tech: 'Technique', year: 'Year', one: 'One of a kind', add: 'Add to cart', ask: 'Ask in Telegram',
@@ -1215,7 +1215,7 @@ class Component extends DCLogic {
       projIntro: 'These works already live with their owners. I can paint any of them again for you — in your size, with changes to the colours or details.',
       etsy: 'Outside Ukraine? You can also order via my Etsy shop ↗',
       share: 'Share', linkCopied: 'Link copied',
-      paperName: 'Postcards & bookmarks', boxesName: 'Branded goods', inStock: 'In stock',
+      paperName: 'Postcards & posters', boxesName: 'Branded goods', inStock: 'In stock',
       orderHead: 'Hello! I would like to order:', totalLine: 'Total: ',
       commHead: 'Hello! I would like to commission a painting.', name: 'Name: ', contact: 'Contact: ', idea: 'Idea: ', mailSubj: 'Commission request' }
   };

@@ -9,6 +9,8 @@
 //    work linking to its page (in the contact section) — readable without JS.
 //  · en/w/<id>.html — the same page in English (title_en / tech_en / description_en, hall name_en), hreflang pairs.
 //  · sitemap.xml — the site (UA + ?lang=en), info pages and every work page in both languages (with its image).
+//  · w/products.xml — Google Merchant Center feed (free «Shopping» listings): every visible painting with a price
+//    and a photo, linked to its w/<id>.html page. Sold works drop out, reserved ones become out of stock.
 // Nothing is rewritten when nothing changed. Run by .github/workflows/work-previews.yml (needs `sharp`).
 // Local test without Supabase (in a copy of the repo — it rewrites index.html and sitemap.xml in place):
 //   PREVIEW_ITEMS=data.json node .github/scripts/work-previews.mjs
@@ -418,6 +420,44 @@ let curMap = '';
 try { curMap = await fs.readFile(path.join(ROOT, 'sitemap.xml'), 'utf8'); } catch (e) {}
 if (curMap !== sitemap) await fs.writeFile(path.join(ROOT, 'sitemap.xml'), sitemap);
 
+// Google Merchant Center feed (RSS 2.0 + g: namespace), submitted once by hand as <site>/w/products.xml.
+// Only priced, visible paintings with a real page: Merchant needs a price, a landing page and a description.
+const feedItems = works.filter(it => it.price > 0 && next[String(it.id)] && statusOf(it.id) !== 'sold').map((it) => {
+  const id = String(it.id);
+  const title = [titleOf(it), String(it.tech || '').trim(), fmtSize(it.size)].filter(Boolean).join(', ');
+  const desc = (String(it.description || '').trim() || `Авторська картина Катерини Онокало. ${detailsOf(it)}.`).replace(/\s+/g, ' ').slice(0, 4900);
+  const type = String(it.hall || '').trim();
+  return `  <item>
+   <g:id>${esc(id)}</g:id>
+   <g:title>${esc(title.slice(0, 150))}</g:title>
+   <g:description>${esc(desc)}</g:description>
+   <g:link>${esc(pageUrl(id, 'uk'))}</g:link>
+   <g:image_link>${esc(it.img)}</g:image_link>
+   <g:availability>${statusOf(id) === 'reserved' ? 'out_of_stock' : 'in_stock'}</g:availability>
+   <g:price>${Number(it.price)}.00 UAH</g:price>
+   <g:condition>new</g:condition>
+   <g:brand>Kateryna Onokalo</g:brand>
+   <g:identifier_exists>no</g:identifier_exists>
+   <g:google_product_category>500044</g:google_product_category>${type ? `
+   <g:product_type>${esc('Картини > ' + type)}</g:product_type>` : ''}
+  </item>`;
+});
+const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- Written by .github/scripts/work-previews.mjs: Google Merchant Center feed of the paintings for sale. -->
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+ <channel>
+  <title>Катерина Онокало — авторські картини</title>
+  <link>${esc(site)}</link>
+  <description>Авторський живопис Катерини Онокало: картини олією та акрилом у наявності.</description>
+${feedItems.join('\n')}
+ </channel>
+</rss>
+`;
+const FEED = path.join(OUT, 'products.xml');
+let curFeed = '';
+try { curFeed = await fs.readFile(FEED, 'utf8'); } catch (e) {}
+if (curFeed !== feed) await fs.writeFile(FEED, feed);
+
 await fs.writeFile(MANIFEST, JSON.stringify({ home, works: next }, null, 1) + '\n');
-console.log(`works: ${works.length}, images rendered: ${rendered}, pages written: ${pages}, files removed: ${removed}, failed: ${failed}, index.html ${homeChanged ? 'updated' : 'unchanged'}, sitemap ${curMap !== sitemap ? 'updated' : 'unchanged'}`);
+console.log(`works: ${works.length}, images rendered: ${rendered}, pages written: ${pages}, files removed: ${removed}, failed: ${failed}, index.html ${homeChanged ? 'updated' : 'unchanged'}, sitemap ${curMap !== sitemap ? 'updated' : 'unchanged'}, feed: ${feedItems.length} items ${curFeed !== feed ? '(updated)' : '(unchanged)'}`);
 if (failed && failed === works.length) process.exit(1);
