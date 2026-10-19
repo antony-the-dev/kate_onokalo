@@ -373,6 +373,13 @@
   /* invisible touch padding: small header/cart buttons get a ~44px target without changing how they look */
   .dc-hit { position: relative; }
   .dc-hit::after { content: ''; position: absolute; inset: -8px -5px; }
+  @media (max-width: 374px) {
+    /* 320px phones: the header row (burger + logo + lang/theme/cart) is wider than the screen without this */
+    .dc-logo > span:first-child { font-size: 16px !important; letter-spacing: .1em !important; }
+    .dc-header-inner .dc-logo-sub { font-size: 8px !important; letter-spacing: .12em !important; }
+    .dc-hright { gap: 6px !important; }
+    .dc-hright button:first-child { padding: 6px 8px !important; letter-spacing: .1em !important; }
+  }
   @media (max-width: 560px) {
     .dc-add { padding: 10px 14px !important; }
     .dc-hright { gap: 10px !important; }
@@ -480,7 +487,7 @@
     </div>
   </sc-if>
 
-  <section id="top" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
+  <section id="top" data-recede="1" style="max-width: 1680px; margin: 0 auto; padding: clamp(40px, 7vw, 96px) clamp(18px, 4vw, 52px) clamp(48px, 8vw, 110px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(32px, 6vw, 80px); align-items: center; min-height: 78vh;">
     <div style="animation: floatIn .9s ease-out both;">
       <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 26px;" data-en="Abstraction · Oil · Acrylic">Абстракція · Олія · Акрил</div>
       <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(46px, 7.4vw, 108px); line-height: .95; letter-spacing: -.02em; margin: 0 0 28px;">
@@ -508,12 +515,12 @@
     </div>
     <div style="position: relative; display: flex; justify-content: center; animation: floatIn 1.1s .1s ease-out both;">
       <div style="animation: breathe 6.3s ease-in-out infinite;">
-        <div ref="{{ heroRef }}" style="position: relative; width: min(560px, 82vw); box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
+        <div ref="{{ heroRef }}" style="position: relative; width: min(560px, 82vw, 100%); box-shadow: 0 60px 90px -40px rgba(20,19,15,.55), 0 4px 12px rgba(20,19,15,.18);">
           <img src="img/hero-1600.webp" alt="Абстракція, олія на полотні" data-en-alt="Abstract oil painting on canvas" width="1582" height="1600" fetchpriority="high" style="display: block; width: 100%; height: auto;">
           <canvas ref="{{ heroCanvasRef }}" class="dc-live" aria-hidden="true"></canvas>
         </div>
       </div>
-      <div style="position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); width: min(620px, 90vw); height: 60px; background: radial-gradient(ellipse at center, rgba(20,19,15,.16), transparent 70%);"></div>
+      <div style="position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); width: min(620px, 90vw, 120%); height: 60px; background: radial-gradient(ellipse at center, rgba(20,19,15,.16), transparent 70%);"></div>
     </div>
   </section>
 
@@ -727,7 +734,7 @@
   </sc-if>
 
   <section id="about" data-recede="1" style="background: var(--navy-bg); color: var(--ltext);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 9vw, 130px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(32px, 5vw, 80px); align-items: center;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <img src="{{ aboutImg1 }}" alt="Катерина у студії" data-en-alt="Kateryna in her studio" loading="lazy" decoding="async" style="display: block; width: 100%; grid-row: span 2; object-fit: cover; height: 100%;">
         <img src="{{ aboutImg2 }}" alt="Катерина Онокало" data-en-alt="Kateryna Onokalo" loading="lazy" decoding="async" style="display: block; width: 100%;">
@@ -760,7 +767,7 @@
       </div>
       <p class="dc-aside" style="max-width: 36ch;" data-en="Send me a photo of your wall — I will show the painting in scale before you decide.">Надішліть фото своєї стіни — покажу картину в масштабі, ще до рішення.</p>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(18px, 2.5vw, 34px);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(18px, 2.5vw, 34px);">
       <figure style="margin: 0;">
         <img src="{{ interiorImg1 }}" alt="Картина в інтер’єрі" data-en-alt="A painting in an interior" loading="lazy" decoding="async" style="display: block; width: 100%;">
         <figcaption style="font-size: 13.5px; line-height: 1.5; letter-spacing: .01em; color: var(--ink3); margin-top: 12px;" data-en="«City on Water», 90×90 — living room">«Місто на воді», 90×90 — вітальня</figcaption>
@@ -773,7 +780,7 @@
   </section>
 
   <section id="order" data-recede="1" style="background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 88px); align-items: start;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(32px, 5vw, 88px); align-items: start;">
       <div>
         <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 22px;" data-en="Commission">На замовлення</div>
         <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4vw, 54px); line-height: 1.08; margin: 0 0 26px;" data-en="A painting made for your room">Картина, яку я напишу під вашу кімнату</h2>
@@ -910,7 +917,7 @@
 
   <section id="contact" style="background: var(--navy-bg); color: var(--ltext);">
     <div style="max-width: 1680px; margin: 0 auto; padding: clamp(56px, 8vw, 120px) clamp(18px, 4vw, 52px);">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(32px, 5vw, 70px); align-items: end;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(32px, 5vw, 70px); align-items: end;">
         <div>
           <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--lgold); margin-bottom: 22px;" data-en="Contact">Контакти</div>
           <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 4.2vw, 58px); line-height: 1.05; margin: 0 0 22px;" data-en="Write to me">Напишіть мені</h2>
@@ -954,7 +961,7 @@
 
   <sc-if value="{{ active }}" hint-placeholder-val="{{ false }}">
     <div class="dc-modal" ref="{{ sheetRef }}" data-sheet="work" role="dialog" aria-modal="true" aria-label="{{ aTitle }}" onClick="{{ closeWork }}" style="position: fixed; inset: 0; overscroll-behavior: contain; z-index: 90; background: rgba(10,28,59,.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 44px); animation: floatIn .35s ease-out both; overflow-y: auto;">
-      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; margin: auto 0; color: var(--ltext);">
+      <div onClick="{{ stop }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(24px, 4vw, 60px); align-items: center; max-width: 1400px; width: 100%; margin: auto 0; color: var(--ltext);">
         <div style="display: flex; justify-content: center; min-width: 0;">
           <div class="dc-sheen dc-fit" style="--r: {{ aRatio }};" onPointerMove="{{ sheenMove }}" onPointerLeave="{{ sheenLeave }}">
             <img src="{{ aThumb }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
